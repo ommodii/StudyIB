@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-color="physics">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IB Science QBank</title>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="atom.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation (RevisionDojo Style) -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.5" fill="none"
+                    class="brand-logo">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                </svg>
+                <span>IB Science QBank</span>
+            </div>
+
+            <div class="sidebar-nav">
+                <a class="nav-link active" id="sidebarHome">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
+                    <span>Home</span>
+                </a>
+
+                <div class="nav-section-title">My Subjects</div>
+                <a class="nav-link" id="sidebarSubPhysics" data-subject="physics">
+                    <div class="nav-dot physics-dot"></div>
+                    <span>IB Physics HL</span>
+                </a>
+                <a class="nav-link" id="sidebarSubChem" data-subject="chemistry">
+                    <div class="nav-dot chem-dot"></div>
+                    <span>IB Chemistry HL</span>
+                </a>
+                <a class="nav-link" id="sidebarSubALevPhysics" data-subject="alevel_physics">
+                    <div class="nav-dot alevel-physics-dot"></div>
+                    <span>A-Level Physics</span>
+                </a>
+                <a class="nav-link" id="sidebarSubALevChem" data-subject="alevel_chemistry">
+                    <div class="nav-dot alevel-chem-dot"></div>
+                    <span>A-Level Chemistry</span>
+                </a>
+
+                <div class="nav-section-title">Study Tools</div>
+                <a class="nav-link" id="predictorBtn">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="9" y1="9" x2="15" y2="15"></line>
+                        <line x1="15" y1="9" x2="9" y2="15"></line>
+                    </svg>
+                    <span>Score Predictor</span>
+                </a>
+                <a class="nav-link" id="sidebarMock">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    </svg>
+                    <span>Mock Simulator</span>
+                </a>
+                <a class="nav-link" id="sidebarAtom">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="12" y1="3" x2="12" y2="21"></line>
+                        <path d="M16.24 7.76l-8.48 8.48"></path>
+                        <path d="M7.76 7.76l8.48 8.48"></path>
+                    </svg>
+                    <span>Atom Notes</span>
+                </a>
+                <a class="nav-link" id="sidebarReviews">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
+                        <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline>
+                        <path
+                            d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z">
+                        </path>
+                    </svg>
+                    <span>Review Queue</span>
+                </a>
+                <a class="nav-link" id="shopBtn">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
+                        <circle cx="9" cy="21" r="1"></circle>
+                        <circle cx="20" cy="21" r="1"></circle>
+                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                    </svg>
+                    <span>Cosmetic Shop</span>
+                </a>
+            </div>
+
+            <!-- Profile Widget Footer Card -->
+            <div class="sidebar-profile-card">
+                <div class="profile-avatar">PI</div>
+                <div class="profile-meta">
+                    <div class="profile-name">PirateIB</div>
+                    <div class="profile-title" id="profileTitleLabel">Candidate HL</div>
+                </div>
+                <button class="settings-gear-btn" id="settingsBtn" aria-label="Settings">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path
+                            d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Hidden compatibility target for gamification script -->
+            <div id="gamificationWidget" style="display: none;"></div>
+        </aside>
+
+        <!-- Sidebar Mobile Backdrop Overlay -->
+        <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+        <!-- Main Content Area -->
+        <main class="content-area" id="mainContentArea">
+            <div class="list-pane">
+                <header class="content-header">
+                    <button class="sidebar-toggle-btn" id="sidebarToggle" aria-label="Toggle Navigation Sidebar">
+                        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.5" fill="none">
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                    </button>
+                    <div id="breadcrumb" class="breadcrumb-trail">Dashboard</div>
+                    <div class="header-title-row">
+                        <h2 id="currentCategoryTitle">Select a Topic</h2>
+                        <div class="header-right">
+                            <div id="paperFilter" class="paper-filter hidden">
+                                <button class="filter-btn active" data-filter="all">All</button>
+                                <button class="filter-btn" data-filter="P1">Paper 1</button>
+                                <button class="filter-btn" data-filter="P2">Paper 2</button>
+                            </div>
+                            <div class="stats" id="categoryStats"></div>
+                        </div>
+                    </div>
+                </header>
+
+                <div class="papers-grid" id="papersGrid">
+                    <!-- PDF cards will be injected here -->
+                    <div class="empty-state">
+                        <svg viewBox="0 0 24 24" width="48" height="48" stroke="currentColor" stroke-width="1.5"
+                            fill="none">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                        <h3>Explore Past Papers</h3>
+                        <p>Select a topic from the sidebar to view questions.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resize Handle -->
+            <div class="resize-handle" id="resizeHandle">
+                <div class="resize-grip"></div>
+            </div>
+
+            <!-- PDF Viewer Pane -->
+            <div class="viewer-pane" id="viewerPane">
+                <div class="viewer-header">
+                    <h3 id="viewerTitle">No PDF Selected</h3>
+                    <div class="viewer-toolbar" id="pdfToolbar">
+                        <!-- Tools -->
+                        <button class="tool-btn" id="toolZoomOut" title="Zoom Out"><svg viewBox="0 0 24 24" width="16"
+                                height="16" stroke="currentColor" stroke-width="2" fill="none">
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg></button>
+                        <span id="zoomDisplay" class="toolbar-text">100%</span>
+                        <button class="tool-btn" id="toolZoomIn" title="Zoom In"><svg viewBox="0 0 24 24" width="16"
+                                height="16" stroke="currentColor" stroke-width="2" fill="none">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg></button>
+
+                        <div class="toolbar-divider"></div>
+
+                        <button class="tool-btn" id="toolPan" title="Pan (Scroll)"><svg viewBox="0 0 24 24" width="16"
+                                height="16" stroke="currentColor" stroke-width="2" fill="none">
+                                <path d="M5 9l-3 3 3 3M9 5l3-3 3 3M19 9l3 3-3 3M9 19l3 3 3-3M2 12h20M12 2v20"></path>
+                            </svg></button>
+                        <button class="tool-btn" id="toolDraw" title="Draw (Pencil)"><svg viewBox="0 0 24 24" width="16"
+                                height="16" stroke="currentColor" stroke-width="2" fill="none">
+                                <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
+                            </svg></button>
+                        <button class="tool-btn" id="toolHighlight" title="Highlight"><svg viewBox="0 0 24 24"
+                                width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
+                                <path d="M12 19l7-7 3 3-7 7-3-3z"></path>
+                                <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path>
+                                <path d="M2 2l7.586 7.586"></path>
+                                <circle cx="11" cy="11" r="2"></circle>
+                            </svg></button>
+                        <button class="tool-btn" id="toolText" title="Type Text"><svg viewBox="0 0 24 24" width="16"
+                                height="16" stroke="currentColor" stroke-width="2" fill="none">
+                                <polyline points="4 7 4 4 20 4 20 7"></polyline>
+                                <line x1="9" y1="20" x2="15" y2="20"></line>
+                                <line x1="12" y1="4" x2="12" y2="20"></line>
+                            </svg></button>
+                        <button class="tool-btn danger-text" id="toolClear" title="Clear Annotations"><svg
+                                viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2"
+                                fill="none">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path
+                                    d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                                </path>
+                            </svg></button>
+
+                        <div class="toolbar-divider"></div>
+
+                        <button id="markschemeToggle" class="ms-toggle-btn hidden">
+                            <span class="ms-text">Markscheme</span>
+                        </button>
+
+                        <button id="completeToggle" class="complete-btn hidden">
+                            <span class="complete-text">Mark as Complete</span>
+                        </button>
+
+                        <div id="srsRatingGroup" class="srs-rating-group hidden">
+                            <button class="srs-rating-btn easy" data-difficulty="easy"
+                                title="Review in 2+ days">Easy</button>
+                            <button class="srs-rating-btn medium" data-difficulty="medium"
+                                title="Review tomorrow">Medium</button>
+                            <button class="srs-rating-btn hard" data-difficulty="hard"
+                                title="Review in 4 hours">Hard</button>
+                        </div>
+
+                        <button class="tool-btn" id="toolFullscreen" title="Fullscreen"><svg viewBox="0 0 24 24"
+                                width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
+                                <polyline points="15 3 21 3 21 9"></polyline>
+                                <polyline points="9 21 3 21 3 15"></polyline>
+                                <line x1="21" y1="3" x2="14" y2="10"></line>
+                                <line x1="3" y1="21" x2="10" y2="14"></line>
+                            </svg></button>
+
+                        <button id="launchAtomBtn" class="primary-btn" style="padding: 0.4rem 0.8rem; background: var(--accent); border-radius: var(--radius-md); font-weight: 700; display: flex; align-items: center; gap: 6px; font-size: 0.8rem; border: none; cursor: pointer; color: white;" title="Open this paper inside the Atom Note-taking workspace">
+                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none" style="vertical-align: middle;"><circle cx="12" cy="12" r="3"></circle><line x1="3" y1="12" x2="21" y2="12"></line><line x1="12" y1="3" x2="12" y2="21"></line><path d="M16.24 7.76l-8.48 8.48"></path><path d="M7.76 7.76l8.48 8.48"></path></svg>
+                            <span>Launch in Atom</span>
+                        </button>
+
+                        <button id="closeViewerBtn" class="close-btn" aria-label="Close Viewer">
+                            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2"
+                                fill="none">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div id="blitzHeader" class="blitz-header hidden">
+                    <div class="blitz-progress-text" id="blitzProgressText">⚡ Blitz Challenge: Question <span
+                            id="blitzIndexText">1</span> of 5</div>
+                    <div id="mockTogglesContainer" class="mock-toggles-container hidden"></div>
+                    <div class="blitz-timer-container">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5"
+                            fill="none" style="margin-right: 4px; vertical-align: middle;">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        <span id="blitzTimerText" style="vertical-align: middle;">03:00</span>
+                    </div>
+                    <div class="blitz-controls" id="blitzControls">
+                        <button id="blitzCompleteBtn" class="blitz-btn success">Solve & Next</button>
+                        <button id="blitzSkipBtn" class="blitz-btn secondary">Skip</button>
+                        <button id="blitzExitBtn" class="blitz-btn danger">Exit Blitz</button>
+                    </div>
+                    <div class="blitz-controls hidden" id="mockControls">
+                        <button id="mockFinishBtn" class="blitz-btn success">Finish Mock</button>
+                        <button id="mockExitBtn" class="blitz-btn danger">Exit Mock</button>
+                    </div>
+                </div>
+                <div id="pdfContainer" class="pdf-container">
+                    <!-- Dynamic pages go here -->
+                </div>
+            </div>
+        </main>
+
+        <!-- Atom Workspace -->
+        <div id="atomWorkspace" class="atom-workspace hidden">
+            <!-- Header bar -->
+            <div class="atom-dashboard-header">
+                <div class="atom-dashboard-title">
+                    <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2.5" fill="none" style="vertical-align: middle; margin-right: 6px;"><circle cx="12" cy="12" r="3"></circle><line x1="3" y1="12" x2="21" y2="12"></line><line x1="12" y1="3" x2="12" y2="21"></line><path d="M16.24 7.76l-8.48 8.48"></path><path d="M7.76 7.76l8.48 8.48"></path></svg>
+                    <span>Atom Notes</span>
+                </div>
+                <div class="atom-dashboard-actions">
+                    <button class="primary-btn" id="atomBackBtn" style="padding: 0.5rem 1rem; border-radius: var(--radius-md); font-weight: 700; background: var(--bg-elevated); border: 1px solid var(--border-light); cursor: pointer; color: var(--text-primary); display: flex; align-items: center; gap: 4px;">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none" style="margin-right: 6px; vertical-align: middle;"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                        <span>Dashboard</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- View 1: Dashboard -->
+            <div id="atomDashboardView" style="flex:1; display:flex; flex-direction:column; overflow:hidden;">
+                <div style="display:flex; justify-content:space-between; align-items:center; padding: 1rem 2rem; border-bottom:1px solid var(--border-light); background: rgba(0,0,0,0.15);">
+                    <div style="color:var(--text-muted); font-size:var(--text-sm); font-weight:600;">My Notebooks & PDF Annotations</div>
+                    <button class="primary-btn" id="atomNewBtn" style="padding: 0.5rem 1.2rem; border-radius: var(--radius-full); font-weight: 700; background: var(--accent); color: white; border: none; cursor: pointer; display: flex; align-items: center; gap: 4px; box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3);">
+                        <span>+</span> New Notebook
+                    </button>
+                </div>
+                <div class="atom-grid" id="atomGrid">
+                    <!-- Notebook cards go here -->
+                </div>
+            </div>
+
+            <!-- View 2: Editor -->
+            <div id="atomEditorView" class="atom-editor hidden">
+                <!-- Floating Editor Tool Bar -->
+                <div class="atom-floating-toolbar">
+                    <!-- Tool Selectors -->
+                    <div class="atom-tool-group">
+                        <button class="atom-toolbar-btn active" data-tool="pen" title="Pen Tool (Sketch)">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
+                        </button>
+                        <button class="atom-toolbar-btn" data-tool="highlighter" title="Highlighter (Semi-transparent)">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M12 19l7-7 3 3-7 7-3-3z"></path><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path></svg>
+                        </button>
+                        <button class="atom-toolbar-btn" data-tool="eraser" title="Eraser (Erase Strokes)">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M20 20H7L3 16c-1.5-1.5-1.5-3.5 0-5l8.5-8.5c1.5-1.5 3.5-1.5 5 0l4 4c1.5 1.5 1.5 3.5 0 5L12 20"></path><line x1="12" y1="11" x2="20" y2="19"></line></svg>
+                        </button>
+                        <button class="atom-toolbar-btn" data-tool="text" title="Text Overlay (Click to Type)">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="4 7 4 4 20 4 20 7"></polyline><line x1="9" y1="20" x2="15" y2="20"></line><line x1="12" y1="4" x2="12" y2="20"></line></svg>
+                        </button>
+                        <button class="atom-toolbar-btn" data-tool="pan" title="Pan (Scroll / View)">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M5 9l-3 3 3 3M9 5l3-3 3 3M19 9l3 3-3 3M9 19l3 3 3-3M2 12h20M12 2v20"></path></svg>
+                        </button>
+                    </div>
+
+                    <div class="atom-toolbar-divider"></div>
+
+                    <!-- Colors Quick Picker -->
+                    <div class="atom-tool-group" style="gap: 0.5rem;">
+                        <button class="atom-color-dot active" style="background:#E11D48;" data-color="#E11D48"></button>
+                        <button class="atom-color-dot" style="background:#3B82F6;" data-color="#3B82F6"></button>
+                        <button class="atom-color-dot" style="background:#10B981;" data-color="#10B981"></button>
+                        <button class="atom-color-dot" style="background:#F59E0B;" data-color="#F59E0B"></button>
+                        <button class="atom-color-dot" style="background:#FFFFFF; border: 1px solid rgba(255,255,255,0.2);" data-color="#FFFFFF"></button>
+                    </div>
+
+                    <div class="atom-toolbar-divider"></div>
+
+                    <!-- Stroke Width Size Slider -->
+                    <div class="atom-tool-group">
+                        <input type="range" id="atomStrokeSlider" class="atom-stroke-slider" min="1" max="20" value="3">
+                    </div>
+
+                    <div class="atom-toolbar-divider"></div>
+
+                    <!-- Undo & PDF Save Buttons -->
+                    <div class="atom-tool-group">
+                        <button class="atom-toolbar-btn" id="atomUndoBtn" title="Undo Annotation">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M3 7v6h6"></path><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"></path></svg>
+                        </button>
+                        <button class="atom-toolbar-btn" id="atomSaveBtn" title="Save Notebook" style="color:var(--color-success);">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Page Thumbnails Panel (Left) -->
+                <div class="atom-thumbnails-sidebar">
+                    <div class="atom-thumbnails-header">Pages</div>
+                    <div class="atom-thumbnails-list" id="atomThumbnailsList">
+                        <!-- Dynamic page thumbnails -->
+                    </div>
+                </div>
+
+                <!-- Document Viewport Canvases (Center) -->
+                <div class="atom-viewport" id="atomViewport">
+                    <!-- Pages Cards are dynamically rendered here -->
+                </div>
+
+                <!-- Floating Bottom FAB to Add Sheets -->
+                <button class="atom-add-page-fab" id="atomAddPageBtn">
+                    <span>+</span> Add Ruled Sheet
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Exam Timer Widget -->
+    <div id="examTimer" class="exam-timer hidden">
+        <div class="timer-display" id="timerDisplay">00:00</div>
+        <div class="timer-controls">
+            <button id="timerPlayPause" class="icon-btn">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
+                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                </svg>
+            </button>
+            <button id="timerStop" class="icon-btn">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Settings & Preferences</h3>
+                <button id="closeSettingsBtn" class="close-btn">
+                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="setting-group">
+                    <label>Appearance</label>
+                    <div class="theme-toggles">
+                        <button class="theme-btn" data-theme="light">Light</button>
+                        <button class="theme-btn active" data-theme="dark">Dark</button>
+                    </div>
+                </div>
+                <div class="setting-group">
+                    <label>Accent Color</label>
+                    <div class="color-picker">
+                        <button class="color-btn active" style="background: #4F46E5" data-color="indigo"></button>
+                        <button class="color-btn" style="background: #2563EB" data-color="blue"></button>
+                        <button class="color-btn" style="background: #059669" data-color="green"></button>
+                        <button class="color-btn" style="background: #D97706" data-color="orange"></button>
+                        <button class="color-btn" style="background: #E11D48" data-color="rose"></button>
+                    </div>
+                </div>
+                <div class="setting-group">
+                    <label>Exam Mode Timer</label>
+                    <p class="setting-desc">Set a timer for full papers or specific questions.</p>
+                    <div class="timer-input-group">
+                        <input type="number" id="timerInput" value="45" min="1" max="300" class="timer-input">
+                        <span class="timer-suffix">mins</span>
+                        <button id="startTimerBtn" class="primary-btn">Start Timer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cosmetic Shop Modal -->
+    <div id="shopModal" class="modal-overlay hidden">
+        <div class="modal-content shop-modal-content">
+            <div class="modal-header">
+                <h3>Cosmetic Shop</h3>
+                <button id="closeShopBtn" class="close-btn">
+                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="shop-balance">
+                    <span>Balance:</span> <span><strong id="shopBalance">0</strong> DP Points 🪙</span>
+                </div>
+                <div class="shop-tabs">
+                    <button class="shop-tab-btn active" data-tab="themes">Themes</button>
+                    <button class="shop-tab-btn" data-tab="titles">Titles</button>
+                </div>
+                <div class="shop-items-container" id="shopItemsContainer">
+                    <!-- Shop items will be rendered dynamically here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mock Generator Modal -->
+    <div id="mockGeneratorModal" class="modal-overlay hidden">
+        <div class="modal-content mock-modal-content">
+            <div class="modal-header">
+                <h3>📝 Mock Paper Generator</h3>
+                <button id="closeMockGeneratorBtn" class="close-btn">
+                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="mock-config-group">
+                    <label class="mock-config-label">Paper Type</label>
+                    <div class="mock-paper-types" id="mockPaperTypes">
+                        <button class="mock-paper-btn active" data-paper="P1">Paper 1</button>
+                        <button class="mock-paper-btn" data-paper="P2">Paper 2</button>
+                        <button class="mock-paper-btn" data-paper="mixed">Mixed</button>
+                    </div>
+                </div>
+                <div class="mock-config-group">
+                    <label class="mock-config-label">Number of Questions</label>
+                    <div class="mock-slider-group">
+                        <input type="range" id="mockQuestionCount" class="mock-slider" min="5" max="40" value="20">
+                        <span class="mock-slider-value" id="mockCountDisplay">20</span>
+                    </div>
+                </div>
+                <div class="mock-config-group">
+                    <label class="mock-config-label">Topics</label>
+                    <p class="mock-config-desc">Weighted by IB HL priority. Uncheck to exclude.</p>
+                    <div class="mock-topics-grid" id="mockTopicsGrid">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+                <div class="mock-config-group">
+                    <label class="mock-config-label">Time Limit</label>
+                    <div class="mock-timer-input">
+                        <input type="number" id="mockTimerInput" value="60" min="5" max="300">
+                        <span class="timer-suffix">minutes</span>
+                    </div>
+                </div>
+                <button id="generateMockBtn" class="mock-generate-btn">Generate Mock Exam</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mock Results Overlay -->
+    <div id="mockResultsOverlay" class="mock-results-overlay hidden">
+        <div class="mock-results-card">
+            <h3 style="font-size: var(--text-lg); font-weight: 800; margin-bottom: 0.25rem;">Mock Exam Complete</h3>
+            <div class="mock-results-score" id="mockResultsScore">0%</div>
+            <p class="mock-results-subtitle" id="mockResultsSubtitle">Questions Attempted</p>
+            <div class="mock-results-stats">
+                <div class="mock-stat-item">
+                    <div class="mock-stat-value" id="mockStatCompleted">0</div>
+                    <div class="mock-stat-label">Completed</div>
+                </div>
+                <div class="mock-stat-item">
+                    <div class="mock-stat-value" id="mockStatTotal">0</div>
+                    <div class="mock-stat-label">Total</div>
+                </div>
+                <div class="mock-stat-item">
+                    <div class="mock-stat-value" id="mockStatTime">0:00</div>
+                    <div class="mock-stat-label">Time</div>
+                </div>
+            </div>
+            <button id="closeMockResultsBtn" class="mock-results-close">Back to Dashboard</button>
+        </div>
+    </div>
+
+    <!-- Score Predictor Modal -->
+    <div id="predictorModal" class="modal-overlay hidden">
+        <div class="modal-content" style="max-width: 480px;">
+            <div class="modal-header">
+                <h3>📊 Score Predictor & Scaler</h3>
+                <button id="closePredictorBtn" class="close-btn">
+                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body" style="padding: 1.5rem; display: flex; flex-direction: column; gap: 1.25rem;">
+                <div class="mock-config-group">
+                    <label class="mock-config-label">Subject</label>
+                    <select id="predictorSubject" class="mock-paper-btn"
+                        style="width: 100%; padding: 0.6rem 1rem; border-radius: var(--radius-md); background: var(--bg-elevated); border: 1px solid var(--border-light); color: var(--text-primary); outline: none;">
+                        <option value="physics">IB Physics HL</option>
+                        <option value="chemistry">IB Chemistry HL</option>
+                    </select>
+                </div>
+                <div class="mock-config-group">
+                    <label class="mock-config-label">Exam Session</label>
+                    <select id="predictorSession" class="mock-paper-btn"
+                        style="width: 100%; padding: 0.6rem 1rem; border-radius: var(--radius-md); background: var(--bg-elevated); border: 1px solid var(--border-light); color: var(--text-primary); outline: none;">
+                        <!-- Populated dynamically -->
+                    </select>
+                </div>
+                <div style="display: flex; gap: 1rem;">
+                    <div class="mock-config-group" style="flex: 1;">
+                        <label class="mock-config-label">Paper 1 Score</label>
+                        <div class="mock-timer-input">
+                            <input type="number" id="predictorP1" value="30" min="0" max="40" style="width: 100%;">
+                            <span class="timer-suffix">/ 40</span>
+                        </div>
+                    </div>
+                    <div class="mock-config-group" style="flex: 1;">
+                        <label class="mock-config-label">Paper 2 Score</label>
+                        <div class="mock-timer-input">
+                            <input type="number" id="predictorP2" value="65" min="0" max="90" style="width: 100%;">
+                            <span class="timer-suffix">/ 90</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results Output Grid -->
+                <div class="predictor-results"
+                    style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 1.25rem; display: flex; flex-direction: column; gap: 0.75rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="color: var(--text-secondary); font-size: var(--text-sm);">Weighted Exam
+                            Score</span>
+                        <span id="predictedPercent"
+                            style="font-size: var(--text-md); font-weight: 800; color: var(--accent);">0.0%</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="color: var(--text-secondary); font-size: var(--text-sm);">Predicted IB Grade</span>
+                        <span id="predictedGrade" style="font-size: 1.5rem; font-weight: 900; color: #EAB308;">Grade
+                            --</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="color: var(--text-secondary); font-size: var(--text-sm);">Scaled OSSD
+                            Percentage</span>
+                        <span id="predictedOssd" style="font-size: 1.5rem; font-weight: 900; color: #22C55E;">--%</span>
+                    </div>
+                </div>
+
+                <!-- Visual Markband Tracker -->
+                <div class="predictor-tracker-wrapper" style="margin-bottom: 1.5rem;">
+                    <label class="mock-config-label" style="margin-bottom: 0.5rem; display: block;">Boundary
+                        Position</label>
+                    <div class="predictor-scale-track" id="predictorScaleTrack"
+                        style="position: relative; height: 12px; background: rgba(255,255,255,0.06); border-radius: var(--radius-pill); margin: 1.5rem 0 0.5rem 0; border: 1px solid var(--border-light);">
+                        <div id="predictorMarker"
+                            style="position: absolute; top: -8px; left: 0%; transform: translateX(-50%); width: 16px; height: 26px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; transition: left 0.25s ease;">
+                            <div
+                                style="width: 16px; height: 16px; border-radius: 50%; background: var(--accent); border: 2px solid #ffffff; box-shadow: 0 0 8px var(--accent-glow);">
+                            </div>
+                            <div style="width: 2px; height: 8px; background: #ffffff;"></div>
+                        </div>
+                        <div id="predictorLabels"
+                            style="display: flex; justify-content: space-between; position: relative; top: 18px; font-size: 10px; font-weight: 700; color: var(--text-muted);">
+                            <span>1</span>
+                            <span>2</span>
+                            <span>3</span>
+                            <span>4</span>
+                            <span>5</span>
+                            <span>6</span>
+                            <span>7</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Data and App Logic -->
+                <script src="data.js"></script>
+                <script src="practice_data.js"></script>
+                <script src="chemistry_data.js?v=1.0.1"></script>
+                <script src="chemistry_practice_data.js?v=1.0.1"></script>
+                <script src="alevel_data.js"></script>
+                <script src="boundaries_data.js"></script>
+                <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+                <script src="gamification.js"></script>
+                <script>
+                    if (typeof require === 'undefined') {
+                        window.require = function(mod) {
+                            if (mod === 'fs') {
+                                return {
+                                    existsSync: () => false,
+                                    readdirSync: () => [],
+                                    readFileSync: () => '',
+                                    writeFileSync: () => {},
+                                    mkdirSync: () => {}
+                                };
+                            }
+                            if (mod === 'path') {
+                                return {
+                                    join: (...args) => args.join('/')
+                                };
+                            }
+                            return null;
+                        };
+                    }
+                </script>
+                <script src="atom.js"></script>
+                <script src="app.js?v=1.0.1"></script>
+</body>
+
+</html>

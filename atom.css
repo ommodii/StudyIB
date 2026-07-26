@@ -1,0 +1,591 @@
+/* ==========================================================================
+   Atom Note-Taking System Styling
+   ========================================================================== */
+
+/* Workspace Dashboard */
+.atom-workspace {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-main);
+    z-index: 100;
+    color: var(--text-primary);
+}
+
+.atom-dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid var(--border-light);
+    background: rgba(15, 23, 42, 0.3);
+    backdrop-filter: blur(10px);
+}
+
+.atom-dashboard-title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #a78bfa 0%, #a78bfa 50%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.atom-dashboard-title span {
+    -webkit-text-fill-color: initial;
+}
+
+.atom-dashboard-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.atom-search-bar {
+    display: flex;
+    align-items: center;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-full);
+    padding: 0.5rem 1rem;
+    width: 280px;
+    gap: 0.5rem;
+}
+
+.atom-search-bar input {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text-primary);
+    width: 100%;
+    font-size: var(--text-sm);
+}
+
+.atom-search-bar svg {
+    color: var(--text-muted);
+}
+
+.atom-grid {
+    flex: 1;
+    overflow-y: auto;
+    padding: 2rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+    align-content: start;
+}
+
+/* Notebook Cards */
+.notebook-card {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.2s;
+}
+
+.notebook-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--accent);
+}
+
+.notebook-preview-area {
+    height: 140px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--text-muted);
+    font-size: 3rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.notebook-preview-decoration {
+    position: absolute;
+    width: 60px;
+    height: 80px;
+    background: #1e293b;
+    border-radius: 4px;
+    border-left: 6px solid var(--accent);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2rem;
+    transform: rotate(-10deg);
+}
+
+.notebook-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.notebook-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.notebook-meta {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    display: flex;
+    justify-content: space-between;
+}
+
+.notebook-badge {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-full);
+    padding: 0.1rem 0.5rem;
+    font-size: 0.75rem;
+}
+
+.notebook-card-delete-btn {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s;
+    z-index: 10;
+}
+
+.notebook-card:hover .notebook-card-delete-btn {
+    opacity: 1;
+}
+
+.notebook-card-delete-btn:hover {
+    background: rgba(239, 68, 68, 0.2);
+    transform: scale(1.1);
+}
+
+/* Notebook Editor Split Workspace */
+.atom-editor {
+    flex: 1;
+    display: flex;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Left Page Thumbnails Sidebar */
+.atom-thumbnails-sidebar {
+    width: 240px;
+    border-right: 1px solid var(--border-light);
+    background: rgba(15, 23, 42, 0.15);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.atom-thumbnails-header {
+    padding: 1rem;
+    font-size: var(--text-xs);
+    font-weight: 800;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.atom-thumbnails-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.thumbnail-card {
+    border: 2px solid transparent;
+    border-radius: var(--radius-md);
+    background: rgba(0,0,0,0.2);
+    padding: 0.25rem;
+    cursor: pointer;
+    transition: border-color 0.2s, transform 0.1s;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.thumbnail-card.active {
+    border-color: var(--accent);
+    transform: scale(1.02);
+}
+
+.thumbnail-canvas-container {
+    height: 120px;
+    background: white;
+    border-radius: 4px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+}
+
+.thumbnail-canvas-container canvas {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.thumbnail-num {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+/* Center Canvas Viewport Scroll Container */
+.atom-viewport {
+    flex: 1;
+    overflow-y: auto;
+    background: #0b0f19;
+    padding: 5rem 2rem 4rem;  /* top pad clears the floating toolbar */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+    scroll-behavior: smooth;
+    position: relative;
+}
+
+/* Floating Toolbar — sticky at top of editor, scrolls with viewport but stays visible */
+.atom-floating-toolbar {
+    position: absolute;
+    top: 0.75rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(15, 23, 42, 0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-full);
+    padding: 0.5rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.6), 0 4px 6px -2px rgba(0, 0, 0, 0.4);
+    z-index: 300;
+    transition: opacity 0.2s;
+    /* Positioned inside .atom-editor which is position:relative — stays above viewport scroll */
+}
+
+.atom-tool-group {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.atom-toolbar-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.atom-toolbar-btn:hover {
+    color: var(--text-primary);
+    background: rgba(255,255,255,0.05);
+}
+
+.atom-toolbar-btn.active {
+    color: white;
+    background: var(--accent);
+    box-shadow: 0 0 10px rgba(99, 102, 241, 0.4);
+}
+
+.atom-toolbar-divider {
+    width: 1px;
+    height: 24px;
+    background: rgba(255,255,255,0.1);
+}
+
+/* Custom Tool Popovers / Adjustments inside toolbar */
+.atom-color-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: transform 0.15s, border-color 0.15s;
+}
+
+.atom-color-dot:hover {
+    transform: scale(1.2);
+}
+
+.atom-color-dot.active {
+    border-color: white;
+    transform: scale(1.25);
+}
+
+.atom-stroke-slider {
+    width: 80px;
+    accent-color: var(--accent);
+    cursor: pointer;
+}
+
+/* Document Pages */
+.atom-page-card {
+    background: #ffffff;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4), 0 5px 15px rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    position: relative;
+    transition: box-shadow 0.3s;
+    overflow: visible;
+    flex-shrink: 0; /* Prevent collapsing in flex layouts */
+}
+
+.atom-page-card.active-page {
+    box-shadow: 0 0 0 2px var(--accent), 0 15px 30px rgba(0, 0, 0, 0.5);
+}
+
+/* Ruled / Grid Paper Styles */
+.grid-paper {
+    background-size: 30px 30px;
+    background-image: 
+        linear-gradient(to right, rgba(99, 102, 241, 0.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(99, 102, 241, 0.05) 1px, transparent 1px);
+    background-color: #0f172a !important; /* Dark Notability mode */
+}
+
+.ruled-paper {
+    background-size: 100% 28px;
+    background-image: 
+        linear-gradient(to bottom, transparent 27px, rgba(99, 102, 241, 0.08) 27px);
+    background-color: #0f172a !important;
+    position: relative;
+}
+
+.ruled-paper::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 60px;
+    bottom: 0;
+    width: 1px;
+    background: rgba(244, 63, 94, 0.2); /* Pink margin line */
+}
+
+/* Grid backgrounds for light mode theme optionally */
+[data-theme="light"] .grid-paper {
+    background-color: #f8fafc !important;
+    background-image: 
+        linear-gradient(to right, rgba(99, 102, 241, 0.08) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(99, 102, 241, 0.08) 1px, transparent 1px);
+}
+
+[data-theme="light"] .ruled-paper {
+    background-color: #f8fafc !important;
+    background-image: 
+        linear-gradient(to bottom, transparent 27px, rgba(99, 102, 241, 0.1) 27px);
+}
+
+/* Layering overlays on page cards */
+.atom-pdf-render-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    /* width/height set by JS to match exact PDF pixel dimensions */
+    z-index: 1;
+    pointer-events: none;
+    border-radius: 8px;
+    display: block;
+}
+
+.atom-annotation-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    /* width/height set by JS to match page canvas dimensions */
+    z-index: 2;
+    cursor: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScyNCcgaGVpZ2h0PScyNCcgdmlld0JveD0nMCAwIDI0IDI0Jz4KICA8bGluZSB4MT0nMTInIHkxPScyJyB4Mj0nMTInIHkyPScyMicgc3Ryb2tlPSdibGFjaycgc3Ryb2tlLXdpZHRoPSczJyAvPgogIDxsaW5lIHgxPScyJyB5MT0nMTInIHgyPScyMicgeTI9JzEyJyBzdHJva2U9J2JsYWNrJyBzdHJva2Utd2lkdGg9JzMnIC8+CiAgPGxpbmUgeDE9JzEyJyB5MT0nMycgeDI9JzEyJyB5Mj0nMjEnIHN0cm9rZT0nd2hpdGUnIHN0cm9rZS13aWR0aD0nMS41JyAvPgogIDxsaW5lIHgxPSczJyB5MT0nMTInIHgyPScyMScgeTI9JzEyJyBzdHJva2U9J3doaXRlJyBzdHJva2Utd2lkdGg9JzEuNScgLz4KICA8Y2lyY2xlIGN4PScxMicgY3k9JzEyJyByPScyLjUnIGZpbGw9JyNFMTFENDgnIHN0cm9rZT0nYmxhY2snIHN0cm9rZS13aWR0aD0nMScgLz4KPC9zdmc+") 12 12, crosshair;
+    border-radius: 8px;
+    background: transparent;
+}
+
+.atom-annotation-layer.cursor-pan {
+    cursor: grab;
+}
+
+.atom-annotation-layer.cursor-pan:active {
+    cursor: grabbing;
+}
+
+.atom-annotation-layer.cursor-text {
+    cursor: text;
+}
+
+/* Text Annotations Overlays inside Editor */
+.atom-text-annotation {
+    position: absolute;
+    min-width: 60px;
+    min-height: 24px;
+    padding: 4px;
+    border: 1px dashed transparent;
+    color: var(--text-primary);
+    font-family: inherit;
+    outline: none;
+    z-index: 10;
+    word-wrap: break-word;
+    border-radius: 4px;
+    overflow: visible;
+}
+
+.atom-text-annotation:hover {
+    border-color: rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.02);
+}
+
+.atom-text-annotation:focus {
+    border-color: var(--accent);
+    background: rgba(0,0,0,0.3);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+/* Page Control Labels inside viewport */
+.atom-page-meta {
+    position: absolute;
+    bottom: -1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    display: flex;
+    gap: 1rem;
+}
+
+.atom-page-delete-btn {
+    color: #ef4444;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.atom-page-delete-btn:hover {
+    text-decoration: underline;
+}
+
+/* Quick Floating action to Add Page at the bottom */
+.atom-add-page-fab {
+    margin: 2rem 0;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-full);
+    padding: 0.6rem 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: var(--text-sm);
+    transition: background 0.2s, border-color 0.2s, transform 0.15s;
+}
+
+.atom-add-page-fab:hover {
+    background: var(--border-light);
+    border-color: var(--accent);
+    color: var(--text-primary);
+    transform: translateY(-2px);
+}
+
+/* Modal Config templates for New Notebook */
+.atom-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 500;
+    transition: opacity 0.2s ease-in-out;
+}
+
+/* --- Atom Editor Mobile Media Queries --- */
+@media (max-width: 768px) {
+    /* Hide the left thumbnails sidebar inside Atom workspace to maximize drawing area */
+    .atom-thumbnails-sidebar {
+        display: none !important;
+    }
+    
+    /* Shrink padding and margins on the floating toolbar */
+    .atom-floating-toolbar {
+        top: 0.5rem !important;
+        left: 0.5rem !important;
+        right: 0.5rem !important;
+        transform: none !important;
+        width: calc(100% - 1rem) !important;
+        padding: 0.4rem 0.6rem !important;
+        border-radius: var(--radius-sm) !important;
+        gap: 0.4rem !important;
+    }
+    
+    /* Make toolbar icons slightly smaller on phone screens */
+    .atom-toolbar-icon-btn {
+        width: 32px !important;
+        height: 32px !important;
+    }
+    
+    /* Reduce toolbar dividers */
+    .atom-toolbar-divider {
+        height: 18px !important;
+    }
+    
+    /* Optimize pages viewport scroll */
+    .atom-pages-viewport {
+        padding: 4.5rem 0.5rem 1rem 0.5rem !important;
+    }
+    
+    .atom-page-card {
+        width: 100% !important;
+        max-width: 100% !important;
+        border-radius: var(--radius-sm) !important;
+    }
+}
