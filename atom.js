@@ -21,6 +21,16 @@
     let strokeWidth = 3;
     let undoStack = [];
     let redoStack = [];
+
+    const isMobileAtomUI = () => window.matchMedia('(max-width: 768px)').matches;
+
+    function setActiveAtomTool(tool) {
+        activeTool = tool;
+        document.querySelectorAll('.atom-toolbar-btn[data-tool]').forEach(btn => {
+            btn.classList.toggle('active', btn.getAttribute('data-tool') === tool);
+        });
+        updateCanvasCursors();
+    }
     
     // --- Platform-Safe Storage Wrapper ---
     const isCapacitor = typeof window.Capacitor !== 'undefined' && window.Capacitor.Plugins && window.Capacitor.Plugins.Filesystem;
@@ -256,6 +266,9 @@
             const backBtn = document.getElementById('atomBackBtn');
             if (backBtn) {
                 backBtn.addEventListener('click', () => {
+                    if (window.StudyIBMobileNavigation && window.StudyIBMobileNavigation.back()) {
+                        return;
+                    }
                     if (activeNotebook) {
                         this.closeEditor();
                     } else {
@@ -269,11 +282,8 @@
             // Toolbar tools
             document.querySelectorAll('.atom-toolbar-btn[data-tool]').forEach(btn => {
                 btn.addEventListener('click', (e) => {
-                    document.querySelectorAll('.atom-toolbar-btn[data-tool]').forEach(b => b.classList.remove('active'));
                     const target = e.currentTarget;
-                    target.classList.add('active');
-                    activeTool = target.getAttribute('data-tool');
-                    updateCanvasCursors();
+                    setActiveAtomTool(target.getAttribute('data-tool'));
                 });
             });
 
@@ -332,6 +342,7 @@
                 // Check if Atom Editor view is currently visible
                 const editorView = document.getElementById('atomEditorView');
                 if (!editorView || editorView.classList.contains('hidden')) return;
+                if (isMobileAtomUI()) return;
 
                 // Skip shortcuts if user is typing in a text input field or edit box
                 if (document.activeElement && (
@@ -413,9 +424,20 @@
                 <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none" style="margin-right: 6px; vertical-align: middle;"><polyline points="15 18 9 12 15 6"></polyline></svg>
                 <span>Save & Close</span>
             `;
+
+            if (isMobileAtomUI()) {
+                // A paper must scroll first on phones; drawing remains one tap away.
+                setActiveAtomTool('pan');
+            }
+            if (window.StudyIBMobileNavigation) {
+                window.StudyIBMobileNavigation.enter('atom-editor');
+            }
             
-            // Build Editor workspace
-            initializeEditor(notebook);
+            // Build Editor workspace. Re-apply Pan after async page creation so
+            // newly-created canvases immediately inherit mobile scrolling.
+            initializeEditor(notebook).then(() => {
+                if (isMobileAtomUI()) setActiveAtomTool('pan');
+            });
         },
 
         closeEditor() {
@@ -815,6 +837,7 @@
             card.setAttribute('data-page-index', index);
             card.style.width = `${pageWidth}px`;
             card.style.height = `${pageHeight}px`;
+            card.style.setProperty('--atom-page-aspect', `${pageWidth} / ${pageHeight}`);
 
             // 2. Render layer for PDF page template
             if (page.isPdfPage && currentPdfDoc) {

@@ -23,6 +23,31 @@ document.addEventListener('DOMContentLoaded', () => {
     let completedQuestions = JSON.parse(localStorage.getItem('science_qbank_completed_questions') || '[]');
     let activeView = 'home'; // 'home' or 'subject'
 
+    // Mobile navigation uses real browser history so the OS/browser Back gesture works.
+    const isMobileUI = () => window.matchMedia('(max-width: 768px)').matches;
+    let handlingMobileHistoryPop = false;
+
+    function pushMobileHistoryState(view) {
+        if (!isMobileUI() || handlingMobileHistoryPop) return;
+        if (history.state && history.state.studyIBView === view) return;
+        history.pushState({ ...(history.state || {}), studyIBView: view }, '', window.location.href);
+    }
+
+    if (!history.state || !history.state.studyIBView) {
+        history.replaceState({ ...(history.state || {}), studyIBView: 'list' }, '', window.location.href);
+    }
+
+    window.StudyIBMobileNavigation = {
+        enter(view) {
+            pushMobileHistoryState(view);
+        },
+        back() {
+            if (!isMobileUI() || !history.state || history.state.studyIBView === 'list') return false;
+            history.back();
+            return true;
+        }
+    };
+
     // --- PDF Scroll and Zoom State Restorer ---
     let pdfScrollPositions = JSON.parse(localStorage.getItem('science_qbank_pdf_scroll_positions') || '{}');
 
@@ -128,11 +153,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const header = document.querySelector('.content-header');
         if (header) header.style.display = '';
         papersGrid.classList.remove('no-grid');
+        if (mainContentArea) mainContentArea.classList.remove('mobile-home-view');
     }
     function hideContentHeader() {
         const header = document.querySelector('.content-header');
         if (header) header.style.display = 'none';
         papersGrid.classList.add('no-grid');
+        if (mainContentArea) mainContentArea.classList.add('mobile-home-view');
     }
 
     function sortCategories(keys) {
@@ -150,6 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const pdfIframe = document.getElementById('pdfIframe');
     const viewerTitle = document.getElementById('viewerTitle');
     const closeViewerBtn = document.getElementById('closeViewerBtn');
+    const mobileViewerBackBtn = document.getElementById('mobileViewerBackBtn');
     const launchAtomBtn = document.getElementById('launchAtomBtn');
     const markschemeToggle = document.getElementById('markschemeToggle');
     const completeToggle = document.getElementById('completeToggle');
@@ -565,6 +593,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 document.querySelectorAll('.sidebar-nav .nav-link').forEach(link => link.classList.remove('active'));
                 sidebarAtom.classList.add('active');
+                pushMobileHistoryState('atom');
             });
         }
     }
@@ -1323,6 +1352,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 viewerTitle.textContent = name;
                 saveListViewState();
                 mainContentArea.classList.add('viewing-pdf');
+                pushMobileHistoryState('pdf');
                 
                 if (completeToggle) {
                     completeToggle.classList.remove('hidden');
@@ -1770,6 +1800,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    async function getMobileFitScale(pdfDoc) {
+        const firstPage = await pdfDoc.getPage(1);
+        const baseViewport = firstPage.getViewport({ scale: 1 });
+        const containerWidth = pdfContainer.clientWidth || window.innerWidth;
+        const availableWidth = Math.max(280, containerWidth - 12);
+        return Math.max(0.35, Math.min(1.25, availableWidth / baseViewport.width));
+    }
+
     async function renderPdf(url) {
         pdfContainer.innerHTML = '<div style="color:var(--text-secondary); margin-top:2rem;">Loading Document...</div>';
         try {
@@ -1785,6 +1823,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 : url;
             const loadingTask = pdfjsLib.getDocument(resolvedUrl);
             currentPdfDoc = await loadingTask.promise;
+            if (isMobileUI()) {
+                currentScale = await getMobileFitScale(currentPdfDoc);
+            }
             await reRenderPdf();
 
             // Restore scroll position
@@ -2064,6 +2105,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 viewerTitle.textContent = displayName;
                 saveListViewState();
                 mainContentArea.classList.add('viewing-pdf');
+                pushMobileHistoryState('pdf');
                 
                 renderPdf(currentPdfUrl);
             });
@@ -2085,22 +2127,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    closeViewerBtn.addEventListener('click', () => {
-        if (blitzState.active) {
-            if (!confirm("Exit Blitz challenge? Any progress on this run will be lost.")) {
-                return;
-            }
-            endBlitzChallenge(false);
-            return;
-        }
+    function restoreListAfterPdf() {
         closePdfViewer();
-        
+
         // Restore saved list-pane view state context
         if (lastListViewState) {
             activeView = lastListViewState.activeView;
             activeCategory = lastListViewState.activeCategory;
             currentMode = lastListViewState.currentMode;
-            
+
             if (activeView === 'home') {
                 renderDojoHome();
             } else if (lastListViewState.isReviewQueue) {
@@ -2112,14 +2147,58 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 renderDashboard();
             }
+        } else if (activeCategory) {
+            if (currentMode === 'topics') renderTopicCategory(activeCategory);
+            else if (currentMode === 'papers') renderPaperCategory(activeCategory);
+            else if (currentMode === 'practice') renderPracticeCategory(activeCategory);
         } else {
-            if (activeCategory) {
-                if (currentMode === 'topics') renderTopicCategory(activeCategory);
-                else if (currentMode === 'papers') renderPaperCategory(activeCategory);
-                else if (currentMode === 'practice') renderPracticeCategory(activeCategory);
-            } else {
-                renderDashboard();
+            renderDashboard();
+        }
+    }
+
+    function requestPdfClose() {
+        if (blitzState.active) {
+            if (!confirm("Exit Blitz challenge? Any progress on this run will be lost.")) {
+                return;
             }
+            endBlitzChallenge(false);
+            return;
+        }
+
+        if (window.StudyIBMobileNavigation && window.StudyIBMobileNavigation.back()) {
+            return;
+        }
+
+        restoreListAfterPdf();
+    }
+
+    closeViewerBtn.addEventListener('click', requestPdfClose);
+    if (mobileViewerBackBtn) {
+        mobileViewerBackBtn.addEventListener('click', requestPdfClose);
+    }
+
+    window.addEventListener('popstate', () => {
+        if (!isMobileUI()) return;
+        handlingMobileHistoryPop = true;
+        try {
+            if (mainContentArea.classList.contains('viewing-pdf')) {
+                restoreListAfterPdf();
+                return;
+            }
+
+            const atomWorkspace = document.getElementById('atomWorkspace');
+            if (atomWorkspace && !atomWorkspace.classList.contains('hidden')) {
+                const atomEditor = document.getElementById('atomEditorView');
+                if (atomEditor && !atomEditor.classList.contains('hidden') && window.AtomWorkspace) {
+                    window.AtomWorkspace.closeEditor();
+                } else {
+                    atomWorkspace.classList.add('hidden');
+                    mainContentArea.classList.remove('hidden');
+                    updateSidebarActiveState();
+                }
+            }
+        } finally {
+            handlingMobileHistoryPop = false;
         }
     });
 
@@ -2177,6 +2256,7 @@ document.addEventListener('DOMContentLoaded', () => {
         viewerTitle.textContent = displayName;
         saveListViewState();
         mainContentArea.classList.add('viewing-pdf');
+        pushMobileHistoryState('pdf');
         renderPdf(currentPdfUrl);
     }
 
@@ -3184,10 +3264,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Mobile Sidebar Drawer Toggle Logic
         const sidebarToggle = document.getElementById('sidebarToggle');
+        const mobileHomeMenuBtn = document.getElementById('mobileHomeMenuBtn');
         const sidebarElement = document.querySelector('.sidebar');
         const sidebarBackdrop = document.getElementById('sidebarBackdrop');
 
-        if (sidebarToggle && sidebarElement && sidebarBackdrop) {
+        if (sidebarElement && sidebarBackdrop) {
             const toggleSidebar = () => {
                 sidebarElement.classList.toggle('open');
                 sidebarBackdrop.classList.toggle('active');
@@ -3198,7 +3279,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 sidebarBackdrop.classList.remove('active');
             };
 
-            sidebarToggle.addEventListener('click', toggleSidebar);
+            if (sidebarToggle) sidebarToggle.addEventListener('click', toggleSidebar);
+            if (mobileHomeMenuBtn) mobileHomeMenuBtn.addEventListener('click', toggleSidebar);
             sidebarBackdrop.addEventListener('click', closeSidebar);
 
             // Close sidebar when clicking any navigation items on mobile

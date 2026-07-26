@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>IB Science QBank</title>
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
@@ -111,6 +111,13 @@
 
         <!-- Main Content Area -->
         <main class="content-area" id="mainContentArea">
+            <button class="mobile-home-menu-btn" id="mobileHomeMenuBtn" aria-label="Open navigation menu">
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.5" fill="none">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
             <div class="list-pane">
                 <header class="content-header">
                     <button class="sidebar-toggle-btn" id="sidebarToggle" aria-label="Toggle Navigation Sidebar">
@@ -159,6 +166,12 @@
             <!-- PDF Viewer Pane -->
             <div class="viewer-pane" id="viewerPane">
                 <div class="viewer-header">
+                    <button id="mobileViewerBackBtn" class="mobile-viewer-back-btn" aria-label="Back to question list">
+                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.5" fill="none">
+                            <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                        <span>Back</span>
+                    </button>
                     <h3 id="viewerTitle">No PDF Selected</h3>
                     <div class="viewer-toolbar" id="pdfToolbar">
                         <!-- Tools -->
@@ -292,7 +305,7 @@
 
             <!-- View 1: Dashboard -->
             <div id="atomDashboardView" style="flex:1; display:flex; flex-direction:column; overflow:hidden;">
-                <div style="display:flex; justify-content:space-between; align-items:center; padding: 1rem 2rem; border-bottom:1px solid var(--border-light); background: rgba(0,0,0,0.15);">
+                <div class="atom-dashboard-subheader" style="display:flex; justify-content:space-between; align-items:center; padding: 1rem 2rem; border-bottom:1px solid var(--border-light); background: rgba(0,0,0,0.15);">
                     <div style="color:var(--text-muted); font-size:var(--text-sm); font-weight:600;">My Notebooks & PDF Annotations</div>
                     <button class="primary-btn" id="atomNewBtn" style="padding: 0.5rem 1.2rem; border-radius: var(--radius-full); font-weight: 700; background: var(--accent); color: white; border: none; cursor: pointer; display: flex; align-items: center; gap: 4px; box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3);">
                         <span>+</span> New Notebook
