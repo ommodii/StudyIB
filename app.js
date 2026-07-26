@@ -676,23 +676,23 @@ document.addEventListener('DOMContentLoaded', () => {
         let dojoHomeHTML = `
             <div class="dojo-top-row">
                 <div class="dojo-search-container">
-                    <input type="text" id="dojoSearchInput" placeholder="Search topics, questions...">
+                    <input type="text" id="dojoSearchInput" placeholder="Search resources…" aria-label="Search topics and questions">
                     <svg class="search-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
                         <circle cx="11" cy="11" r="8"></circle>
                         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                     </svg>
                 </div>
                 <div class="dojo-user-metrics">
-                    <div class="dojo-metric" title="Daily Streak 🔥">
-                        <span>🔥</span>
+                    <div class="dojo-metric" data-metric="streak" title="Daily streak">
+                        <span class="dojo-metric-icon">${getWorkspaceIcon('streak')}</span>
                         <strong id="dojoStreakVal">${streak}</strong>
                     </div>
-                    <div class="dojo-metric" title="XP Earned ✨">
-                        <span>✨</span>
+                    <div class="dojo-metric" data-metric="xp" title="XP earned">
+                        <span class="dojo-metric-icon">${getWorkspaceIcon('xp')}</span>
                         <strong id="dojoXpVal">${xp} XP</strong>
                     </div>
-                    <div class="dojo-metric" title="DP Balance 💎">
-                        <span>💎</span>
+                    <div class="dojo-metric" data-metric="dp" title="DP balance">
+                        <span class="dojo-metric-icon">${getWorkspaceIcon('dp')}</span>
                         <strong id="dojoDpVal">${dp}</strong>
                     </div>
                 </div>
@@ -941,7 +941,10 @@ document.addEventListener('DOMContentLoaded', () => {
             papers: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path><path d="M8 13h8M8 17h8"></path>',
             mock: '<rect x="3" y="3" width="18" height="18" rx="4"></rect><path d="m8 12 2.5 2.5L16.5 8.5"></path>',
             reviews: '<path d="M6 3h12a2 2 0 0 1 2 2v16l-8-4-8 4V5a2 2 0 0 1 2-2z"></path><path d="m9 9 2 2 4-4"></path>',
-            daily: '<path d="m13 2-8 12h7l-1 8 8-12h-7z"></path>'
+            daily: '<path d="m13 2-8 12h7l-1 8 8-12h-7z"></path>',
+            streak: '<path d="M12 22c4 0 7-2.7 7-6.4 0-2.4-1.2-4.7-3.6-6.9.1 2-1 3.2-2.2 3.9.3-3.8-1.8-7.5-5.1-10.6.2 3.5-3.1 5.8-3.1 10.7C5 18 8 22 12 22z"></path><path d="M9.5 18.5c0-1.8 1-3.1 2.6-4.4.1 1.4.8 2.2 1.5 2.9.5.5.9 1.1.9 1.9"></path>',
+            xp: '<path d="m12 3 1.2 3.8L17 8l-3.8 1.2L12 13l-1.2-3.8L7 8l3.8-1.2z"></path><path d="m18.5 14 .7 2.3 2.3.7-2.3.7-.7 2.3-.7-2.3-2.3-.7 2.3-.7z"></path><path d="m5 14 .6 1.9 1.9.6-1.9.6L5 19l-.6-1.9-1.9-.6 1.9-.6z"></path>',
+            dp: '<path d="m12 3 8 6-8 12L4 9z"></path><path d="m4 9 8 3 8-3M9 4l3 8 3-8"></path>'
         };
         return `<svg class="workspace-nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${icons[name] || ''}</svg>`;
     }
