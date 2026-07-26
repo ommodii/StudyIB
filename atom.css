@@ -379,6 +379,19 @@
     box-shadow: 0 0 0 2px var(--accent), 0 15px 30px rgba(0, 0, 0, 0.5);
 }
 
+.atom-page-placeholder {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    color: #64748b;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
 /* Ruled / Grid Paper Styles */
 .grid-paper {
     background-size: 30px 30px;
@@ -694,6 +707,14 @@
         aspect-ratio: var(--atom-page-aspect, 816 / 1056);
         border-radius: var(--radius-sm) !important;
         flex: 0 0 auto;
+        overflow: hidden;
+        transition: none;
+        contain: layout paint style;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+    }
+
+    .atom-page-card.active-page {
+        box-shadow: 0 0 0 1px var(--accent), 0 8px 20px rgba(0, 0, 0, 0.4);
     }
 
     .atom-pdf-render-layer,

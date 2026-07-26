@@ -21,6 +21,10 @@
     let strokeWidth = 3;
     let undoStack = [];
     let redoStack = [];
+    let mobilePageObserver = null;
+    let atomActivePageObserver = null;
+    let atomRenderGeneration = 0;
+    let mobilePdfRenderQueue = Promise.resolve();
 
     const isMobileAtomUI = () => window.matchMedia('(max-width: 768px)').matches;
 
@@ -30,6 +34,28 @@
             btn.classList.toggle('active', btn.getAttribute('data-tool') === tool);
         });
         updateCanvasCursors();
+    }
+
+    function queueMobilePdfRender(job) {
+        const queued = mobilePdfRenderQueue.then(job, job);
+        mobilePdfRenderQueue = queued.catch(() => {});
+        return queued;
+    }
+
+    function releaseMobileEditorResources() {
+        if (mobilePageObserver) {
+            mobilePageObserver.disconnect();
+            mobilePageObserver = null;
+        }
+        if (atomActivePageObserver) {
+            atomActivePageObserver.disconnect();
+            atomActivePageObserver = null;
+        }
+        document.querySelectorAll('.atom-page-card').forEach(card => {
+            if (typeof card._atomUnmountLayers === 'function') {
+                card._atomUnmountLayers(true);
+            }
+        });
     }
     
     // --- Platform-Safe Storage Wrapper ---
@@ -444,6 +470,9 @@
             if (activeNotebook) {
                 saveNotebook(activeNotebook);
             }
+            if (isMobileAtomUI()) {
+                releaseMobileEditorResources();
+            }
             activeNotebook = null;
             document.getElementById('atomEditorView').classList.add('hidden');
             document.getElementById('atomDashboardView').classList.remove('hidden');
@@ -807,6 +836,9 @@
         const list = document.getElementById('atomThumbnailsList');
         if (!viewport || !list) return;
 
+        releaseMobileEditorResources();
+        const renderGeneration = ++atomRenderGeneration;
+        const mobileUI = isMobileAtomUI();
         viewport.innerHTML = '';
         list.innerHTML = '';
 
@@ -839,8 +871,16 @@
             card.style.height = `${pageHeight}px`;
             card.style.setProperty('--atom-page-aspect', `${pageWidth} / ${pageHeight}`);
 
+            let placeholder = null;
+            if (mobileUI && page.isPdfPage) {
+                placeholder = document.createElement('div');
+                placeholder.className = 'atom-page-placeholder';
+                placeholder.innerHTML = '<span>Loading page…</span>';
+                card.appendChild(placeholder);
+            }
+
             // 2. Render layer for PDF page template
-            if (page.isPdfPage && currentPdfDoc) {
+            if (!mobileUI && page.isPdfPage && currentPdfDoc) {
                 const pdfCanvas = document.createElement('canvas');
                 pdfCanvas.className = 'atom-pdf-render-layer';
                 card.appendChild(pdfCanvas);
@@ -851,8 +891,8 @@
             // 3. Overlaid drawing canvas
             const annotCanvas = document.createElement('canvas');
             annotCanvas.className = 'atom-annotation-layer';
-            annotCanvas.width = pageWidth * 2; // 2x coordinate scaling for retina-like precision
-            annotCanvas.height = pageHeight * 2;
+            annotCanvas.width = mobileUI ? 1 : pageWidth * 2; // Mobile mounts full canvases lazily.
+            annotCanvas.height = mobileUI ? 1 : pageHeight * 2;
             annotCanvas.style.width = `${pageWidth}px`;
             annotCanvas.style.height = `${pageHeight}px`;
             card.appendChild(annotCanvas);
@@ -902,6 +942,81 @@
 
             viewport.appendChild(card);
 
+            if (mobileUI) {
+                card.dataset.atomLayersMounted = 'false';
+
+                card._atomMountLayers = () => {
+                    if (card.dataset.atomLayersMounted === 'true') return;
+                    if (renderGeneration !== atomRenderGeneration) return;
+                    card.dataset.atomLayersMounted = 'true';
+
+                    let mobilePdfCanvas = null;
+                    if (page.isPdfPage && currentPdfDoc) {
+                        mobilePdfCanvas = document.createElement('canvas');
+                        mobilePdfCanvas.className = 'atom-pdf-render-layer';
+                        card.insertBefore(mobilePdfCanvas, meta);
+                    }
+
+                    const mobileAnnotCanvas = document.createElement('canvas');
+                    mobileAnnotCanvas.className = 'atom-annotation-layer';
+                    mobileAnnotCanvas.width = pageWidth * 2;
+                    mobileAnnotCanvas.height = pageHeight * 2;
+                    mobileAnnotCanvas.style.width = `${pageWidth}px`;
+                    mobileAnnotCanvas.style.height = `${pageHeight}px`;
+                    if (activeTool === 'pan') mobileAnnotCanvas.classList.add('cursor-pan');
+                    if (activeTool === 'text') mobileAnnotCanvas.classList.add('cursor-text');
+                    card.insertBefore(mobileAnnotCanvas, meta);
+
+                    const mobileTextOverlay = document.createElement('div');
+                    mobileTextOverlay.style.position = 'absolute';
+                    mobileTextOverlay.style.top = '0';
+                    mobileTextOverlay.style.left = '0';
+                    mobileTextOverlay.style.width = '100%';
+                    mobileTextOverlay.style.height = '100%';
+                    mobileTextOverlay.style.zIndex = '3';
+                    mobileTextOverlay.style.pointerEvents = 'none';
+                    mobileTextOverlay.className = 'atom-text-overlay-layer';
+                    card.insertBefore(mobileTextOverlay, meta);
+
+                    if (page.texts) {
+                        page.texts.forEach(item => spawnTextNode(mobileTextOverlay, page, item));
+                    }
+
+                    attachDrawingHandlers(mobileAnnotCanvas, page);
+                    redrawPageStrokes(mobileAnnotCanvas, page);
+
+                    if (mobilePdfCanvas) {
+                        queueMobilePdfRender(async () => {
+                            if (renderGeneration !== atomRenderGeneration || !mobilePdfCanvas.isConnected) return;
+                            await renderPDFTemplatePage(page.pdfPageIdx, mobilePdfCanvas, pageWidth, pageHeight, true);
+                            if (renderGeneration === atomRenderGeneration && mobilePdfCanvas.isConnected && placeholder) {
+                                placeholder.classList.add('hidden');
+                            }
+                        });
+                    } else if (placeholder) {
+                        placeholder.classList.add('hidden');
+                    }
+                };
+
+                card._atomUnmountLayers = (force = false) => {
+                    if (card.dataset.atomLayersMounted !== 'true') return;
+                    if (!force && card.contains(document.activeElement)) return;
+                    card.dataset.atomLayersMounted = 'false';
+                    const mountedPdfCanvas = card.querySelector('.atom-pdf-render-layer');
+                    if (mountedPdfCanvas && mountedPdfCanvas._atomRenderTask && typeof mountedPdfCanvas._atomRenderTask.cancel === 'function') {
+                        mountedPdfCanvas._atomRenderTask.cancel();
+                    }
+                    card.querySelectorAll('.atom-pdf-render-layer, .atom-annotation-layer, .atom-text-overlay-layer').forEach(layer => {
+                        if (layer.tagName === 'CANVAS') {
+                            layer.width = 0;
+                            layer.height = 0;
+                        }
+                        layer.remove();
+                    });
+                    if (placeholder) placeholder.classList.remove('hidden');
+                };
+            }
+
             // 6. Hook stroke vector drawing handlers
             attachDrawingHandlers(annotCanvas, page);
 
@@ -928,10 +1043,31 @@
 
             // Draw vector strokes initially onto annotation canvas
             redrawPageStrokes(annotCanvas, page);
+            if (mobileUI) {
+                annotCanvas.width = 0;
+                annotCanvas.height = 0;
+                annotCanvas.remove();
+                textOverlay.remove();
+            }
+        }
+
+        if (mobileUI) {
+            mobilePageObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    const card = entry.target;
+                    if (entry.isIntersecting) card._atomMountLayers();
+                    else card._atomUnmountLayers();
+                });
+            }, {
+                root: viewport,
+                rootMargin: '80% 0px 80% 0px',
+                threshold: 0.01
+            });
+            viewport.querySelectorAll('.atom-page-card').forEach(card => mobilePageObserver.observe(card));
         }
 
         // Add page card intersection observer to track active page inside thumbnail view
-        const observer = new IntersectionObserver((entries) => {
+        atomActivePageObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     const idx = entry.target.getAttribute('data-page-index');
@@ -947,11 +1083,11 @@
             });
         }, { root: viewport, threshold: 0.4 });
 
-        viewport.querySelectorAll('.atom-page-card').forEach(card => observer.observe(card));
+        viewport.querySelectorAll('.atom-page-card').forEach(card => atomActivePageObserver.observe(card));
     }
 
     // Render PDF page templates onto background canvas
-    async function renderPDFTemplatePage(pageIdx, canvas, containerWidth, containerHeight) {
+    async function renderPDFTemplatePage(pageIdx, canvas, containerWidth, containerHeight, mobileRender = false) {
         if (!currentPdfDoc) return;
         try {
             // Ensure pdfjsLib worker is set
@@ -960,7 +1096,11 @@
             }
 
             const pdfPage = await currentPdfDoc.getPage(pageIdx);
-            const pixelRatio = window.devicePixelRatio || 1;
+            let pixelRatio = window.devicePixelRatio || 1;
+            if (mobileRender) {
+                const visibleWidth = Math.max(280, Math.min(window.innerWidth - 13, containerWidth));
+                pixelRatio = (visibleWidth / containerWidth) * Math.min(pixelRatio, 1.5);
+            }
 
             // Scale so the PDF page fits exactly inside the container at pixelRatio resolution
             const baseViewport = pdfPage.getViewport({ scale: 1 });
@@ -981,9 +1121,15 @@
                 canvasContext: canvas.getContext('2d'),
                 viewport: scaledViewport
             };
-            await pdfPage.render(renderContext).promise;
+            const renderTask = pdfPage.render(renderContext);
+            canvas._atomRenderTask = renderTask;
+            await renderTask.promise;
         } catch (err) {
-            console.error(`Failed to render PDF page ${pageIdx} onto template canvas:`, err);
+            if (!err || err.name !== 'RenderingCancelledException') {
+                console.error(`Failed to render PDF page ${pageIdx} onto template canvas:`, err);
+            }
+        } finally {
+            canvas._atomRenderTask = null;
         }
     }
 
