@@ -673,6 +673,56 @@ document.addEventListener('DOMContentLoaded', () => {
             greeting = 'Good evening';
         }
 
+        const buildSubjectProgress = (id, label, data) => {
+            let total = 0;
+            let completed = 0;
+            let nextTopic = '';
+            let nextCategory = '';
+            const searchEntries = [];
+
+            sortCategories(Object.keys(data || {})).forEach(category => {
+                const subtopics = data[category] || {};
+                Object.entries(subtopics || {}).forEach(([subtopic, files]) => {
+                    searchEntries.push({ subject: id, subjectLabel: label, category, title: subtopic });
+                    (files || []).forEach(file => {
+                        const filepath = file.filepath || file.qp_path;
+                        if (!filepath) return;
+                        total += 1;
+                        if (isQuestionCompleted(filepath)) {
+                            completed += 1;
+                        } else if (!nextTopic) {
+                            nextTopic = subtopic;
+                            nextCategory = category;
+                        }
+                    });
+                });
+            });
+
+            return {
+                id,
+                label,
+                total,
+                completed,
+                percent: total > 0 ? Math.round((completed / total) * 100) : 0,
+                nextTopic,
+                nextCategory,
+                searchEntries
+            };
+        };
+
+        const physicsProgress = buildSubjectProgress('physics', 'Physics HL', syllabusData);
+        const chemistryProgress = buildSubjectProgress('chemistry', 'Chemistry HL', chemistrySyllabusData);
+        const subjectProgress = [physicsProgress, chemistryProgress];
+        const totalResources = subjectProgress.reduce((sum, subject) => sum + subject.total, 0);
+        const completedResources = subjectProgress.reduce((sum, subject) => sum + subject.completed, 0);
+        const overallProgress = totalResources > 0 ? Math.round((completedResources / totalResources) * 100) : 0;
+        const nextSubject = [...subjectProgress].sort((a, b) => a.percent - b.percent)[0];
+        const dueReviewCount = Object.values(srsData).filter(entry => entry && entry.nextReview <= Date.now()).length;
+        const dashboardSearchEntries = subjectProgress.flatMap(subject => subject.searchEntries);
+        const progressMessage = completedResources > 0
+            ? `${completedResources} of ${totalResources} topical resources completed.`
+            : 'Your progress will appear here as you complete resources.';
+
         let dojoHomeHTML = `
             <div class="dojo-top-row">
                 <div class="dojo-search-container">
@@ -681,6 +731,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <circle cx="11" cy="11" r="8"></circle>
                         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                     </svg>
+                    <div class="dojo-search-results hidden" id="dojoSearchResults"></div>
                 </div>
                 <div class="dojo-user-metrics">
                     <div class="dojo-metric" data-metric="streak" title="Daily streak">
@@ -698,132 +749,148 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             </div>
 
-            <div class="dojo-promo-banner">
-                <div class="promo-text">
-                    <h3>${greeting}</h3>
-                    <p>Study Boost active! Earn <strong>Double XP (2x)</strong> on all chemistry practice items.</p>
-                </div>
-                <div class="promo-timer">
-                    <span>Ends in: 1d 07h 04m</span>
-                    <button class="promo-btn" id="promoShopBtn">Get Boost ↗</button>
-                </div>
-            </div>
-
-            <div class="dojo-section-title">My Subjects</div>
-            <div class="dojo-subjects-grid">
-                <!-- Card 1: Physics -->
-                <div class="dojo-subject-card card-physics" data-subject="physics">
-                    <div class="subject-card-icon">⚛️</div>
-                    <div class="subject-card-content">
-                        <h3>IB Physics HL</h3>
-                        <p>Theme A – Theme E • 6 core themes</p>
+            <div class="dojo-dashboard-content">
+                <section class="dashboard-overview-hero">
+                    <div class="dashboard-overview-copy">
+                        <span class="dashboard-eyebrow">Study overview</span>
+                        <h1>${greeting}</h1>
+                        <p>${progressMessage}</p>
                     </div>
-                    <button class="subject-open-btn">Open ></button>
-                </div>
-                
-                <!-- Card 2: Chem -->
-                <div class="dojo-subject-card card-chem" data-subject="chemistry">
-                    <div class="subject-card-icon">🧪</div>
-                    <div class="subject-card-content">
-                        <h3>IB Chemistry HL</h3>
-                        <p>Structure & Reactivity • 6 core themes</p>
+                    <div class="dashboard-progress-orb" style="--dashboard-progress: ${overallProgress * 3.6}deg" aria-label="${overallProgress}% overall progress">
+                        <div>
+                            <strong>${overallProgress}%</strong>
+                            <span>overall</span>
+                        </div>
                     </div>
-                    <button class="subject-open-btn">Open ></button>
-                </div>
-                
-            </div>
+                </section>
 
-            <div class="dojo-section-title" style="margin-top: 2rem;">Recommended for you</div>
-            <div class="dojo-shortcuts-row">
-                <button class="shortcut-pill" id="shortcutTopics">
-                    <span>📚</span> Review Topical
-                </button>
-                <button class="shortcut-pill" id="shortcutPredictor">
-                    <span>📈</span> Practice Predicted
-                </button>
-                <button class="shortcut-pill" id="shortcutMock">
-                    <span>⚔️</span> Generate a Mock
-                </button>
-                <button class="shortcut-pill" id="shortcutQueue">
-                    <span>📥</span> Review Queue
-                </button>
-                <button class="shortcut-pill" id="shortcutCosmetics">
-                    <span>💎</span> Unlock Cosmetics
-                </button>
+                <div class="dashboard-focus-grid">
+                    <section class="dashboard-data-card dashboard-progress-card">
+                        <div class="dashboard-card-heading">
+                            <div>
+                                <span class="dashboard-eyebrow">Topical completion</span>
+                                <h2>Your progress</h2>
+                            </div>
+                            <span class="dashboard-resource-count">${completedResources}/${totalResources}</span>
+                        </div>
+
+                        ${subjectProgress.map(subject => `
+                            <div class="dashboard-subject-progress">
+                                <div class="dashboard-subject-icon ${subject.id}">${getWorkspaceIcon(subject.id)}</div>
+                                <div class="dashboard-subject-details">
+                                    <div class="dashboard-subject-label">
+                                        <strong>${subject.label}</strong>
+                                        <span>${subject.percent}%</span>
+                                    </div>
+                                    <div class="dashboard-progress-track" aria-hidden="true">
+                                        <span style="width:${subject.percent}%"></span>
+                                    </div>
+                                    <small>${subject.completed} of ${subject.total} resources</small>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </section>
+
+                    <section class="dashboard-data-card dashboard-next-card">
+                        <div class="dashboard-next-icon">${getWorkspaceIcon('target')}</div>
+                        <span class="dashboard-eyebrow">Suggested next</span>
+                        <h2>${nextSubject.nextTopic || `Explore ${nextSubject.label}`}</h2>
+                        <p>Continue with ${nextSubject.label} and build on your least-completed subject.</p>
+                        <button class="dashboard-primary-action" id="dashboardContinueBtn">
+                            <span>Continue studying</span>${getWorkspaceIcon('arrow')}
+                        </button>
+
+                        <div class="dashboard-review-status">
+                            <div class="dashboard-review-icon">${getWorkspaceIcon('reviews')}</div>
+                            <div>
+                                <strong>${dueReviewCount > 0 ? `${dueReviewCount} review${dueReviewCount === 1 ? '' : 's'} due` : 'Review queue clear'}</strong>
+                                <span>${dueReviewCount > 0 ? 'Revisit items scheduled for today.' : 'Nothing is waiting for review.'}</span>
+                            </div>
+                            ${dueReviewCount > 0 ? '<button id="dashboardReviewBtn" aria-label="Open review queue">Review</button>' : ''}
+                        </div>
+                    </section>
+                </div>
             </div>
         `;
 
         papersGrid.innerHTML = dojoHomeHTML;
 
-        // Bind clicks to subject cards
-        const subjectCards = document.querySelectorAll('.dojo-subject-card');
-        subjectCards.forEach(card => {
-            card.addEventListener('click', () => {
-                const sub = card.getAttribute('data-subject');
-                openSubject(sub);
-            });
-        });
+        const openDashboardTopic = (subject, category) => {
+            openSubject(subject);
+            switchMode('topics');
+            activeCategory = category;
+            renderTopicCategory(category);
+        };
 
-        // Bind clicks to promotional banner shop button
-        const promoShopBtn = document.getElementById('promoShopBtn');
-        if (promoShopBtn) {
-            promoShopBtn.addEventListener('click', () => {
-                const shopBtn = document.getElementById('shopBtn');
-                if (shopBtn) shopBtn.click();
+        const dashboardContinueBtn = document.getElementById('dashboardContinueBtn');
+        if (dashboardContinueBtn) {
+            dashboardContinueBtn.addEventListener('click', () => {
+                if (nextSubject.nextCategory) {
+                    openDashboardTopic(nextSubject.id, nextSubject.nextCategory);
+                } else {
+                    openSubject(nextSubject.id);
+                }
             });
         }
 
-        // Bind clicks to shortcuts
-        const shortcutTopics = document.getElementById('shortcutTopics');
-        const shortcutPredictor = document.getElementById('shortcutPredictor');
-        const shortcutMock = document.getElementById('shortcutMock');
-        const shortcutQueue = document.getElementById('shortcutQueue');
-        const shortcutCosmetics = document.getElementById('shortcutCosmetics');
-
-        if (shortcutTopics) {
-            shortcutTopics.addEventListener('click', () => {
-                openSubject('physics');
-            });
-        }
-        if (shortcutPredictor) {
-            shortcutPredictor.addEventListener('click', () => {
-                const predictorBtn = document.getElementById('predictorBtn');
-                if (predictorBtn) predictorBtn.click();
-            });
-        }
-        if (shortcutMock) {
-            shortcutMock.addEventListener('click', () => {
-                openMockGeneratorModal();
-            });
-        }
-        if (shortcutQueue) {
-            shortcutQueue.addEventListener('click', () => {
+        const dashboardReviewBtn = document.getElementById('dashboardReviewBtn');
+        if (dashboardReviewBtn) {
+            dashboardReviewBtn.addEventListener('click', () => {
                 activeView = 'subject';
-                if (!currentSubject) currentSubject = 'physics';
+                currentSubject = nextSubject.id;
                 renderReviewQueue();
                 updateSidebarActiveState();
-            });
-        }
-        if (shortcutCosmetics) {
-            shortcutCosmetics.addEventListener('click', () => {
-                const shopBtn = document.getElementById('shopBtn');
-                if (shopBtn) shopBtn.click();
             });
         }
 
         // Bind global search input inside the home panel
         const dojoSearchInput = document.getElementById('dojoSearchInput');
-        if (dojoSearchInput) {
+        const dojoSearchResults = document.getElementById('dojoSearchResults');
+        if (dojoSearchInput && dojoSearchResults) {
+            let visibleSearchMatches = [];
+
+            const selectSearchResult = (index) => {
+                const match = visibleSearchMatches[index];
+                if (!match) return;
+                openDashboardTopic(match.subject, match.category);
+            };
+
             dojoSearchInput.addEventListener('input', () => {
                 const term = dojoSearchInput.value.toLowerCase().trim();
-                subjectCards.forEach(card => {
-                    const text = card.textContent.toLowerCase();
-                    if (text.includes(term)) {
-                        card.style.display = '';
-                    } else {
-                        card.style.display = 'none';
-                    }
+                if (term.length < 2) {
+                    visibleSearchMatches = [];
+                    dojoSearchResults.classList.add('hidden');
+                    dojoSearchResults.innerHTML = '';
+                    return;
+                }
+
+                visibleSearchMatches = dashboardSearchEntries.filter(entry => {
+                    const searchable = `${entry.title} ${entry.category} ${entry.subjectLabel}`.toLowerCase();
+                    return searchable.includes(term);
+                }).slice(0, 6);
+
+                if (visibleSearchMatches.length === 0) {
+                    dojoSearchResults.innerHTML = '<div class="dojo-search-empty">No matching topics</div>';
+                } else {
+                    dojoSearchResults.innerHTML = visibleSearchMatches.map((entry, index) => `
+                        <button type="button" data-search-index="${index}">
+                            <span>${entry.title}</span>
+                            <small>${entry.subjectLabel} · ${entry.category}</small>
+                        </button>
+                    `).join('');
+                }
+                dojoSearchResults.classList.remove('hidden');
+
+                dojoSearchResults.querySelectorAll('button[data-search-index]').forEach(button => {
+                    button.addEventListener('click', () => selectSearchResult(Number(button.dataset.searchIndex)));
                 });
+            });
+
+            dojoSearchInput.addEventListener('keydown', event => {
+                if (event.key === 'Enter' && visibleSearchMatches.length > 0) {
+                    event.preventDefault();
+                    selectSearchResult(0);
+                }
             });
         }
     }
@@ -944,7 +1011,9 @@ document.addEventListener('DOMContentLoaded', () => {
             daily: '<path d="m13 2-8 12h7l-1 8 8-12h-7z"></path>',
             streak: '<path d="M12 22c4 0 7-2.7 7-6.4 0-2.4-1.2-4.7-3.6-6.9.1 2-1 3.2-2.2 3.9.3-3.8-1.8-7.5-5.1-10.6.2 3.5-3.1 5.8-3.1 10.7C5 18 8 22 12 22z"></path><path d="M9.5 18.5c0-1.8 1-3.1 2.6-4.4.1 1.4.8 2.2 1.5 2.9.5.5.9 1.1.9 1.9"></path>',
             xp: '<path d="m12 3 1.2 3.8L17 8l-3.8 1.2L12 13l-1.2-3.8L7 8l3.8-1.2z"></path><path d="m18.5 14 .7 2.3 2.3.7-2.3.7-.7 2.3-.7-2.3-2.3-.7 2.3-.7z"></path><path d="m5 14 .6 1.9 1.9.6-1.9.6L5 19l-.6-1.9-1.9-.6 1.9-.6z"></path>',
-            dp: '<path d="m12 3 8 6-8 12L4 9z"></path><path d="m4 9 8 3 8-3M9 4l3 8 3-8"></path>'
+            dp: '<path d="m12 3 8 6-8 12L4 9z"></path><path d="m4 9 8 3 8-3M9 4l3 8 3-8"></path>',
+            target: '<circle cx="12" cy="12" r="8"></circle><circle cx="12" cy="12" r="3"></circle><path d="M12 2v3M22 12h-3M12 22v-3M2 12h3"></path>',
+            arrow: '<path d="M5 12h14"></path><path d="m14 7 5 5-5 5"></path>'
         };
         return `<svg class="workspace-nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${icons[name] || ''}</svg>`;
     }

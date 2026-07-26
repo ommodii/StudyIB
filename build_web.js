@@ -18,7 +18,8 @@ const filesToCopy = [
     'practice_data.js',
     'chemistry_practice_data.js',
     'index.css',
-    'atom.css'
+    'atom.css',
+    '_headers'
 ];
 
 const foldersToCopy = [];
