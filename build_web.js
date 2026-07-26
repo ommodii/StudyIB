@@ -17,7 +17,6 @@ const filesToCopy = [
     'chemistry_data.js',
     'practice_data.js',
     'chemistry_practice_data.js',
-    'alevel_data.js',
     'index.css',
     'atom.css'
 ];

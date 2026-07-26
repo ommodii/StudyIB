@@ -6,6 +6,7 @@ const projectRoot = path.resolve(__dirname, '..');
 const contentRoot = path.join(projectRoot, 'Content');
 const bucket = process.env.STUDYIB_R2_BUCKET || 'studyib-content';
 const concurrency = Math.max(1, Number(process.env.STUDYIB_UPLOAD_CONCURRENCY || 4));
+const requestedPaths = process.argv.slice(2);
 const globalModules = path.join(process.env.APPDATA, 'npm', 'node_modules');
 const wranglerCli = path.join(globalModules, 'wrangler', 'bin', 'wrangler.js');
 
@@ -25,6 +26,22 @@ function collectFiles(directory) {
         else if (entry.isFile()) files.push(fullPath);
     }
     return files;
+}
+
+function resolveUploadRoots() {
+    if (requestedPaths.length === 0) return [contentRoot];
+
+    return requestedPaths.map(requestedPath => {
+        const resolvedPath = path.resolve(contentRoot, requestedPath);
+        const relativePath = path.relative(contentRoot, resolvedPath);
+        if (relativePath.startsWith('..') || path.isAbsolute(relativePath)) {
+            throw new Error(`Upload path must stay inside Content: ${requestedPath}`);
+        }
+        if (!fs.existsSync(resolvedPath) || !fs.statSync(resolvedPath).isDirectory()) {
+            throw new Error(`Upload directory not found: ${resolvedPath}`);
+        }
+        return resolvedPath;
+    });
 }
 
 function contentTypeFor(filePath) {
@@ -64,13 +81,15 @@ function upload(filePath) {
 }
 
 async function main() {
-    const files = collectFiles(contentRoot);
+    const uploadRoots = resolveUploadRoots();
+    const files = [...new Set(uploadRoots.flatMap(collectFiles))];
     let nextIndex = 0;
     let completed = 0;
     let failed = 0;
     const startedAt = Date.now();
 
-    console.log(`Uploading ${files.length} files to ${bucket}/Content with concurrency ${concurrency}...`);
+    const labels = uploadRoots.map(root => path.relative(contentRoot, root) || 'all Content').join(', ');
+    console.log(`Uploading ${files.length} files from ${labels} to ${bucket}/Content with concurrency ${concurrency}...`);
 
     async function worker() {
         while (true) {

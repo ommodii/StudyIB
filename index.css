@@ -55,28 +55,6 @@
     --pdf-bg: #121212;
 }
 
-/* ─── Light Theme ─── */
-[data-theme="light"] {
-    --bg-main: #F3F5F8;
-    --bg-sidebar: #FFFFFF;
-    --bg-card: #FFFFFF;
-    --bg-elevated: #EDF0F5;
-
-    --text-primary: #15191F;
-    --text-secondary: #454D5A;
-    --text-muted: #7A8291;
-
-    --border-light: #DDE1E8;
-    --border: #C5CBD5;
-
-    --modal-overlay: rgba(21, 25, 31, 0.4);
-    --modal-bg: #FFFFFF;
-    --input-bg: #F3F5F8;
-
-    --btn-hover: #E8ECF2;
-    --pdf-bg: #E0E4EA;
-}
-
 /* ─── Subject Accent Colors ─── */
 [data-color="physics"] {
     --accent: #3B82F6;
@@ -688,7 +666,6 @@ body {
 .tool-btn.active { background: var(--accent-light); color: var(--accent); }
 .tool-btn.danger-text { color: var(--color-error); }
 [data-theme="dark"] .tool-btn.danger-text:hover { background: rgba(239, 68, 68, 0.12); }
-[data-theme="light"] .tool-btn.danger-text:hover { background: #FEE2E2; }
 
 .toolbar-text {
     font-size: var(--text-xs);
@@ -859,31 +836,6 @@ body {
     font-size: var(--text-xs);
     color: var(--text-muted);
     margin-bottom: 0.6rem;
-}
-.theme-toggles {
-    display: flex;
-    gap: 3px;
-    background: var(--bg-elevated);
-    padding: 3px;
-    border-radius: var(--radius-pill);
-    border: 1px solid var(--border-light);
-}
-.theme-btn {
-    flex: 1;
-    background: transparent;
-    border: none;
-    padding: 0.5rem 0;
-    font-size: var(--text-sm);
-    font-weight: 700;
-    color: var(--text-muted);
-    border-radius: var(--radius-pill);
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-.theme-btn.active {
-    background: var(--accent);
-    color: #fff;
-    box-shadow: 0 2px 8px var(--accent-glow);
 }
 .color-picker { display: flex; gap: 0.6rem; }
 .color-btn {
@@ -2659,8 +2611,6 @@ body:has(.modal-overlay:not(.hidden)) .workspace-top-nav {
 }
 .physics-dot { background: #3B82F6; }
 .chem-dot { background: #22C55E; }
-.alevel-physics-dot { background: #A855F7; }
-.alevel-chem-dot { background: #06B6D4; }
 
 /* Profile widget card */
 .sidebar-profile-card {
@@ -2898,20 +2848,6 @@ body:has(.modal-overlay:not(.hidden)) .workspace-top-nav {
 }
 .card-chem:hover {
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.45), 0 0 20px rgba(34, 197, 94, 0.2);
-}
-.card-alevel-physics {
-    --subject-accent: #A855F7;
-    background: linear-gradient(135deg, rgba(168, 85, 247, 0.08) 0%, rgba(168, 85, 247, 0.01) 100%), rgba(255, 255, 255, 0.01);
-}
-.card-alevel-physics:hover {
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.45), 0 0 20px rgba(168, 85, 247, 0.2);
-}
-.card-alevel-chem {
-    --subject-accent: #06B6D4;
-    background: linear-gradient(135deg, rgba(6, 182, 212, 0.08) 0%, rgba(6, 182, 212, 0.01) 100%), rgba(255, 255, 255, 0.01);
-}
-.card-alevel-chem:hover {
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.45), 0 0 20px rgba(6, 182, 212, 0.2);
 }
 
 .subject-card-icon {

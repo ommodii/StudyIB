@@ -406,20 +406,6 @@
     background: rgba(244, 63, 94, 0.2); /* Pink margin line */
 }
 
-/* Grid backgrounds for light mode theme optionally */
-[data-theme="light"] .grid-paper {
-    background-color: #f8fafc !important;
-    background-image: 
-        linear-gradient(to right, rgba(99, 102, 241, 0.08) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(99, 102, 241, 0.08) 1px, transparent 1px);
-}
-
-[data-theme="light"] .ruled-paper {
-    background-color: #f8fafc !important;
-    background-image: 
-        linear-gradient(to bottom, transparent 27px, rgba(99, 102, 241, 0.1) 27px);
-}
-
 /* Layering overlays on page cards */
 .atom-pdf-render-layer {
     position: absolute;

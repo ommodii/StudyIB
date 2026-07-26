@@ -38,7 +38,6 @@ const rootFiles = [
   'practice_data.js',
   'chemistry_data.js',
   'chemistry_practice_data.js',
-  'alevel_data.js',
   'boundaries_data.js',
   'atom.css',              // note-taking component stylesheet
   'index.css',            // content-component styles (dojo-*, nav-item, pdf-card, etc.)

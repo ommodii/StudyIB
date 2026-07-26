@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- State ---
-    let currentSubject = 'physics'; // 'physics' or 'chemistry' or 'alevel_physics' or 'alevel_chemistry'
+    let currentSubject = 'physics'; // 'physics' or 'chemistry'
     let currentMode = 'topics'; // 'topics' or 'papers' or 'practice' or 'textbooks'
     let activeCategory = null; // Either a Topic name or a Year or a Textbook name
     let timerInterval = null;
@@ -94,32 +94,24 @@ document.addEventListener('DOMContentLoaded', () => {
     function getSyllabusData() {
         if (currentSubject === 'physics') return syllabusData;
         if (currentSubject === 'chemistry') return chemistrySyllabusData;
-        if (currentSubject === 'alevel_physics') return alevelPhysicsSyllabusData;
-        if (currentSubject === 'alevel_chemistry') return alevelChemistrySyllabusData;
         return {};
     }
 
     function getFullPapersData() {
         if (currentSubject === 'physics') return fullPapersData;
         if (currentSubject === 'chemistry') return chemistryFullPapersData;
-        if (currentSubject === 'alevel_physics') return alevelPhysicsFullPapersData;
-        if (currentSubject === 'alevel_chemistry') return alevelChemistryFullPapersData;
         return {};
     }
 
     function getPracticeData() {
         if (currentSubject === 'physics') return practiceData;
         if (currentSubject === 'chemistry') return chemistryPracticeData;
-        if (currentSubject === 'alevel_physics') return alevelPhysicsPracticeData;
-        if (currentSubject === 'alevel_chemistry') return alevelChemistryPracticeData;
         return {};
     }
 
     function getSubjectLabel() {
         if (currentSubject === 'physics') return 'Physics HL';
         if (currentSubject === 'chemistry') return 'Chemistry HL';
-        if (currentSubject === 'alevel_physics') return 'A-Level Physics';
-        if (currentSubject === 'alevel_chemistry') return 'A-Level Chem';
         return '';
     }
     
@@ -180,7 +172,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const settingsBtn = document.getElementById('settingsBtn');
     const settingsModal = document.getElementById('settingsModal');
     const closeSettingsBtn = document.getElementById('closeSettingsBtn');
-    const themeBtns = document.querySelectorAll('.theme-btn');
     const colorBtns = document.querySelectorAll('.color-btn');
     
     // Timer
@@ -206,34 +197,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Preferences (Settings) ---
     function loadPreferences() {
-        const theme = localStorage.getItem('theme') || 'dark';
         const color = localStorage.getItem('color') || 'indigo';
         userAccentColor = color;
-        
-        htmlRoot.setAttribute('data-theme', theme);
+
+        htmlRoot.setAttribute('data-theme', 'dark');
+        localStorage.removeItem('theme');
         if (currentSubject === 'physics') {
             htmlRoot.setAttribute('data-color', 'physics');
         } else {
             htmlRoot.setAttribute('data-color', 'chemistry');
         }
         
-        themeBtns.forEach(btn => {
-            btn.classList.toggle('active', btn.getAttribute('data-theme') === theme);
-        });
         colorBtns.forEach(btn => {
             btn.classList.toggle('active', btn.getAttribute('data-color') === color);
         });
     }
-
-    themeBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const theme = btn.getAttribute('data-theme');
-            htmlRoot.setAttribute('data-theme', theme);
-            localStorage.setItem('theme', theme);
-            themeBtns.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-        });
-    });
 
     colorBtns.forEach(btn => {
         btn.addEventListener('click', () => {
@@ -527,8 +505,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const sidebarHome = document.getElementById('sidebarHome');
         const sidebarSubPhysics = document.getElementById('sidebarSubPhysics');
         const sidebarSubChem = document.getElementById('sidebarSubChem');
-        const sidebarSubALevPhysics = document.getElementById('sidebarSubALevPhysics');
-        const sidebarSubALevChem = document.getElementById('sidebarSubALevChem');
         const sidebarMock = document.getElementById('sidebarMock');
         const sidebarReviews = document.getElementById('sidebarReviews');
         const sidebarAtom = document.getElementById('sidebarAtom');
@@ -543,9 +519,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Subject links array
         const subjectLinks = [
             { el: sidebarSubPhysics, id: 'physics' },
-            { el: sidebarSubChem, id: 'chemistry' },
-            { el: sidebarSubALevPhysics, id: 'alevel_physics' },
-            { el: sidebarSubALevChem, id: 'alevel_chemistry' }
+            { el: sidebarSubChem, id: 'chemistry' }
         ];
 
         subjectLinks.forEach(link => {
@@ -606,8 +580,6 @@ document.addEventListener('DOMContentLoaded', () => {
             let activeLink = null;
             if (currentSubject === 'physics') activeLink = document.getElementById('sidebarSubPhysics');
             else if (currentSubject === 'chemistry') activeLink = document.getElementById('sidebarSubChem');
-            else if (currentSubject === 'alevel_physics') activeLink = document.getElementById('sidebarSubALevPhysics');
-            else if (currentSubject === 'alevel_chemistry') activeLink = document.getElementById('sidebarSubALevChem');
             
             if (activeLink) activeLink.classList.add('active');
         }
@@ -635,10 +607,6 @@ document.addEventListener('DOMContentLoaded', () => {
             htmlRoot.setAttribute('data-color', 'physics');
         } else if (currentSubject === 'chemistry') {
             htmlRoot.setAttribute('data-color', 'chemistry');
-        } else if (currentSubject === 'alevel_physics') {
-            htmlRoot.setAttribute('data-color', 'blue');
-        } else if (currentSubject === 'alevel_chemistry') {
-            htmlRoot.setAttribute('data-color', 'green');
         }
 
         showContentHeader();
@@ -734,25 +702,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     <button class="subject-open-btn">Open ></button>
                 </div>
                 
-                <!-- Card 3: A-Level Physics -->
-                <div class="dojo-subject-card card-alevel-physics" data-subject="alevel_physics">
-                    <div class="subject-card-icon">🔭</div>
-                    <div class="subject-card-content">
-                        <h3>A-Level Physics</h3>
-                        <p>AQA Specification • 8 core topics</p>
-                    </div>
-                    <button class="subject-open-btn">Open ></button>
-                </div>
-                
-                <!-- Card 4: A-Level Chem -->
-                <div class="dojo-subject-card card-alevel-chem" data-subject="alevel_chemistry">
-                    <div class="subject-card-icon">⚗️</div>
-                    <div class="subject-card-content">
-                        <h3>A-Level Chemistry</h3>
-                        <p>AQA Specification • 3 core topics</p>
-                    </div>
-                    <button class="subject-open-btn">Open ></button>
-                </div>
             </div>
 
             <div class="dojo-section-title" style="margin-top: 2rem;">Recommended for you</div>
@@ -961,8 +910,6 @@ document.addEventListener('DOMContentLoaded', () => {
         updateBreadcrumbs([]);
 
         const subjectLabel = getSubjectLabel();
-        const isALevel = currentSubject.startsWith('alevel_');
-
         const syllabusData = getSyllabusData();
         const categories = sortCategories(Object.keys(syllabusData));
 
@@ -974,7 +921,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span class="menu-link" id="homeNavSyllabus">Syllabus Themes</span>
                     <span class="menu-link" id="homeNavTopics">Topical Papers</span>
                     <span class="menu-link" id="homeNavPapers">Past Papers</span>
-                    ${!isALevel ? `<span class="menu-link" id="homeNavMock">Mock Simulator</span>` : ''}
+                    <span class="menu-link" id="homeNavMock">Mock Simulator</span>
                     <span class="menu-link" id="homeNavReviews">Review Queue</span>
                 </div>
                 <button class="workspace-cta-btn" id="homeCtaBtn">
@@ -1670,9 +1617,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const paperDefinitions = {
                 'P1': { title: 'Paper 1 — Multiple Choice', meta: 'MCQ' },
                 'P2': { title: 'Paper 2 — Structured', meta: 'Structured' },
-                'P3': { title: 'Paper 3 — Options & Data Analysis', meta: 'Data & Options' },
-                'P4': { title: 'Paper 4 — A-Level Structured', meta: 'A2 Structured' },
-                'P5': { title: 'Paper 5 — Planning & Evaluation', meta: 'Planning' }
+                'P3': { title: 'Paper 3 — Options & Data Analysis', meta: 'Data & Options' }
             };
 
             for (const [ptype, pdef] of Object.entries(paperDefinitions)) {
