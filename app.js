@@ -932,6 +932,20 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>`;
     }
 
+    function getWorkspaceIcon(name) {
+        const icons = {
+            physics: '<circle cx="12" cy="12" r="1.6" fill="currentColor"></circle><ellipse cx="12" cy="12" rx="9" ry="3.5"></ellipse><ellipse cx="12" cy="12" rx="9" ry="3.5" transform="rotate(60 12 12)"></ellipse><ellipse cx="12" cy="12" rx="9" ry="3.5" transform="rotate(120 12 12)"></ellipse>',
+            chemistry: '<path d="M9 3h6"></path><path d="M10 3v6.2l-5 8.3A2.3 2.3 0 0 0 7 21h10a2.3 2.3 0 0 0 2-3.5l-5-8.3V3"></path><path d="M8 15h8"></path>',
+            syllabus: '<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H11v17H6.5A2.5 2.5 0 0 0 4 22z"></path><path d="M20 5.5A2.5 2.5 0 0 0 17.5 3H13v17h4.5A2.5 2.5 0 0 1 20 22z"></path>',
+            topics: '<path d="m12 2 9 5-9 5-9-5z"></path><path d="m3 12 9 5 9-5"></path><path d="m3 17 9 5 9-5"></path>',
+            papers: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path><path d="M8 13h8M8 17h8"></path>',
+            mock: '<rect x="3" y="3" width="18" height="18" rx="4"></rect><path d="m8 12 2.5 2.5L16.5 8.5"></path>',
+            reviews: '<path d="M6 3h12a2 2 0 0 1 2 2v16l-8-4-8 4V5a2 2 0 0 1 2-2z"></path><path d="m9 9 2 2 4-4"></path>',
+            daily: '<path d="m13 2-8 12h7l-1 8 8-12h-7z"></path>'
+        };
+        return `<svg class="workspace-nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${icons[name] || ''}</svg>`;
+    }
+
     function renderDashboard() {
         hideContentHeader();
         currentCategoryTitle.textContent = "Workspace";
@@ -939,22 +953,37 @@ document.addEventListener('DOMContentLoaded', () => {
         updateBreadcrumbs([]);
 
         const subjectLabel = getSubjectLabel();
+        const subjectIcon = subjectLabel.toLowerCase().includes('chemistry') ? 'chemistry' : 'physics';
         const syllabusData = getSyllabusData();
         const categories = sortCategories(Object.keys(syllabusData));
 
         let homescreenHTML = `
             <!-- Top Nav Bar (Stationary) -->
             <div class="workspace-top-nav">
-                <div class="workspace-logo">${subjectLabel}</div>
-                <div class="workspace-menu">
-                    <span class="menu-link" id="homeNavSyllabus">Syllabus Themes</span>
-                    <span class="menu-link" id="homeNavTopics">Topical Papers</span>
-                    <span class="menu-link" id="homeNavPapers">Past Papers</span>
-                    <span class="menu-link" id="homeNavMock">Mock Simulator</span>
-                    <span class="menu-link" id="homeNavReviews">Review Queue</span>
+                <div class="workspace-logo" title="${subjectLabel}">
+                    ${getWorkspaceIcon(subjectIcon)}
+                    <span>${subjectLabel}</span>
                 </div>
-                <button class="workspace-cta-btn" id="homeCtaBtn">
-                    Problem of the Day ↗
+                <div class="workspace-menu" aria-label="Subject tools">
+                    <button type="button" class="workspace-nav-item is-active" id="homeNavSyllabus" aria-label="Syllabus themes" title="Syllabus themes">
+                        ${getWorkspaceIcon('syllabus')}<span>Syllabus</span>
+                    </button>
+                    <button type="button" class="workspace-nav-item" id="homeNavTopics" aria-label="Topical papers" title="Topical papers">
+                        ${getWorkspaceIcon('topics')}<span>Topical</span>
+                    </button>
+                    <button type="button" class="workspace-nav-item" id="homeNavPapers" aria-label="Past papers" title="Past papers">
+                        ${getWorkspaceIcon('papers')}<span>Papers</span>
+                    </button>
+                    <button type="button" class="workspace-nav-item" id="homeNavMock" aria-label="Mock simulator" title="Mock simulator">
+                        ${getWorkspaceIcon('mock')}<span>Mock</span>
+                    </button>
+                    <button type="button" class="workspace-nav-item" id="homeNavReviews" aria-label="Review queue" title="Review queue">
+                        ${getWorkspaceIcon('reviews')}<span>Review</span>
+                    </button>
+                </div>
+                <button type="button" class="workspace-cta-btn" id="homeCtaBtn" aria-label="Problem of the day" title="Problem of the day">
+                    ${getWorkspaceIcon('daily')}
+                    <span>Daily problem</span>
                 </button>
             </div>
 
