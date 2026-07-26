@@ -5,6 +5,12 @@
   "main": "main.js",
   "author": "Om Modi",
   "license": "ISC",
+  "scripts": {
+    "build:web": "node build_web.js",
+    "deploy:worker": "npm run build:web && wrangler deploy",
+    "deploy:pages": "npm run build:web && wrangler pages deploy www --project-name studyib --branch main",
+    "deploy:all": "npm run build:web && wrangler deploy && wrangler pages deploy www --project-name studyib --branch main"
+  },
   "dependencies": {
     "@capacitor/core": "^8.4.1",
     "@capacitor/filesystem": "^8.1.2"
