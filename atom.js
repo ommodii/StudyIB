@@ -749,7 +749,10 @@
         // If it's a PDF templates paper, load and parse it using pdfjs
         if (notebook.pdfPath) {
             try {
-                const loadingTask = pdfjsLib.getDocument(notebook.pdfPath);
+                const resolvedPdfPath = window.resolveStudyIBContentUrl
+                    ? window.resolveStudyIBContentUrl(notebook.pdfPath)
+                    : notebook.pdfPath;
+                const loadingTask = pdfjsLib.getDocument(resolvedPdfPath);
                 currentPdfDoc = await loadingTask.promise;
                 
                 // If pages array is empty or contains no PDF pages, initialize them

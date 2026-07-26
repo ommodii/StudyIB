@@ -7,6 +7,7 @@ const destDir = path.join(__dirname, 'www');
 // Files to copy
 const filesToCopy = [
     'index.html',
+    'config.js',
     'app.js',
     'atom.js',
     'gamification.js',
@@ -21,9 +22,7 @@ const filesToCopy = [
     'atom.css'
 ];
 
-const foldersToCopy = [
-    'Content'
-];
+const foldersToCopy = [];
 
 function copyFileSync(src, dest) {
     fs.mkdirSync(path.dirname(dest), { recursive: true });

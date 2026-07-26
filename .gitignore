@@ -1,1 +1,4 @@
 /Content/
+/www/
+/node_modules/.cache/
+~$*.docx

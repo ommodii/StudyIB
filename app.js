@@ -1835,7 +1835,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentScale = 1.25;
             }
 
-            const loadingTask = pdfjsLib.getDocument(url);
+            const resolvedUrl = window.resolveStudyIBContentUrl
+                ? window.resolveStudyIBContentUrl(url)
+                : url;
+            const loadingTask = pdfjsLib.getDocument(resolvedUrl);
             currentPdfDoc = await loadingTask.promise;
             await reRenderPdf();
 

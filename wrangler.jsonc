@@ -1,0 +1,23 @@
+{
+  "name": "studyib-site",
+  "compatibility_date": "2026-07-26",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "workers_dev": false,
+  "routes": [
+    {
+      "pattern": "ommodi.site/*",
+      "zone_id": "03ff71c99528c753e6d75828cd46f655"
+    },
+    {
+      "pattern": "www.ommodi.site/*",
+      "zone_id": "03ff71c99528c753e6d75828cd46f655"
+    }
+  ],
+  "assets": {
+    "directory": "./www",
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "404-page"
+  }
+}
