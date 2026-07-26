@@ -6,9 +6,12 @@ const projectRoot = path.resolve(__dirname, '..');
 const contentRoot = path.join(projectRoot, 'Content');
 const bucket = process.env.STUDYIB_R2_BUCKET || 'studyib-content';
 const concurrency = Math.max(1, Number(process.env.STUDYIB_UPLOAD_CONCURRENCY || 4));
-const requestedPaths = process.argv.slice(2);
+const retryFailedUploads = process.argv.includes('--retry-failed');
+const requestedPaths = process.argv.slice(2).filter(value => value !== '--retry-failed');
 const globalModules = path.join(process.env.APPDATA, 'npm', 'node_modules');
 const wranglerCli = path.join(globalModules, 'wrangler', 'bin', 'wrangler.js');
+const wranglerLogDir = path.join(process.env.APPDATA, 'xdg.config', '.wrangler', 'logs');
+const maxAttempts = Math.max(1, Number(process.env.STUDYIB_UPLOAD_MAX_ATTEMPTS || 6));
 
 if (!fs.existsSync(contentRoot)) {
     throw new Error(`Content directory not found: ${contentRoot}`);
@@ -44,6 +47,32 @@ function resolveUploadRoots() {
     });
 }
 
+function collectRateLimitedFiles() {
+    if (!fs.existsSync(wranglerLogDir)) {
+        throw new Error(`Wrangler log directory not found: ${wranglerLogDir}`);
+    }
+
+    const files = new Set();
+    for (const entry of fs.readdirSync(wranglerLogDir, { withFileTypes: true })) {
+        if (!entry.isFile() || !entry.name.endsWith('.log')) continue;
+        const log = fs.readFileSync(path.join(wranglerLogDir, entry.name), 'utf8');
+        if (!log.includes('429: Too Many Requests')) continue;
+
+        const match = log.match(/Creating object "(Content\/[^"]+)" in bucket/);
+        if (!match) continue;
+        const relativeObjectPath = match[1].slice('Content/'.length);
+        const localPath = path.join(contentRoot, ...relativeObjectPath.split('/'));
+        if (fs.existsSync(localPath) && fs.statSync(localPath).isFile()) {
+            files.add(localPath);
+        }
+    }
+
+    if (files.size === 0) {
+        throw new Error('No locally available rate-limited uploads were found in Wrangler logs.');
+    }
+    return [...files];
+}
+
 function contentTypeFor(filePath) {
     const extension = path.extname(filePath).toLowerCase();
     if (extension === '.pdf') return 'application/pdf';
@@ -51,7 +80,7 @@ function contentTypeFor(filePath) {
     return 'application/octet-stream';
 }
 
-function upload(filePath) {
+function uploadOnce(filePath) {
     const relativePath = path.relative(contentRoot, filePath).split(path.sep).join('/');
     const objectPath = `${bucket}/Content/${relativePath}`;
     const args = [
@@ -80,15 +109,40 @@ function upload(filePath) {
     });
 }
 
+function wait(milliseconds) {
+    return new Promise(resolve => setTimeout(resolve, milliseconds));
+}
+
+async function upload(filePath) {
+    let lastError;
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        try {
+            await uploadOnce(filePath);
+            return;
+        } catch (error) {
+            lastError = error;
+            if (attempt === maxAttempts) break;
+            const delay = Math.min(30000, 1000 * (2 ** (attempt - 1)));
+            console.warn(`Retrying ${path.relative(contentRoot, filePath)} in ${delay / 1000}s (attempt ${attempt + 1}/${maxAttempts})...`);
+            await wait(delay);
+        }
+    }
+    throw lastError;
+}
+
 async function main() {
-    const uploadRoots = resolveUploadRoots();
-    const files = [...new Set(uploadRoots.flatMap(collectFiles))];
+    const uploadRoots = retryFailedUploads ? [] : resolveUploadRoots();
+    const files = retryFailedUploads
+        ? collectRateLimitedFiles()
+        : [...new Set(uploadRoots.flatMap(collectFiles))];
     let nextIndex = 0;
     let completed = 0;
     let failed = 0;
     const startedAt = Date.now();
 
-    const labels = uploadRoots.map(root => path.relative(contentRoot, root) || 'all Content').join(', ');
+    const labels = retryFailedUploads
+        ? 'rate-limited files recorded in Wrangler logs'
+        : uploadRoots.map(root => path.relative(contentRoot, root) || 'all Content').join(', ');
     console.log(`Uploading ${files.length} files from ${labels} to ${bucket}/Content with concurrency ${concurrency}...`);
 
     async function worker() {
