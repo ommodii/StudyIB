@@ -31,7 +31,9 @@
     function setActiveAtomTool(tool) {
         activeTool = tool;
         document.querySelectorAll('.atom-toolbar-btn[data-tool]').forEach(btn => {
-            btn.classList.toggle('active', btn.getAttribute('data-tool') === tool);
+            const isActive = btn.getAttribute('data-tool') === tool;
+            btn.classList.toggle('active', isActive);
+            btn.setAttribute('aria-pressed', String(isActive));
         });
         updateCanvasCursors();
     }
@@ -316,9 +318,13 @@
             // Color selection
             document.querySelectorAll('.atom-color-dot').forEach(dot => {
                 dot.addEventListener('click', (e) => {
-                    document.querySelectorAll('.atom-color-dot').forEach(d => d.classList.remove('active'));
+                    document.querySelectorAll('.atom-color-dot').forEach(d => {
+                        d.classList.remove('active');
+                        d.setAttribute('aria-checked', 'false');
+                    });
                     const target = e.currentTarget;
                     target.classList.add('active');
+                    target.setAttribute('aria-checked', 'true');
                     strokeColor = target.getAttribute('data-color');
                 });
             });
@@ -347,12 +353,9 @@
                 saveBtn.addEventListener('click', () => {
                     if (activeNotebook) {
                         saveNotebook(activeNotebook);
-                        // Visual save indicator flashing green
-                        const originalColor = saveBtn.style.color;
-                        saveBtn.style.color = '#10B981';
-                        setTimeout(() => {
-                            saveBtn.style.color = originalColor;
-                        }, 1000);
+                        // Brief semantic confirmation without coupling behaviour to inline styles.
+                        saveBtn.classList.add('is-saved');
+                        setTimeout(() => saveBtn.classList.remove('is-saved'), 1000);
                     }
                 });
             }
@@ -447,7 +450,7 @@
             document.getElementById('atomDashboardView').classList.add('hidden');
             document.getElementById('atomEditorView').classList.remove('hidden');
             document.getElementById('atomBackBtn').innerHTML = `
-                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none" style="margin-right: 6px; vertical-align: middle;"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                <svg aria-hidden="true" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="15 18 9 12 15 6"></polyline></svg>
                 <span>Save & Close</span>
             `;
 
@@ -477,7 +480,7 @@
             document.getElementById('atomEditorView').classList.add('hidden');
             document.getElementById('atomDashboardView').classList.remove('hidden');
             document.getElementById('atomBackBtn').innerHTML = `
-                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none" style="margin-right: 6px; vertical-align: middle;"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                <svg aria-hidden="true" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="15 18 9 12 15 6"></polyline></svg>
                 <span>Dashboard</span>
             `;
             loadNotebooks();
@@ -670,10 +673,10 @@
         
         if (notebooks.length === 0) {
             grid.innerHTML = `
-                <div class="empty-state" style="grid-column: 1 / -1; margin-top: 4rem; text-align: center;">
-                    <svg viewBox="0 0 24 24" width="48" height="48" stroke="currentColor" stroke-width="1.5" fill="none" style="margin-bottom: 1rem; color: var(--text-muted);"><circle cx="12" cy="12" r="3"></circle><line x1="3" y1="12" x2="21" y2="12"></line><line x1="12" y1="3" x2="12" y2="21"></line><path d="M16.24 7.76l-8.48 8.48"></path><path d="M7.76 7.76l8.48 8.48"></path></svg>
+                <div class="empty-state atom-empty-state">
+                    <svg class="empty-state-icon" aria-hidden="true" viewBox="0 0 24 24" width="48" height="48" stroke="currentColor" stroke-width="1.5" fill="none"><circle cx="12" cy="12" r="3"></circle><line x1="3" y1="12" x2="21" y2="12"></line><line x1="12" y1="3" x2="12" y2="21"></line><path d="M16.24 7.76l-8.48 8.48"></path><path d="M7.76 7.76l8.48 8.48"></path></svg>
                     <h3>No Notes Yet</h3>
-                    <p style="color: var(--text-muted); max-width: 320px; margin: 0.5rem auto 0;">Create a new blank notebook or open any past paper in Atom to start sketching!</p>
+                    <p>Create a new blank notebook or open any past paper in Atom to start sketching!</p>
                 </div>
             `;
             return;
@@ -683,19 +686,21 @@
             const date = new Date(notebook.lastModified).toLocaleDateString();
             const badge = notebook.pdfPath ? 'Exam Paper' : 'Blank Notes';
             return `
-                <div class="notebook-card" data-id="${notebook.id}">
-                    <button class="notebook-card-delete-btn" data-id="${notebook.id}" title="Delete Permanently">×</button>
-                    <div class="notebook-preview-area" style="position: relative; background: #0f172a; height: 160px; overflow: hidden; border-radius: 6px; display: flex; justify-content: center; align-items: center; border: 1px solid var(--border-light);">
-                        <canvas class="notebook-card-canvas" id="canvas_${notebook.id}" style="width: 100%; height: 100%; object-fit: contain;"></canvas>
-                    </div>
-                    <div class="notebook-info">
-                        <div class="notebook-title">${notebook.title}</div>
-                        <div class="notebook-meta">
-                            <span>Modified: ${date}</span>
-                            <span class="notebook-badge">${badge}</span>
-                        </div>
-                    </div>
-                </div>
+                <article class="notebook-card card" data-id="${notebook.id}">
+                    <button type="button" class="notebook-card-delete-btn button button-destructive button-icon button-sm" data-id="${notebook.id}" title="Delete permanently" aria-label="Delete ${notebook.title}">×</button>
+                    <button type="button" class="notebook-card-open" aria-label="Open ${notebook.title}">
+                        <span class="notebook-preview-area">
+                            <canvas class="notebook-card-canvas" id="canvas_${notebook.id}"></canvas>
+                        </span>
+                        <span class="notebook-info">
+                            <span class="notebook-title">${notebook.title}</span>
+                            <span class="notebook-meta">
+                                <span>Modified: ${date}</span>
+                                <span class="notebook-badge badge">${badge}</span>
+                            </span>
+                        </span>
+                    </button>
+                </article>
             `;
         }).join('');
 
@@ -709,55 +714,85 @@
 
         // Bind clicks to notebooks
         grid.querySelectorAll('.notebook-card').forEach(card => {
-            card.addEventListener('click', (e) => {
-                if (e.target.classList.contains('notebook-card-delete-btn')) {
-                    e.stopPropagation();
-                    const id = e.target.getAttribute('data-id');
-                    if (confirm("Are you sure you want to delete this notebook permanently?")) {
-                        deleteNotebook(id);
-                    }
-                    return;
-                }
+            card.querySelector('.notebook-card-open').addEventListener('click', () => {
                 const id = card.getAttribute('data-id');
                 const notebook = notebooks.find(n => n.id === id);
                 if (notebook) window.AtomWorkspace.openNotebook(notebook);
+            });
+            card.querySelector('.notebook-card-delete-btn').addEventListener('click', (e) => {
+                e.stopPropagation();
+                const id = e.currentTarget.getAttribute('data-id');
+                if (confirm("Are you sure you want to delete this notebook permanently?")) {
+                    deleteNotebook(id);
+                }
             });
         });
     }
 
     // --- New Notebook Modal Dialog ---
     function openNewNotebookModal() {
+        const previouslyFocused = document.activeElement;
         const modal = document.createElement('div');
-        modal.className = 'atom-modal-overlay';
+        modal.className = 'atom-modal-overlay dialog-overlay';
+        modal.setAttribute('role', 'dialog');
+        modal.setAttribute('aria-modal', 'true');
+        modal.setAttribute('aria-labelledby', 'newNotebookTitle');
         modal.innerHTML = `
-            <div class="modal-content" style="max-width: 420px; animation: modalSlide 0.2s cubic-bezier(0.4, 0, 0.2, 1);">
-                <div class="modal-header">
-                    <h3 style="display: flex; align-items: center; gap: 8px;">
-                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.5" fill="none" style="vertical-align: middle;"><circle cx="12" cy="12" r="3"></circle><line x1="3" y1="12" x2="21" y2="12"></line><line x1="12" y1="3" x2="12" y2="21"></line><path d="M16.24 7.76l-8.48 8.48"></path><path d="M7.76 7.76l8.48 8.48"></path></svg>
+            <div class="modal-content dialog atom-dialog">
+                <div class="modal-header dialog-header">
+                    <h3 id="newNotebookTitle" class="atom-dialog-title">
+                        <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="12" cy="12" r="3"></circle><line x1="3" y1="12" x2="21" y2="12"></line><line x1="12" y1="3" x2="12" y2="21"></line><path d="M16.24 7.76l-8.48 8.48"></path><path d="M7.76 7.76l8.48 8.48"></path></svg>
                         <span>Create New Notebook</span>
                     </h3>
-                    <button class="close-btn" id="closeNewModalBtn">×</button>
+                    <button type="button" class="close-btn button button-ghost button-icon" id="closeNewModalBtn" aria-label="Close new notebook dialog">×</button>
                 </div>
-                <div class="modal-body" style="padding: 1.5rem; display: flex; flex-direction: column; gap: 1.25rem;">
+                <div class="modal-body dialog-content atom-dialog-content">
                     <div class="mock-config-group">
-                        <label class="mock-config-label">Notebook Name</label>
-                        <input type="text" id="notebookTitleInput" class="mock-paper-btn" style="width: 100%; border: 1px solid var(--border-light); background: var(--bg-elevated); outline: none; padding: 0.6rem 1rem; border-radius: var(--radius-md); color: var(--text-primary);" placeholder="My Physics Notes" value="Untitled Notebook">
+                        <label class="mock-config-label" for="notebookTitleInput">Notebook Name</label>
+                        <input type="text" id="notebookTitleInput" class="input" placeholder="My Physics Notes" value="Untitled Notebook">
                     </div>
                     <div class="mock-config-group">
-                        <label class="mock-config-label">Paper Template Style</label>
-                        <select id="notebookPaperStyleInput" class="mock-paper-btn" style="width: 100%; padding: 0.6rem; background: var(--bg-elevated); border: 1px solid var(--border-light); color: var(--text-primary); border-radius: var(--radius-md);">
+                        <label class="mock-config-label" for="notebookPaperStyleInput">Paper Template Style</label>
+                        <select id="notebookPaperStyleInput" class="select">
                             <option value="grid-paper">Graph / Grid Paper</option>
                             <option value="ruled-paper">Ruled Lines Paper</option>
                             <option value="solid-paper">Solid Blank Paper</option>
                         </select>
                     </div>
-                    <button class="primary-btn" id="confirmCreateNotebookBtn" style="width: 100%; padding: 0.75rem; font-weight: 700; border-radius: var(--radius-md); background: var(--accent);">Create & Open Editor</button>
+                    <button type="button" class="primary-btn button button-primary atom-dialog-submit" id="confirmCreateNotebookBtn">Create & Open Editor</button>
                 </div>
             </div>
         `;
         document.body.appendChild(modal);
 
-        modal.querySelector('#closeNewModalBtn').addEventListener('click', () => modal.remove());
+        const closeModal = () => {
+            modal.remove();
+            if (previouslyFocused && typeof previouslyFocused.focus === 'function') {
+                previouslyFocused.focus();
+            }
+        };
+        modal.querySelector('#closeNewModalBtn').addEventListener('click', closeModal);
+        modal.addEventListener('click', (event) => {
+            if (event.target === modal) closeModal();
+        });
+        modal.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') closeModal();
+            if (event.key === 'Tab') {
+                const focusable = [...modal.querySelectorAll('button, input, select, textarea, [href], [tabindex]:not([tabindex="-1"])')]
+                    .filter(element => !element.disabled && element.getClientRects().length > 0);
+                if (!focusable.length) return;
+                const first = focusable[0];
+                const last = focusable[focusable.length - 1];
+                if (event.shiftKey && document.activeElement === first) {
+                    event.preventDefault();
+                    last.focus();
+                } else if (!event.shiftKey && document.activeElement === last) {
+                    event.preventDefault();
+                    first.focus();
+                }
+            }
+        });
+        modal.querySelector('#notebookTitleInput').focus();
         modal.querySelector('#confirmCreateNotebookBtn').addEventListener('click', () => {
             const title = modal.querySelector('#notebookTitleInput').value.trim() || 'Untitled Notebook';
             const style = modal.querySelector('#notebookPaperStyleInput').value;
@@ -791,7 +826,7 @@
         const list = document.getElementById('atomThumbnailsList');
         if (!viewport || !list) return;
 
-        viewport.innerHTML = '<div style="color: var(--text-muted); font-size: var(--text-sm);">Loading Atom canvas layer...</div>';
+        viewport.innerHTML = '<div class="loading-state atom-loading-state">Loading Atom canvas layer...</div>';
         list.innerHTML = '';
         currentPdfDoc = null;
         undoStack = [];
@@ -921,7 +956,7 @@
             meta.className = 'atom-page-meta';
             meta.innerHTML = `
                 <span>Page ${idx} of ${notebook.pages.length}</span>
-                <button class="atom-page-delete-btn" data-idx="${index}">Delete Page</button>
+                <button type="button" class="atom-page-delete-btn button button-destructive button-sm" data-idx="${index}">Delete Page</button>
             `;
             card.appendChild(meta);
             
@@ -1021,12 +1056,14 @@
             attachDrawingHandlers(annotCanvas, page);
 
             // 7. Add Left sidebar thumbnail items
-            const thumb = document.createElement('div');
+            const thumb = document.createElement('button');
+            thumb.type = 'button';
             thumb.className = 'thumbnail-card';
             thumb.setAttribute('data-target-idx', index);
+            thumb.setAttribute('aria-label', `Go to page ${idx}`);
             thumb.innerHTML = `
-                <div class="thumbnail-canvas-container" style="background:#0f172a; display:flex; justify-content:center; align-items:center; overflow:hidden;">
-                    <canvas class="thumbnail-page-canvas" id="thumb_canvas_${idx}" style="width:100%; height:100%; object-fit:contain; pointer-events:none;"></canvas>
+                <div class="thumbnail-canvas-container">
+                    <canvas class="thumbnail-page-canvas" id="thumb_canvas_${idx}"></canvas>
                 </div>
                 <div class="thumbnail-num">${idx}</div>
             `;

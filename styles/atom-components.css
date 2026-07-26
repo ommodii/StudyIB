@@ -1,0 +1,457 @@
+/* Atom-specific components loaded after the legacy editor stylesheet. */
+/* ==========================================================================
+   Unified design system: Atom application chrome
+   Document, PDF, annotation, and text layers intentionally retain their
+   specialized rendering rules above.
+   ========================================================================== */
+
+.atom-workspace {
+    background: var(--background);
+    color: var(--foreground);
+}
+
+.atom-dashboard-header.app-toolbar {
+    min-height: var(--toolbar-height);
+    padding: var(--space-2) var(--space-4);
+    background: var(--surface-1);
+    border-color: var(--border);
+    backdrop-filter: none;
+}
+
+.atom-dashboard-title {
+    gap: var(--space-2);
+    color: var(--foreground);
+    font-size: var(--text-lg);
+    font-weight: var(--weight-semibold);
+    line-height: 1.2;
+    background: none;
+    -webkit-text-fill-color: currentColor;
+}
+
+.atom-dashboard-title span {
+    -webkit-text-fill-color: currentColor;
+}
+
+.atom-brand-icon {
+    flex: 0 0 auto;
+    color: var(--primary);
+}
+
+.atom-dashboard-actions {
+    gap: var(--space-2);
+}
+
+.atom-dashboard-view {
+    flex: 1;
+    display: flex;
+    min-height: 0;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.atom-dashboard-subheader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    min-height: var(--toolbar-height);
+    padding: var(--space-2) var(--space-6);
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--border);
+}
+
+.atom-dashboard-description {
+    min-width: 0;
+    color: var(--muted-foreground);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+}
+
+.atom-grid {
+    padding: var(--space-6);
+    grid-template-columns: repeat(auto-fill, minmax(min(17rem, 100%), 1fr));
+    gap: var(--space-4);
+}
+
+.atom-empty-state {
+    grid-column: 1 / -1;
+    max-width: 28rem;
+    margin: var(--space-10) auto 0;
+    text-align: center;
+}
+
+.atom-empty-state .empty-state-icon {
+    margin-bottom: var(--space-4);
+    color: var(--muted-foreground);
+}
+
+.atom-empty-state p {
+    max-width: 22rem;
+    margin: var(--space-2) auto 0;
+    color: var(--muted-foreground);
+}
+
+.notebook-card {
+    display: block;
+    padding: 0;
+    overflow: hidden;
+    background: var(--card);
+    border-color: var(--border);
+    border-radius: var(--radius-lg);
+    cursor: default;
+    transition: border-color var(--duration-fast) var(--ease-standard),
+        background var(--duration-fast) var(--ease-standard);
+}
+
+.notebook-card:hover,
+.notebook-card:focus-within {
+    transform: none;
+    background: var(--surface-hover);
+    border-color: var(--border-strong);
+}
+
+.notebook-card-open {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: var(--space-3);
+    color: inherit;
+    text-align: left;
+    background: transparent;
+    border: 0;
+    border-radius: inherit;
+    cursor: pointer;
+}
+
+.notebook-preview-area {
+    display: flex;
+    position: relative;
+    height: 10rem;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: var(--surface-3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+}
+
+.notebook-card-canvas,
+.thumbnail-page-canvas {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+}
+
+.notebook-info {
+    gap: var(--space-1);
+}
+
+.notebook-title {
+    color: var(--card-foreground);
+    font-size: var(--text-base);
+    font-weight: var(--weight-semibold);
+}
+
+.notebook-meta {
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--muted-foreground);
+    font-size: var(--text-xs);
+}
+
+.notebook-badge {
+    flex: 0 0 auto;
+    background: var(--secondary);
+    border-color: var(--border);
+}
+
+.notebook-card-delete-btn {
+    top: var(--space-2);
+    right: var(--space-2);
+    width: 2rem;
+    height: 2rem;
+    color: var(--destructive-foreground);
+    background: var(--destructive);
+    border-radius: var(--radius-md);
+    opacity: 0;
+    transition: opacity var(--duration-fast) var(--ease-standard),
+        background var(--duration-fast) var(--ease-standard);
+}
+
+.notebook-card:hover .notebook-card-delete-btn,
+.notebook-card:focus-within .notebook-card-delete-btn,
+.notebook-card-delete-btn:focus-visible {
+    opacity: 1;
+}
+
+.notebook-card-delete-btn:hover {
+    background: var(--destructive-hover);
+    transform: none;
+}
+
+.atom-editor {
+    background: var(--surface-2);
+}
+
+.atom-thumbnails-sidebar {
+    width: 13rem;
+    background: var(--surface-1);
+    border-color: var(--border);
+}
+
+.atom-thumbnails-header {
+    min-height: 2.75rem;
+    padding: var(--space-3) var(--space-4);
+    color: var(--muted-foreground);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-semibold);
+    letter-spacing: 0.06em;
+    border-color: var(--border);
+}
+
+.atom-thumbnails-list {
+    padding: var(--space-3);
+    gap: var(--space-3);
+}
+
+.thumbnail-card {
+    width: 100%;
+    padding: var(--space-1);
+    color: var(--muted-foreground);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    transition: border-color var(--duration-fast) var(--ease-standard),
+        background var(--duration-fast) var(--ease-standard);
+}
+
+.thumbnail-card:hover {
+    background: var(--surface-hover);
+    border-color: var(--border-strong);
+}
+
+.thumbnail-card.active {
+    color: var(--foreground);
+    background: color-mix(in srgb, var(--primary) 10%, var(--surface-2));
+    border-color: var(--primary);
+    transform: none;
+}
+
+.thumbnail-canvas-container {
+    background: var(--surface-3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    box-shadow: none;
+}
+
+.thumbnail-num {
+    color: inherit;
+    font-weight: var(--weight-medium);
+}
+
+.atom-viewport {
+    background: var(--surface-2);
+    scrollbar-gutter: stable;
+}
+
+.atom-floating-toolbar {
+    top: var(--space-3);
+    gap: var(--space-2);
+    padding: var(--space-2);
+    background: var(--popover);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    backdrop-filter: none;
+}
+
+.atom-tool-group {
+    gap: var(--space-1);
+}
+
+.atom-color-group {
+    gap: var(--space-2);
+}
+
+.atom-toolbar-btn {
+    width: 2.25rem;
+    height: 2.25rem;
+    color: var(--muted-foreground);
+    border-radius: var(--radius-md);
+    transition: color var(--duration-fast) var(--ease-standard),
+        background var(--duration-fast) var(--ease-standard),
+        border-color var(--duration-fast) var(--ease-standard);
+}
+
+.atom-toolbar-btn:hover {
+    color: var(--foreground);
+    background: var(--accent);
+}
+
+.atom-toolbar-btn.active {
+    color: var(--primary-foreground);
+    background: var(--primary);
+    box-shadow: none;
+}
+
+.atom-save-button {
+    color: var(--success);
+}
+
+.atom-save-button.is-saved {
+    color: var(--success-foreground);
+    background: var(--success);
+}
+
+.atom-toolbar-divider {
+    background: var(--border-strong);
+}
+
+.atom-color-dot {
+    width: 1rem;
+    height: 1rem;
+    padding: 0;
+    border: 2px solid transparent;
+}
+
+.atom-color-dot:hover {
+    transform: scale(1.1);
+}
+
+.atom-color-dot.active {
+    border-color: var(--foreground);
+    outline: 2px solid var(--background);
+    transform: scale(1.1);
+}
+
+.atom-color-rose { background: #e11d48; }
+.atom-color-blue { background: #3b82f6; }
+.atom-color-green { background: #10b981; }
+.atom-color-amber { background: #f59e0b; }
+.atom-color-white { background: #fff; }
+
+.atom-stroke-slider {
+    accent-color: var(--primary);
+}
+
+.atom-page-card {
+    border: 1px solid var(--border-strong);
+    box-shadow: var(--shadow-md);
+}
+
+.atom-page-card.active-page {
+    box-shadow: 0 0 0 2px var(--ring), var(--shadow-md);
+}
+
+.atom-page-meta {
+    color: var(--foreground);
+    background: var(--popover);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+}
+
+.atom-page-delete-btn {
+    min-height: 1.75rem;
+}
+
+.atom-add-page-fab {
+    position: absolute;
+    right: var(--space-4);
+    bottom: var(--space-4);
+    z-index: 310;
+    margin: 0;
+    gap: var(--space-2);
+    color: var(--foreground);
+    background: var(--surface-1);
+    border-color: var(--border-strong);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+}
+
+.atom-add-page-fab:hover {
+    color: var(--foreground);
+    background: var(--surface-hover);
+    border-color: var(--border-strong);
+    transform: none;
+}
+
+.atom-loading-state {
+    color: var(--muted-foreground);
+}
+
+.atom-modal-overlay {
+    background: color-mix(in srgb, var(--background) 78%, transparent);
+    backdrop-filter: blur(4px);
+}
+
+.atom-dialog {
+    width: min(26rem, calc(100vw - var(--space-8)));
+    max-width: 26rem;
+    animation: none;
+}
+
+.atom-dialog-title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-base);
+    font-weight: var(--weight-semibold);
+}
+
+.atom-dialog-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+}
+
+.atom-dialog-submit {
+    width: 100%;
+}
+
+@media (hover: none) {
+    .notebook-card-delete-btn {
+        opacity: 1;
+    }
+}
+
+@media (max-width: 768px) {
+    .atom-dashboard-header.app-toolbar {
+        padding: var(--space-2) var(--space-3);
+    }
+
+    .atom-dashboard-subheader {
+        padding: var(--space-2) var(--space-3) !important;
+    }
+
+    .atom-grid {
+        padding: var(--space-3);
+        gap: var(--space-3);
+    }
+
+    .notebook-card {
+        padding: 0;
+    }
+
+    .atom-floating-toolbar {
+        background: var(--popover);
+        border-color: var(--border-strong);
+        box-shadow: var(--shadow-md);
+    }
+
+    .atom-page-card,
+    .atom-page-card.active-page {
+        box-shadow: var(--shadow-md);
+    }
+
+    .atom-add-page-fab {
+        box-shadow: var(--shadow-md);
+    }
+
+    .atom-modal-overlay > .atom-dialog {
+        width: calc(100vw - var(--space-4)) !important;
+        max-height: calc(100dvh - var(--space-4));
+    }
+}

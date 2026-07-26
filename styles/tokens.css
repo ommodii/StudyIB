@@ -1,0 +1,162 @@
+/* StudyIB semantic design tokens.
+   Functional document, canvas, and PDF measurements intentionally live with
+   their specialized interfaces rather than in this visual token layer. */
+:root,
+[data-theme="dark"] {
+    color-scheme: dark;
+
+    --background: #09090b;
+    --foreground: #fafafa;
+
+    --surface-1: #0f0f12;
+    --surface-2: #151519;
+    --surface-3: #1c1c22;
+    --surface-hover: #202027;
+    --surface-active: #292932;
+
+    --card: #111114;
+    --card-foreground: var(--foreground);
+    --popover: #121216;
+    --popover-foreground: var(--foreground);
+
+    --primary: #6366f1;
+    --primary-hover: #5558e6;
+    --primary-active: #484bd0;
+    --primary-foreground: #ffffff;
+    --primary-muted-foreground: #c7d2fe;
+    --primary-soft: rgba(99, 102, 241, 0.14);
+    --primary-soft-hover: rgba(99, 102, 241, 0.2);
+    --primary-border: rgba(99, 102, 241, 0.24);
+    --primary-border-strong: rgba(99, 102, 241, 0.3);
+
+    --secondary: #1a1a20;
+    --secondary-hover: #22222a;
+    --secondary-foreground: #e4e4e7;
+
+    --muted: #18181d;
+    --muted-foreground: #a1a1aa;
+
+    --accent: var(--primary);
+    --accent-hover: var(--primary-hover);
+    --accent-foreground: var(--primary-foreground);
+
+    --success: #22c55e;
+    --success-foreground: #052e16;
+    --success-muted-foreground: #86efac;
+    --success-soft: rgba(34, 197, 94, 0.12);
+    --success-border: rgba(34, 197, 94, 0.2);
+    --warning: #f59e0b;
+    --warning-muted-foreground: #fcd34d;
+    --warning-soft: rgba(245, 158, 11, 0.12);
+    --warning-border: rgba(245, 158, 11, 0.28);
+    --destructive: #ef4444;
+    --destructive-hover: #dc2626;
+    --destructive-foreground: #ffffff;
+    --destructive-muted-foreground: #fca5a5;
+    --destructive-muted-hover: #fecaca;
+    --destructive-soft: rgba(239, 68, 68, 0.12);
+    --destructive-border: rgba(239, 68, 68, 0.28);
+
+    --border: #27272a;
+    --border-strong: #3f3f46;
+    --input: #27272a;
+    --ring: #818cf8;
+
+    --sidebar: #0d0d10;
+    --sidebar-foreground: #e4e4e7;
+    --sidebar-accent: var(--primary-soft);
+    --sidebar-border: #222226;
+
+    --font-sans: "DM Sans", Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+
+    --text-xs: 0.75rem;
+    --text-sm: 0.8125rem;
+    --text-base: 0.9375rem;
+    --text-lg: 1.0625rem;
+    --text-xl: 1.25rem;
+    --text-2xl: 1.5rem;
+    --text-3xl: 1.875rem;
+
+    --weight-normal: 400;
+    --weight-medium: 500;
+    --weight-semibold: 600;
+    --weight-bold: 700;
+
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-5: 1.25rem;
+    --space-6: 1.5rem;
+    --space-8: 2rem;
+    --space-10: 2.5rem;
+    --space-12: 3rem;
+
+    --radius-sm: 0.375rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 0.75rem;
+    --radius-xl: 1rem;
+    --radius-full: 999px;
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.24);
+    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.24);
+    --shadow-document: 0 8px 24px rgba(0, 0, 0, 0.3);
+
+    --physics: #60a5fa;
+    --chemistry: #34d399;
+    --document-background: #ffffff;
+
+    --duration-fast: 120ms;
+    --duration-normal: 180ms;
+    --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+
+    --sidebar-width: 15.5rem;
+    --content-max-width: 90rem;
+    --toolbar-height: 3.25rem;
+    --control-height-sm: 2rem;
+    --control-height: 2.5rem;
+    --control-height-lg: 2.75rem;
+
+    /* Backward-compatible aliases used by the existing application. */
+    --bg-main: var(--background);
+    --bg-sidebar: var(--sidebar);
+    --bg-card: var(--card);
+    --bg-elevated: var(--surface-2);
+    --text-primary: var(--foreground);
+    --text-secondary: var(--secondary-foreground);
+    --text-muted: var(--muted-foreground);
+    --border-light: var(--border);
+    --modal-overlay: rgba(0, 0, 0, 0.72);
+    --modal-bg: var(--popover);
+    --input-bg: var(--surface-1);
+    --btn-hover: var(--surface-hover);
+    --pdf-bg: var(--background);
+    --transition-speed: var(--duration-normal);
+    --radius-pill: var(--radius-full);
+    --shadow-lg: var(--shadow-md);
+    --accent-light: var(--primary-soft);
+    --accent-glow: rgba(99, 102, 241, 0.18);
+    --accent-solid: var(--primary);
+    --color-success: var(--success);
+    --color-warning: var(--warning);
+    --color-error: var(--destructive);
+}
+
+/* Subject identity remains available for dots and labels, while interactive
+   emphasis uses one application-wide primary colour. */
+[data-color="physics"] { --subject-accent: var(--physics); }
+[data-color="chemistry"] { --subject-accent: var(--chemistry); }
+[data-color="physics"],
+[data-color="chemistry"],
+[data-color="indigo"],
+[data-color="blue"],
+[data-color="green"],
+[data-color="orange"],
+[data-color="rose"] {
+    --accent: var(--primary);
+    --accent-hover: var(--primary-hover);
+    --accent-light: var(--primary-soft);
+    --accent-glow: rgba(99, 102, 241, 0.18);
+    --accent-solid: var(--primary);
+}

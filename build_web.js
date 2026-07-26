@@ -22,7 +22,9 @@ const filesToCopy = [
     '_headers'
 ];
 
-const foldersToCopy = [];
+const foldersToCopy = [
+    'styles'
+];
 
 function copyFileSync(src, dest) {
     fs.mkdirSync(path.dirname(dest), { recursive: true });

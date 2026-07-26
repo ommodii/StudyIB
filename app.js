@@ -237,7 +237,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         colorBtns.forEach(btn => {
-            btn.classList.toggle('active', btn.getAttribute('data-color') === color);
+            const isActive = btn.getAttribute('data-color') === color;
+            btn.classList.toggle('active', isActive);
+            btn.setAttribute('aria-checked', String(isActive));
         });
     }
 
@@ -254,8 +256,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 localStorage.setItem('color', color);
                 userAccentColor = color;
             }
-            colorBtns.forEach(b => b.classList.remove('active'));
+            colorBtns.forEach(b => {
+                b.classList.remove('active');
+                b.setAttribute('aria-checked', 'false');
+            });
             btn.classList.add('active');
+            btn.setAttribute('aria-checked', 'true');
         });
     });
 
@@ -265,26 +271,74 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.target === settingsModal) settingsModal.classList.add('hidden');
     });
 
+    // Shared keyboard and focus handling for every static application dialog.
+    const dialogReturnFocus = new WeakMap();
+    const applicationDialogs = [...document.querySelectorAll('[role="dialog"]')];
+    const getDialogControls = dialog => [...dialog.querySelectorAll(
+        'button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [href], [tabindex]:not([tabindex="-1"])'
+    )].filter(control => !control.closest('.hidden'));
+
+    applicationDialogs.forEach(dialog => {
+        new MutationObserver(() => {
+            if (!dialog.classList.contains('hidden')) {
+                dialogReturnFocus.set(dialog, document.activeElement);
+                requestAnimationFrame(() => getDialogControls(dialog)[0]?.focus());
+            } else {
+                const returnTarget = dialogReturnFocus.get(dialog);
+                if (returnTarget instanceof HTMLElement && returnTarget.isConnected) returnTarget.focus();
+            }
+        }).observe(dialog, { attributes: true, attributeFilter: ['class'] });
+    });
+
+    document.addEventListener('keydown', event => {
+        const openDialog = [...applicationDialogs].reverse().find(dialog => !dialog.classList.contains('hidden'));
+        if (!openDialog) return;
+
+        if (event.key === 'Escape') {
+            event.preventDefault();
+            event.stopPropagation();
+            const closeControl = openDialog.querySelector(
+                '[aria-label^="Close"], #closeMockResultsBtn, #closeNewModalBtn'
+            );
+            if (closeControl) closeControl.click();
+            return;
+        }
+
+        if (event.key === 'Tab') {
+            const controls = getDialogControls(openDialog);
+            if (controls.length === 0) return;
+            const first = controls[0];
+            const last = controls[controls.length - 1];
+            if (event.shiftKey && document.activeElement === first) {
+                event.preventDefault();
+                last.focus();
+            } else if (!event.shiftKey && document.activeElement === last) {
+                event.preventDefault();
+                first.focus();
+            }
+        }
+    });
+
     // --- Mode Switcher ---
     const paperFilter = document.getElementById('paperFilter');
     
     function renderPaperFilter() {
         if (!paperFilter) return;
         const isIB = currentSubject === 'physics' || currentSubject === 'chemistry';
-        let html = '<button class="filter-btn active" data-filter="all">All</button>';
+        let html = '<button type="button" class="filter-btn active" data-filter="all">All</button>';
         
         if (isIB) {
             html += `
-                <button class="filter-btn" data-filter="P1">Paper 1</button>
-                <button class="filter-btn" data-filter="P2">Paper 2</button>
-                <button class="filter-btn" data-filter="P3">Paper 3</button>
+                <button type="button" class="filter-btn" data-filter="P1">Paper 1</button>
+                <button type="button" class="filter-btn" data-filter="P2">Paper 2</button>
+                <button type="button" class="filter-btn" data-filter="P3">Paper 3</button>
             `;
         } else {
             html += `
-                <button class="filter-btn" data-filter="P1">Paper 1</button>
-                <button class="filter-btn" data-filter="P2">Paper 2</button>
-                <button class="filter-btn" data-filter="P4">Paper 4</button>
-                <button class="filter-btn" data-filter="P5">Paper 5</button>
+                <button type="button" class="filter-btn" data-filter="P1">Paper 1</button>
+                <button type="button" class="filter-btn" data-filter="P2">Paper 2</button>
+                <button type="button" class="filter-btn" data-filter="P4">Paper 4</button>
+                <button type="button" class="filter-btn" data-filter="P5">Paper 5</button>
             `;
         }
         
@@ -331,18 +385,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const container = document.getElementById('breadcrumb');
         if (!container) return;
         
-        let html = `<span data-crumb="dashboard">Dashboard</span>`;
+        let html = `<button type="button" class="breadcrumb-item" data-crumb="dashboard">Dashboard</button>`;
         crumbs.forEach((crumb, idx) => {
-            html += ` <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" style="margin: 0 4px; color: var(--text-muted);"><polyline points="9 18 15 12 9 6"></polyline></svg> `;
+            html += ` <svg class="breadcrumb-separator" viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" aria-hidden="true"><polyline points="9 18 15 12 9 6"></polyline></svg> `;
             if (idx === crumbs.length - 1) {
-                html += `<span class="active">${crumb}</span>`;
+                html += `<span class="breadcrumb-current" aria-current="page">${crumb}</span>`;
             } else {
-                html += `<span data-crumb="${idx}">${crumb}</span>`;
+                html += `<button type="button" class="breadcrumb-item" data-crumb="${idx}">${crumb}</button>`;
             }
         });
         container.innerHTML = html;
         
-        container.querySelectorAll('span[data-crumb]').forEach(el => {
+        container.querySelectorAll('[data-crumb]').forEach(el => {
             el.addEventListener('click', () => {
                 const val = el.getAttribute('data-crumb');
                 if (val === 'dashboard') {
@@ -724,9 +778,9 @@ document.addEventListener('DOMContentLoaded', () => {
             : 'Your progress will appear here as you complete resources.';
 
         let dojoHomeHTML = `
-            <div class="dojo-top-row">
+            <div class="dojo-top-row app-toolbar">
                 <div class="dojo-search-container">
-                    <input type="text" id="dojoSearchInput" placeholder="Search resources…" aria-label="Search topics and questions">
+                    <input class="input" type="search" id="dojoSearchInput" placeholder="Search resources…" autocomplete="off" aria-label="Search topics and questions">
                     <svg class="search-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
                         <circle cx="11" cy="11" r="8"></circle>
                         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
@@ -750,7 +804,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
 
             <div class="dojo-dashboard-content">
-                <section class="dashboard-overview-hero">
+                <section class="dashboard-overview-hero card">
                     <div class="dashboard-overview-copy">
                         <span class="dashboard-eyebrow">Study overview</span>
                         <h1>${greeting}</h1>
@@ -765,13 +819,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 </section>
 
                 <div class="dashboard-focus-grid">
-                    <section class="dashboard-data-card dashboard-progress-card">
+                    <section class="dashboard-data-card dashboard-progress-card card">
                         <div class="dashboard-card-heading">
                             <div>
                                 <span class="dashboard-eyebrow">Topical completion</span>
                                 <h2>Your progress</h2>
                             </div>
-                            <span class="dashboard-resource-count">${completedResources}/${totalResources}</span>
+                            <span class="dashboard-resource-count badge">${completedResources}/${totalResources}</span>
                         </div>
 
                         ${subjectProgress.map(subject => `
@@ -782,8 +836,8 @@ document.addEventListener('DOMContentLoaded', () => {
                                         <strong>${subject.label}</strong>
                                         <span>${subject.percent}%</span>
                                     </div>
-                                    <div class="dashboard-progress-track" aria-hidden="true">
-                                        <span style="width:${subject.percent}%"></span>
+                                    <div class="dashboard-progress-track progress" aria-hidden="true">
+                                        <span class="progress-bar" style="width:${subject.percent}%"></span>
                                     </div>
                                     <small>${subject.completed} of ${subject.total} resources</small>
                                 </div>
@@ -791,12 +845,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         `).join('')}
                     </section>
 
-                    <section class="dashboard-data-card dashboard-next-card">
+                    <section class="dashboard-data-card dashboard-next-card card">
                         <div class="dashboard-next-icon">${getWorkspaceIcon('target')}</div>
                         <span class="dashboard-eyebrow">Suggested next</span>
                         <h2>${nextSubject.nextTopic || `Explore ${nextSubject.label}`}</h2>
                         <p>Continue with ${nextSubject.label} and build on your least-completed subject.</p>
-                        <button class="dashboard-primary-action" id="dashboardContinueBtn">
+                        <button type="button" class="dashboard-primary-action button button-primary" id="dashboardContinueBtn">
                             <span>Continue studying</span>${getWorkspaceIcon('arrow')}
                         </button>
 
@@ -806,7 +860,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <strong>${dueReviewCount > 0 ? `${dueReviewCount} review${dueReviewCount === 1 ? '' : 's'} due` : 'Review queue clear'}</strong>
                                 <span>${dueReviewCount > 0 ? 'Revisit items scheduled for today.' : 'Nothing is waiting for review.'}</span>
                             </div>
-                            ${dueReviewCount > 0 ? '<button id="dashboardReviewBtn" aria-label="Open review queue">Review</button>' : ''}
+                            ${dueReviewCount > 0 ? '<button type="button" class="button button-outline button-sm" id="dashboardReviewBtn" aria-label="Open review queue">Review</button>' : ''}
                         </div>
                     </section>
                 </div>
@@ -897,14 +951,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderTopicNavigation() {
         const categories = sortCategories(Object.keys(getSyllabusData()));
-        let navHTML = `<a class="nav-item dashboard-nav-item active" data-dashboard="true">
-            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none" style="margin-right:6px;"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+        let navHTML = `<button type="button" class="nav-item dashboard-nav-item active" data-dashboard="true">
+            <svg class="nav-inline-icon" aria-hidden="true" viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
             Dashboard
-        </a>`;
+        </button>`;
         if (categories.length > 0) {
             navHTML += `<div class="nav-group">
-                <div class="nav-group-title" style="margin-top: 1rem;">Topics</div>
-                ${categories.map(key => `<a class="nav-item" data-category="${key}">${key}</a>`).join('')}
+                <div class="nav-group-title nav-group-title-spaced">Topics</div>
+                ${categories.map(key => `<button type="button" class="nav-item" data-category="${key}">${key}</button>`).join('')}
             </div>`;
         }
         if (navMenu) navMenu.innerHTML = navHTML;
@@ -915,28 +969,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderPapersNavigation() {
         const years = Object.keys(getFullPapersData()).sort((a, b) => b - a); // Newest first
-        let navHTML = `<a class="nav-item dashboard-nav-item active" data-dashboard="true">
-            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none" style="margin-right:6px;"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+        let navHTML = `<button type="button" class="nav-item dashboard-nav-item active" data-dashboard="true">
+            <svg class="nav-inline-icon" aria-hidden="true" viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
             Dashboard
-        </a>`;
+        </button>`;
         if (years.length > 0) {
             navHTML += `<div class="nav-group">
-                <div class="nav-group-title" style="margin-top: 1rem;">Years</div>
-                ${years.map(year => `<a class="nav-item" data-category="${year}">${year}</a>`).join('')}
+                <div class="nav-group-title nav-group-title-spaced">Years</div>
+                ${years.map(year => `<button type="button" class="nav-item" data-category="${year}">${year}</button>`).join('')}
             </div>`;
         }
         
         // Add Save My Exams Mocks and Topics groups
         navHTML += `<div class="nav-group">
-            <div class="nav-group-title" style="margin-top: 1rem;">Mock & Topic Papers</div>
-            <a class="nav-item" data-category="Save My Exams Mocks">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none" style="margin-right:6px; display:inline-block; vertical-align:middle;"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
+            <div class="nav-group-title nav-group-title-spaced">Mock & Topic Papers</div>
+            <button type="button" class="nav-item" data-category="Save My Exams Mocks">
+                <svg class="nav-inline-icon" aria-hidden="true" viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
                 Mock Exams & Predictions
-            </a>
-            <a class="nav-item" data-category="Save My Exams Topics">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none" style="margin-right:6px; display:inline-block; vertical-align:middle;"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 20V4H20v16H6.5z"></path></svg>
+            </button>
+            <button type="button" class="nav-item" data-category="Save My Exams Topics">
+                <svg class="nav-inline-icon" aria-hidden="true" viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 20V4H20v16H6.5z"></path></svg>
                 Topic-Sorted Papers
-            </a>
+            </button>
         </div>`;
         
         if (navMenu) navMenu.innerHTML = navHTML;
@@ -947,18 +1001,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderPracticeNavigation() {
         const categories = sortCategories(Object.keys(getPracticeData()));
-        let navHTML = `<a class="nav-item dashboard-nav-item active" data-dashboard="true">
-            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none" style="margin-right:6px;"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+        let navHTML = `<button type="button" class="nav-item dashboard-nav-item active" data-dashboard="true">
+            <svg class="nav-inline-icon" aria-hidden="true" viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
             Dashboard
-        </a>`;
+        </button>`;
         for (const category of categories) {
             const subtopics = sortCategories(Object.keys(getPracticeData()[category]));
             const totalQs = subtopics.reduce((sum, st) => sum + getPracticeData()[category][st].length, 0);
             navHTML += `<div class="nav-group">
-                <div class="nav-group-title" style="margin-top: 1rem;">${category} <span class="nav-count">${totalQs}</span></div>
+                <div class="nav-group-title nav-group-title-spaced">${category} <span class="nav-count">${totalQs}</span></div>
                 ${subtopics.map(st => {
                     const count = getPracticeData()[category][st].length;
-                    return `<a class="nav-item" data-category="${category}|||${st}">${st} <span class="nav-count">${count}</span></a>`;
+                    return `<button type="button" class="nav-item" data-category="${category}|||${st}">${st} <span class="nav-count">${count}</span></button>`;
                 }).join('')}
             </div>`;
         }
@@ -1036,8 +1090,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     ${getWorkspaceIcon(subjectIcon)}
                     <span>${subjectLabel}</span>
                 </div>
-                <div class="workspace-menu" aria-label="Subject tools">
-                    <button type="button" class="workspace-nav-item is-active" id="homeNavSyllabus" aria-label="Syllabus themes" title="Syllabus themes">
+                <nav class="workspace-menu" aria-label="Subject tools">
+                    <button type="button" class="workspace-nav-item is-active" id="homeNavSyllabus" aria-current="page" aria-label="Syllabus themes" title="Syllabus themes">
                         ${getWorkspaceIcon('syllabus')}<span>Syllabus</span>
                     </button>
                     <button type="button" class="workspace-nav-item" id="homeNavTopics" aria-label="Topical papers" title="Topical papers">
@@ -1052,7 +1106,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <button type="button" class="workspace-nav-item" id="homeNavReviews" aria-label="Review queue" title="Review queue">
                         ${getWorkspaceIcon('reviews')}<span>Review</span>
                     </button>
-                </div>
+                </nav>
                 <button type="button" class="workspace-cta-btn" id="homeCtaBtn" aria-label="Problem of the day" title="Problem of the day">
                     ${getWorkspaceIcon('daily')}
                     <span>Daily problem</span>
@@ -1103,7 +1157,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                     const pct = totalCount > 0 ? Math.round((doneCount / totalCount) * 100) : 0;
                                     
                                     return `
-                                        <div class="theme-subcat-card" data-category="${category}" data-subcat="${subcat}">
+                                        <button type="button" class="theme-subcat-card card card-interactive" data-category="${category}" data-subcat="${subcat}" aria-label="Open ${subcat}, ${pct}% complete">
                                             <div class="card-progress-ring">
                                                 <svg viewBox="0 0 36 36" class="progress-ring-svg">
                                                     <circle class="ring-bg" cx="18" cy="18" r="15.915" fill="transparent" stroke-width="2.5"></circle>
@@ -1116,7 +1170,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                                 <p>${totalCount} snippets • ${doneCount} completed</p>
                                             </div>
                                             <div class="card-arrow">↗</div>
-                                        </div>
+                                        </button>
                                     `;
                                 }).join('')}
                             </div>
@@ -1222,31 +1276,31 @@ document.addEventListener('DOMContentLoaded', () => {
             const percent = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
 
             html += `
-                <div class="topic-card">
-                    <div class="topic-card-header">
+                <article class="topic-card card">
+                    <div class="topic-card-header card-header">
                         <div class="topic-card-title">${category}</div>
                     </div>
-                    <div class="topic-card-body">
+                    <div class="topic-card-body card-content">
                         ${subcatNames.map(sub => {
                             const count = subcategories[sub].length;
                             return `
-                                <div class="subtopic-row" data-category="${category}" data-subtopic="${sub}">
+                                <button type="button" class="subtopic-row" data-category="${category}" data-subtopic="${sub}">
                                     <span class="subtopic-name">${sub}</span>
-                                    <span class="subtopic-badge">${count} paper${count !== 1 ? 's' : ''}</span>
-                                </div>
+                                    <span class="subtopic-badge badge">${count} paper${count !== 1 ? 's' : ''}</span>
+                                </button>
                             `;
                         }).join('')}
                     </div>
-                    <div class="topic-card-footer">
+                    <div class="topic-card-footer card-footer">
                         <div class="progress-info">
                             <span>${completedCount} / ${totalCount} Completed</span>
                             <span>${percent}%</span>
                         </div>
-                        <div class="progress-bar-container">
+                        <div class="progress-bar-container progress">
                             <div class="progress-bar" style="width: ${percent}%"></div>
                         </div>
                     </div>
-                </div>
+                </article>
             `;
         });
         html += '</div>';
@@ -1286,31 +1340,31 @@ document.addEventListener('DOMContentLoaded', () => {
             const percent = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
 
             html += `
-                <div class="topic-card">
-                    <div class="topic-card-header">
+                <article class="topic-card card">
+                    <div class="topic-card-header card-header">
                         <div class="topic-card-title">Year ${category}</div>
                     </div>
-                    <div class="topic-card-body">
+                    <div class="topic-card-body card-content">
                         ${subcatNames.map(sub => {
                             const count = subcategories[sub].length;
                             return `
-                                <div class="subtopic-row" data-category="${category}" data-subtopic="${sub}">
+                                <button type="button" class="subtopic-row" data-category="${category}" data-subtopic="${sub}">
                                     <span class="subtopic-name">${sub}</span>
-                                    <span class="subtopic-badge">${count} paper${count !== 1 ? 's' : ''}</span>
-                                </div>
+                                    <span class="subtopic-badge badge">${count} paper${count !== 1 ? 's' : ''}</span>
+                                </button>
                             `;
                         }).join('')}
                     </div>
-                    <div class="topic-card-footer">
+                    <div class="topic-card-footer card-footer">
                         <div class="progress-info">
                             <span>${completedCount} / ${totalCount} Completed</span>
                             <span>${percent}%</span>
                         </div>
-                        <div class="progress-bar-container">
+                        <div class="progress-bar-container progress">
                             <div class="progress-bar" style="width: ${percent}%"></div>
                         </div>
                     </div>
-                </div>
+                </article>
             `;
         });
         // Append Mock Exams & Predictions Card and Topic-Sorted Papers Card
@@ -1321,54 +1375,54 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // 1. Mock predicted papers card
             html += `
-                <div class="topic-card mock-exams-card" style="border: 1px dashed var(--accent); background: linear-gradient(135deg, rgba(79, 70, 229, 0.05) 0%, rgba(124, 58, 237, 0.05) 100%);">
-                    <div class="topic-card-header">
-                        <div class="topic-card-title" style="color: var(--accent); font-weight: 800; display: flex; align-items: center; gap: 8px;">
+                <article class="topic-card mock-exams-card card topic-card-featured">
+                    <div class="topic-card-header card-header">
+                        <div class="topic-card-title topic-card-title-accent">
                             <span>🏆</span> Mock Exams & Predictions
                         </div>
                     </div>
-                    <div class="topic-card-body" style="padding-top: 0.5rem;">
-                        <div class="subtopic-row" data-category="Save My Exams Mocks" data-subtopic="All Mocks" style="border-left: 2px solid var(--accent); padding-left: 8px;">
-                            <span class="subtopic-name" style="font-weight: 600;">Save My Exams & Revision Dojo</span>
-                            <span class="subtopic-badge" style="background: var(--accent); color: white;">${mockExamsList.length} papers</span>
-                        </div>
-                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 12px; line-height: 1.4;">
+                    <div class="topic-card-body card-content">
+                        <button type="button" class="subtopic-row subtopic-row-featured" data-category="Save My Exams Mocks" data-subtopic="All Mocks">
+                            <span class="subtopic-name">Save My Exams & Revision Dojo</span>
+                            <span class="subtopic-badge badge badge-primary">${mockExamsList.length} papers</span>
+                        </button>
+                        <p class="topic-card-description">
                             Ripped full mock exams and predicted papers for high-yield exam preparation.
                         </p>
                     </div>
-                    <div class="topic-card-footer" style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 12px; margin-top: auto;">
+                    <div class="topic-card-footer card-footer">
                         <div class="progress-info">
                             <span>Ready to Practice</span>
                             <span>100% Offline</span>
                         </div>
                     </div>
-                </div>
+                </article>
             `;
 
             // 2. Topic-sorted papers card
             html += `
-                <div class="topic-card mock-exams-card" style="border: 1px dashed var(--accent); background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(5, 150, 105, 0.05) 100%);">
-                    <div class="topic-card-header">
-                        <div class="topic-card-title" style="color: #10b981; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+                <article class="topic-card mock-exams-card card topic-card-featured">
+                    <div class="topic-card-header card-header">
+                        <div class="topic-card-title topic-card-title-accent">
                             <span>📚</span> Topic-Sorted Papers
                         </div>
                     </div>
-                    <div class="topic-card-body" style="padding-top: 0.5rem;">
-                        <div class="subtopic-row" data-category="Save My Exams Topics" data-subtopic="All Topics" style="border-left: 2px solid #10b981; padding-left: 8px;">
-                            <span class="subtopic-name" style="font-weight: 600;">Save My Exams Topic Tests</span>
-                            <span class="subtopic-badge" style="background: #10b981; color: white;">${topicSortedList.length} papers</span>
-                        </div>
-                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 12px; line-height: 1.4;">
+                    <div class="topic-card-body card-content">
+                        <button type="button" class="subtopic-row subtopic-row-featured" data-category="Save My Exams Topics" data-subtopic="All Topics">
+                            <span class="subtopic-name">Save My Exams Topic Tests</span>
+                            <span class="subtopic-badge badge badge-primary">${topicSortedList.length} papers</span>
+                        </button>
+                        <p class="topic-card-description">
                             Full topical test papers compiled from official question banks to target weak areas.
                         </p>
                     </div>
-                    <div class="topic-card-footer" style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 12px; margin-top: auto;">
+                    <div class="topic-card-footer card-footer">
                         <div class="progress-info">
                             <span>Ready to Practice</span>
                             <span>100% Offline</span>
                         </div>
                     </div>
-                </div>
+                </article>
             `;
         }
 
@@ -1432,7 +1486,7 @@ document.addEventListener('DOMContentLoaded', () => {
             html += `
                 <div class="review-card" data-pdf-url="${entry.filepath}" data-pdf-name="${filename}">
                     ${getPdfIcon()}
-                    <div class="pdf-info" style="flex:1;">
+                    <div class="pdf-info pdf-info-grow">
                         <div class="pdf-name">${filename}</div>
                         <div class="pdf-meta">${diffLabel} · Review #${entry.reviewCount + 1}</div>
                     </div>
@@ -1493,13 +1547,13 @@ document.addEventListener('DOMContentLoaded', () => {
                             const isBossDefeated = window.gamification ? window.gamification.isBossDefeated(file.filepath) : false;
                             
                             return `
-                                <a href="#" class="pdf-card ${isBoss ? 'boss-card' : ''}" data-pdf-url="${file.filepath}" data-pdf-name="${file.filename}" data-subcat="${subcat}" data-boss="${isBoss}">
+                                <button type="button" class="pdf-card ${isBoss ? 'boss-card' : ''}" data-pdf-url="${file.filepath}" data-pdf-name="${file.filename}" data-subcat="${subcat}" data-boss="${isBoss}">
                                     ${isBoss ? `<div class="boss-crown" title="Boss Battle! 👑">${isBossDefeated ? '👑' : '💀'}</div>` : getPdfIcon()}
                                     <div class="pdf-info">
-                                        <div class="pdf-name" style="${done ? 'text-decoration: line-through; opacity: 0.7;' : ''}">${file.filename.replace('.pdf', '')}</div>
-                                        <div class="pdf-meta">${done ? '<span style="color:var(--color-success); font-weight:bold;">Completed ✓</span>' : isBoss ? `<span style="color:var(--accent); font-weight:bold;">Topic Boss Battle ${isBossDefeated ? '👑' : '💀'}</span>` : 'Topic Snippet'}</div>
+                                        <div class="pdf-name ${done ? 'is-complete' : ''}">${file.filename.replace('.pdf', '')}</div>
+                                        <div class="pdf-meta">${done ? '<span class="resource-status resource-status-complete">Completed ✓</span>' : isBoss ? `<span class="resource-status resource-status-featured">Topic Boss Battle ${isBossDefeated ? '👑' : '💀'}</span>` : 'Topic Snippet'}</div>
                                     </div>
-                                </a>
+                                </button>
                             `;
                         }).join('')}
                     </div>
@@ -1665,13 +1719,13 @@ document.addEventListener('DOMContentLoaded', () => {
                                 const filepath = `Content/Save My Exams/${f.filename}`;
                                 const done = isQuestionCompleted(filepath);
                                 return `
-                                    <a href="#" class="pdf-card" data-pdf-url="${filepath}" data-ms-url="" data-pdf-name="${f.name}">
+                                    <button type="button" class="pdf-card" data-pdf-url="${filepath}" data-ms-url="" data-pdf-name="${f.name}">
                                         ${getPdfIcon()}
                                         <div class="pdf-info">
-                                            <div class="pdf-name" style="${done ? 'text-decoration: line-through; opacity: 0.7;' : ''}">${f.name}</div>
-                                            <div class="pdf-meta">${done ? '<span style="color:var(--color-success); font-weight:bold;">Completed ✓</span>' : isMocksMode ? 'Mock Exam Paper' : 'Topic Test Paper'}</div>
+                                            <div class="pdf-name ${done ? 'is-complete' : ''}">${f.name}</div>
+                                            <div class="pdf-meta">${done ? '<span class="resource-status resource-status-complete">Completed ✓</span>' : isMocksMode ? 'Mock Exam Paper' : 'Topic Test Paper'}</div>
                                         </div>
-                                    </a>
+                                    </button>
                                 `;
                             }).join('')}
                         </div>
@@ -1704,13 +1758,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     <h3 class="subtopic-title">${session} Session</h3>
                     <div class="cards-grid">
                         ${files.map(file => `
-                            <a href="#" class="pdf-card" data-pdf-url="${file.qp_path}" data-ms-url="${file.ms_path || ''}" data-pdf-name="${file.name}">
+                            <button type="button" class="pdf-card" data-pdf-url="${file.qp_path}" data-ms-url="${file.ms_path || ''}" data-pdf-name="${file.name}">
                                 ${getPdfIcon()}
                                 <div class="pdf-info">
                                     <div class="pdf-name">${file.name}</div>
                                     <div class="pdf-meta">Full Paper</div>
                                 </div>
-                            </a>
+                            </button>
                         `).join('')}
                     </div>
                 </div>
@@ -1761,13 +1815,13 @@ document.addEventListener('DOMContentLoaded', () => {
                                 ${qs.map(q => {
                                     const done = isQuestionCompleted(q.filepath);
                                     return `
-                                        <a href="#" class="pdf-card" data-pdf-url="${q.filepath}" data-full-paper="${q.full_paper_path}" data-pdf-name="${q.filename}">
+                                        <button type="button" class="pdf-card" data-pdf-url="${q.filepath}" data-full-paper="${q.full_paper_path}" data-pdf-name="${q.filename}">
                                             ${getPdfIcon()}
                                             <div class="pdf-info">
-                                                <div class="pdf-name" style="${done ? 'text-decoration: line-through; opacity: 0.7;' : ''}">${q.source} Q${q.qnum}</div>
-                                                <div class="pdf-meta">${done ? '<span style="color:var(--color-success); font-weight:bold;">Completed ✓</span>' : `Pages ${q.pages} · ${pdef.meta}`}</div>
+                                                <div class="pdf-name ${done ? 'is-complete' : ''}">${q.source} Q${q.qnum}</div>
+                                                <div class="pdf-meta">${done ? '<span class="resource-status resource-status-complete">Completed ✓</span>' : `Pages ${q.pages} · ${pdef.meta}`}</div>
                                             </div>
-                                        </a>
+                                        </button>
                                     `;
                                 }).join('')}
                             </div>
@@ -1910,7 +1964,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function renderPdf(url) {
-        pdfContainer.innerHTML = '<div style="color:var(--text-secondary); margin-top:2rem;">Loading Document...</div>';
+        pdfContainer.innerHTML = '<div class="loading-state viewer-loading-state">Loading document…</div>';
         try {
             // Restore scale
             if (pdfScrollPositions[url] && pdfScrollPositions[url].scale) {
@@ -1937,7 +1991,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (error) {
             console.error('Error rendering PDF:', error);
-            pdfContainer.innerHTML = '<div style="color:#E11D48; margin-top:2rem;">Failed to load PDF.</div>';
+            pdfContainer.innerHTML = '<div class="error-state viewer-error-state">Failed to load PDF.</div>';
         }
     }
 
@@ -2592,10 +2646,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     totalFiles += filtered.length;
                     html += `<div class="subtopic-section"><h3 class="subtopic-title">${category} > ${subcat}</h3><div class="cards-grid">
                         ${filtered.map(file => `
-                            <a href="#" class="pdf-card" data-pdf-url="${file.filepath}" data-pdf-name="${file.filename}">
+                            <button type="button" class="pdf-card" data-pdf-url="${file.filepath}" data-pdf-name="${file.filename}">
                                 ${getPdfIcon()}
                                 <div class="pdf-info"><div class="pdf-name">${file.filename.replace('.pdf', '')}</div><div class="pdf-meta">Topic Snippet</div></div>
-                            </a>
+                            </button>
                         `).join('')}
                     </div></div>`;
                 }
@@ -2608,10 +2662,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     totalFiles += filtered.length;
                     html += `<div class="subtopic-section"><h3 class="subtopic-title">${year} ${session}</h3><div class="cards-grid">
                         ${filtered.map(file => `
-                            <a href="#" class="pdf-card" data-pdf-url="${file.qp_path}" data-ms-url="${file.ms_path || ''}" data-pdf-name="${file.name}">
+                            <button type="button" class="pdf-card" data-pdf-url="${file.qp_path}" data-ms-url="${file.ms_path || ''}" data-pdf-name="${file.name}">
                                 ${getPdfIcon()}
                                 <div class="pdf-info"><div class="pdf-name">${file.name}</div><div class="pdf-meta">Full Paper</div></div>
-                            </a>
+                            </button>
                         `).join('')}
                     </div></div>`;
                 }
@@ -2624,10 +2678,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     totalFiles += filtered.length;
                     html += `<div class="subtopic-section"><h3 class="subtopic-title">${category} > ${subtopic}</h3><div class="cards-grid">
                         ${filtered.map(q => `
-                            <a href="#" class="pdf-card" data-pdf-url="${q.filepath}" data-full-paper="${q.full_paper_path}" data-pdf-name="${q.filename}">
+                            <button type="button" class="pdf-card" data-pdf-url="${q.filepath}" data-full-paper="${q.full_paper_path}" data-pdf-name="${q.filename}">
                                 ${getPdfIcon()}
                                 <div class="pdf-info"><div class="pdf-name">${q.source} Q${q.qnum}</div><div class="pdf-meta">${q.paper_type === 'P1' ? 'MCQ' : 'Structured'}</div></div>
-                            </a>
+                            </button>
                         `).join('')}
                     </div></div>`;
                 }
@@ -2746,8 +2800,12 @@ document.addEventListener('DOMContentLoaded', () => {
         mockPaperTypes.addEventListener('click', (e) => {
             const btn = e.target.closest('.mock-paper-btn');
             if (!btn) return;
-            mockPaperTypes.querySelectorAll('.mock-paper-btn').forEach(b => b.classList.remove('active'));
+            mockPaperTypes.querySelectorAll('.mock-paper-btn').forEach(b => {
+                b.classList.remove('active');
+                b.setAttribute('aria-pressed', 'false');
+            });
             btn.classList.add('active');
+            btn.setAttribute('aria-pressed', 'true');
             mockSelectedPaperType = btn.getAttribute('data-paper');
             
             // Adjust defaults
@@ -2916,13 +2974,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 togglesContainer.classList.remove('hidden');
                 let pillsHtml = '';
                 questions.forEach((q, idx) => {
-                    pillsHtml += `<button class="mock-q-pill" data-idx="${idx}" title="Mark Question ${idx + 1} Solved">Q${idx + 1}</button>`;
+                    pillsHtml += `<button type="button" class="mock-q-pill" data-idx="${idx}" title="Mark Question ${idx + 1} Solved" aria-pressed="false">Q${idx + 1}</button>`;
                 });
                 togglesContainer.innerHTML = pillsHtml;
 
                 togglesContainer.querySelectorAll('.mock-q-pill').forEach(pill => {
                     pill.addEventListener('click', () => {
                         pill.classList.toggle('active');
+                        pill.setAttribute('aria-pressed', String(pill.classList.contains('active')));
                     });
                 });
             }
