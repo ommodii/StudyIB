@@ -846,7 +846,7 @@ body {
     transform: translateY(-3px);
 }
 
-.topic-card-header {
+.topic-card .topic-card-header {
     padding: 0.9rem 1.1rem 0.65rem;
     background: var(--accent);
 }
@@ -905,7 +905,7 @@ body {
     flex-shrink: 0;
 }
 
-.topic-card-footer {
+.topic-card .topic-card-footer {
     border-top: 1px solid var(--border-light);
     padding: 0.6rem 1rem;
 }
