@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- State ---
-    let currentSubject = 'physics'; // 'physics' or 'chemistry'
+    let currentSubject = 'physics';
     let currentMode = 'topics'; // 'topics' or 'papers' or 'practice' or 'textbooks'
     let activeCategory = null; // Either a Topic name or a Year or a Textbook name
     let timerInterval = null;
@@ -115,29 +115,64 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     let activeDailyChallengeFile = null;
 
+    const subjectConfigs = {
+        physics: {
+            label: 'Physics HL',
+            icon: 'physics',
+            sidebarId: 'sidebarSubPhysics',
+            syllabus: () => syllabusData,
+            papers: () => fullPapersData,
+            practice: () => practiceData
+        },
+        chemistry: {
+            label: 'Chemistry HL',
+            icon: 'chemistry',
+            sidebarId: 'sidebarSubChem',
+            syllabus: () => chemistrySyllabusData,
+            papers: () => chemistryFullPapersData,
+            practice: () => chemistryPracticeData
+        },
+        biology: {
+            label: 'Biology HL',
+            icon: 'biology',
+            sidebarId: 'sidebarSubBiology',
+            syllabus: () => biologySyllabusData,
+            papers: () => biologyFullPapersData,
+            practice: () => ({})
+        },
+        math: {
+            label: 'Math AA HL',
+            icon: 'math',
+            sidebarId: 'sidebarSubMath',
+            syllabus: () => mathSyllabusData,
+            papers: () => mathFullPapersData,
+            practice: () => ({})
+        }
+    };
+
+    function getSubjectConfig(subjectId = currentSubject) {
+        return subjectConfigs[subjectId] || subjectConfigs.physics;
+    }
+
     // Helpers to get subject-specific data
     function getSyllabusData() {
-        if (currentSubject === 'physics') return syllabusData;
-        if (currentSubject === 'chemistry') return chemistrySyllabusData;
-        return {};
+        return getSubjectConfig().syllabus();
     }
 
     function getFullPapersData() {
-        if (currentSubject === 'physics') return fullPapersData;
-        if (currentSubject === 'chemistry') return chemistryFullPapersData;
-        return {};
+        return getSubjectConfig().papers();
     }
 
     function getPracticeData() {
-        if (currentSubject === 'physics') return practiceData;
-        if (currentSubject === 'chemistry') return chemistryPracticeData;
-        return {};
+        return getSubjectConfig().practice();
     }
 
     function getSubjectLabel() {
-        if (currentSubject === 'physics') return 'Physics HL';
-        if (currentSubject === 'chemistry') return 'Chemistry HL';
-        return '';
+        return getSubjectConfig().label;
+    }
+
+    function subjectHasQuestionLevelContent() {
+        return Object.keys(getPracticeData()).length > 0;
     }
     
     // --- DOM Elements ---
@@ -230,11 +265,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         htmlRoot.setAttribute('data-theme', 'dark');
         localStorage.removeItem('theme');
-        if (currentSubject === 'physics') {
-            htmlRoot.setAttribute('data-color', 'physics');
-        } else {
-            htmlRoot.setAttribute('data-color', 'chemistry');
-        }
+        htmlRoot.setAttribute('data-color', currentSubject);
         
         colorBtns.forEach(btn => {
             const isActive = btn.getAttribute('data-color') === color;
@@ -251,8 +282,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 localStorage.setItem('color', color);
                 userAccentColor = color;
             } else {
-                // If in chemistry, color can be saved for when they switch back to physics,
-                // but the screen stays green.
+                // Preserve the user's preferred custom accent for Physics while
+                // keeping the current subject's identity colour active.
                 localStorage.setItem('color', color);
                 userAccentColor = color;
             }
@@ -324,7 +355,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function renderPaperFilter() {
         if (!paperFilter) return;
-        const isIB = currentSubject === 'physics' || currentSubject === 'chemistry';
+        const isIB = Object.hasOwn(subjectConfigs, currentSubject);
         let html = '<button type="button" class="filter-btn active" data-filter="all">All</button>';
         
         if (isIB) {
@@ -585,8 +616,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function initDojoLayout() {
         const sidebarHome = document.getElementById('sidebarHome');
-        const sidebarSubPhysics = document.getElementById('sidebarSubPhysics');
-        const sidebarSubChem = document.getElementById('sidebarSubChem');
         const sidebarMock = document.getElementById('sidebarMock');
         const sidebarReviews = document.getElementById('sidebarReviews');
         const sidebarAtom = document.getElementById('sidebarAtom');
@@ -598,11 +627,10 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
         
-        // Subject links array
-        const subjectLinks = [
-            { el: sidebarSubPhysics, id: 'physics' },
-            { el: sidebarSubChem, id: 'chemistry' }
-        ];
+        const subjectLinks = Object.entries(subjectConfigs).map(([id, config]) => ({
+            el: document.getElementById(config.sidebarId),
+            id
+        }));
 
         subjectLinks.forEach(link => {
             if (link.el) {
@@ -660,10 +688,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const homeLink = document.getElementById('sidebarHome');
             if (homeLink) homeLink.classList.add('active');
         } else if (activeView === 'subject') {
-            let activeLink = null;
-            if (currentSubject === 'physics') activeLink = document.getElementById('sidebarSubPhysics');
-            else if (currentSubject === 'chemistry') activeLink = document.getElementById('sidebarSubChem');
-            
+            const activeLink = document.getElementById(getSubjectConfig().sidebarId);
             if (activeLink) activeLink.classList.add('active');
         }
     }
@@ -686,11 +711,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const brandName = document.getElementById('brandName');
         if (brandName) brandName.textContent = subjectLabel;
 
-        if (currentSubject === 'physics') {
-            htmlRoot.setAttribute('data-color', 'physics');
-        } else if (currentSubject === 'chemistry') {
-            htmlRoot.setAttribute('data-color', 'chemistry');
-        }
+        htmlRoot.setAttribute('data-color', currentSubject);
 
         showContentHeader();
         renderPaperFilter();
@@ -764,9 +785,9 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         };
 
-        const physicsProgress = buildSubjectProgress('physics', 'Physics HL', syllabusData);
-        const chemistryProgress = buildSubjectProgress('chemistry', 'Chemistry HL', chemistrySyllabusData);
-        const subjectProgress = [physicsProgress, chemistryProgress];
+        const subjectProgress = Object.entries(subjectConfigs).map(([id, config]) =>
+            buildSubjectProgress(id, config.label, config.syllabus())
+        );
         const totalResources = subjectProgress.reduce((sum, subject) => sum + subject.total, 0);
         const completedResources = subjectProgress.reduce((sum, subject) => sum + subject.completed, 0);
         const overallProgress = totalResources > 0 ? Math.round((completedResources / totalResources) * 100) : 0;
@@ -1057,6 +1078,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const icons = {
             physics: '<circle cx="12" cy="12" r="1.6" fill="currentColor"></circle><ellipse cx="12" cy="12" rx="9" ry="3.5"></ellipse><ellipse cx="12" cy="12" rx="9" ry="3.5" transform="rotate(60 12 12)"></ellipse><ellipse cx="12" cy="12" rx="9" ry="3.5" transform="rotate(120 12 12)"></ellipse>',
             chemistry: '<path d="M9 3h6"></path><path d="M10 3v6.2l-5 8.3A2.3 2.3 0 0 0 7 21h10a2.3 2.3 0 0 0 2-3.5l-5-8.3V3"></path><path d="M8 15h8"></path>',
+            biology: '<path d="M12 22c4.5-3.2 7-7.1 7-11.2C19 6 16.1 3 12 2 7.9 3 5 6 5 10.8 5 14.9 7.5 18.8 12 22z"></path><path d="M8.5 15c2.2-1.8 4.4-4.4 6.5-8"></path><path d="M9 10c1.5.1 2.7.6 3.6 1.5"></path>',
+            math: '<path d="M18 4H7l5 8-5 8h11"></path><path d="M15 8h4M15 16h4"></path>',
             syllabus: '<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H11v17H6.5A2.5 2.5 0 0 0 4 22z"></path><path d="M20 5.5A2.5 2.5 0 0 0 17.5 3H13v17h4.5A2.5 2.5 0 0 1 20 22z"></path>',
             topics: '<path d="m12 2 9 5-9 5-9-5z"></path><path d="m3 12 9 5 9-5"></path><path d="m3 17 9 5 9-5"></path>',
             papers: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path><path d="M8 13h8M8 17h8"></path>',
@@ -1079,9 +1102,10 @@ document.addEventListener('DOMContentLoaded', () => {
         updateBreadcrumbs([]);
 
         const subjectLabel = getSubjectLabel();
-        const subjectIcon = subjectLabel.toLowerCase().includes('chemistry') ? 'chemistry' : 'physics';
+        const subjectIcon = getSubjectConfig().icon;
         const syllabusData = getSyllabusData();
         const categories = sortCategories(Object.keys(syllabusData));
+        const hasQuestionLevelContent = subjectHasQuestionLevelContent();
 
         let homescreenHTML = `
             <!-- Top Nav Bar (Stationary) -->
@@ -1100,17 +1124,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     <button type="button" class="workspace-nav-item" id="homeNavPapers" aria-label="Past papers" title="Past papers">
                         ${getWorkspaceIcon('papers')}<span>Papers</span>
                     </button>
-                    <button type="button" class="workspace-nav-item" id="homeNavMock" aria-label="Mock simulator" title="Mock simulator">
-                        ${getWorkspaceIcon('mock')}<span>Mock</span>
-                    </button>
+                    ${hasQuestionLevelContent ? `
+                        <button type="button" class="workspace-nav-item" id="homeNavMock" aria-label="Mock simulator" title="Mock simulator">
+                            ${getWorkspaceIcon('mock')}<span>Mock</span>
+                        </button>
+                    ` : ''}
                     <button type="button" class="workspace-nav-item" id="homeNavReviews" aria-label="Review queue" title="Review queue">
                         ${getWorkspaceIcon('reviews')}<span>Review</span>
                     </button>
                 </nav>
-                <button type="button" class="workspace-cta-btn" id="homeCtaBtn" aria-label="Problem of the day" title="Problem of the day">
-                    ${getWorkspaceIcon('daily')}
-                    <span>Daily problem</span>
-                </button>
+                ${hasQuestionLevelContent ? `
+                    <button type="button" class="workspace-cta-btn" id="homeCtaBtn" aria-label="Problem of the day" title="Problem of the day">
+                        ${getWorkspaceIcon('daily')}
+                        <span>Daily problem</span>
+                    </button>
+                ` : ''}
             </div>
 
             <div class="workspace-scroll-container">
@@ -1213,17 +1241,21 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // CTA button launches Problem of the Day
-        document.getElementById('homeCtaBtn').addEventListener('click', () => {
-            launchDailyChallenge();
-        });
+        const homeCtaBtn = document.getElementById('homeCtaBtn');
+        if (homeCtaBtn) homeCtaBtn.addEventListener('click', launchDailyChallenge);
 
         // Bind subcategory card clicks
         document.querySelectorAll('.theme-subcat-card').forEach(card => {
             card.addEventListener('click', () => {
                 const category = card.getAttribute('data-category');
                 const subcat = card.getAttribute('data-subcat');
-                switchMode('practice');
-                renderPracticeCategory(`${category}|||${subcat}`);
+                if (hasQuestionLevelContent) {
+                    switchMode('practice');
+                    renderPracticeCategory(`${category}|||${subcat}`);
+                } else {
+                    switchMode('topics');
+                    renderTopicCategory(category, subcat);
+                }
             });
         });
     }
@@ -1522,15 +1554,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
-    function renderTopicCategory(category) {
+    function renderTopicCategory(category, selectedSubtopic = null) {
         activeCategory = category;
         showContentHeader();
         currentCategoryTitle.textContent = category;
-        updateBreadcrumbs([
-            getSubjectLabel(),
-            category
-        ]);
-        const subcategories = getSyllabusData()[category] || {};
+        updateBreadcrumbs([getSubjectLabel(), category, ...(selectedSubtopic ? [selectedSubtopic] : [])]);
+        const allSubcategories = getSyllabusData()[category] || {};
+        const subcategories = selectedSubtopic && allSubcategories[selectedSubtopic]
+            ? { [selectedSubtopic]: allSubcategories[selectedSubtopic] }
+            : allSubcategories;
         
         let totalFiles = 0;
         let html = '';
@@ -1605,8 +1637,10 @@ document.addEventListener('DOMContentLoaded', () => {
         ]
     };
     function getSaveMyExamsMocks() {
-        const currentKey = currentSubject.includes('physics') ? 'physics' : 'chemistry';
+        const currentKey = currentSubject;
         const fallback = saveMyExamsMocks[currentKey] || [];
+
+        if (!Object.hasOwn(saveMyExamsMocks, currentKey)) return fallback;
         
         if (!fs || !path || typeof process === 'undefined' || !process.cwd) {
             return fallback;
@@ -2837,6 +2871,10 @@ document.addEventListener('DOMContentLoaded', () => {
         // Populate topics grid from practice data
         const pData = getPracticeData();
         const topics = sortCategories(Object.keys(pData));
+        if (topics.length === 0) {
+            showNotification('Question-level mock generation is not available for this subject.', 'info');
+            return;
+        }
         
         let gridHTML = '';
         topics.forEach(topic => {

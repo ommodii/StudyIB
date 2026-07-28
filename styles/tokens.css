@@ -105,6 +105,8 @@
 
     --physics: #60a5fa;
     --chemistry: #34d399;
+    --biology: #2dd4bf;
+    --math: #fbbf24;
     --document-background: #ffffff;
 
     --duration-fast: 120ms;
@@ -147,8 +149,12 @@
    emphasis uses one application-wide primary colour. */
 [data-color="physics"] { --subject-accent: var(--physics); }
 [data-color="chemistry"] { --subject-accent: var(--chemistry); }
+[data-color="biology"] { --subject-accent: var(--biology); }
+[data-color="math"] { --subject-accent: var(--math); }
 [data-color="physics"],
 [data-color="chemistry"],
+[data-color="biology"],
+[data-color="math"],
 [data-color="indigo"],
 [data-color="blue"],
 [data-color="green"],

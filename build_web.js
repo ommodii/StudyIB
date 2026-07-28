@@ -15,6 +15,8 @@ const filesToCopy = [
     'boundaries_data.js',
     'data.js',
     'chemistry_data.js',
+    'biology_data.js',
+    'math_data.js',
     'practice_data.js',
     'chemistry_practice_data.js',
     'index.css',

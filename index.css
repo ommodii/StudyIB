@@ -71,6 +71,9 @@
     --accent-solid: #22C55E;
 }
 
+[data-color="biology"] { --accent: #14B8A6; --accent-light: rgba(20, 184, 166, 0.14); --accent-hover: #0D9488; --accent-glow: rgba(20, 184, 166, 0.25); --accent-solid: #14B8A6; }
+[data-color="math"] { --accent: #F59E0B; --accent-light: rgba(245, 158, 11, 0.14); --accent-hover: #D97706; --accent-glow: rgba(245, 158, 11, 0.25); --accent-solid: #F59E0B; }
+
 [data-color="indigo"] { --accent: #6366F1; --accent-light: rgba(99, 102, 241, 0.14); --accent-hover: #4F46E5; --accent-glow: rgba(99, 102, 241, 0.25); --accent-solid: #6366F1; }
 [data-color="blue"] { --accent: #3B82F6; --accent-light: rgba(59, 130, 246, 0.14); --accent-hover: #2563EB; --accent-glow: rgba(59, 130, 246, 0.25); --accent-solid: #3B82F6; }
 [data-color="green"] { --accent: #22C55E; --accent-light: rgba(34, 197, 94, 0.14); --accent-hover: #16A34A; --accent-glow: rgba(34, 197, 94, 0.25); --accent-solid: #22C55E; }
@@ -2309,6 +2312,8 @@ body:has(.modal-overlay:not(.hidden)) .workspace-top-nav {
 }
 .physics-dot { background: #3B82F6; }
 .chem-dot { background: #22C55E; }
+.biology-dot { background: #14B8A6; }
+.math-dot { background: #F59E0B; }
 
 /* Profile widget card */
 .sidebar-profile-card {
@@ -3807,6 +3812,8 @@ body:has(.modal-overlay:not(.hidden)) .workspace-top-nav {
 .nav-dot { width: 0.5rem; height: 0.5rem; }
 .physics-dot { background: var(--physics); }
 .chem-dot { background: var(--chemistry); }
+.biology-dot { background: var(--biology); }
+.math-dot { background: var(--math); }
 
 .sidebar-profile-card {
     min-height: 4rem;
@@ -3940,6 +3947,8 @@ body:has(.modal-overlay:not(.hidden)) .workspace-top-nav {
 }
 .dashboard-subject-icon { width: 2.25rem; height: 2.25rem; border-radius: var(--radius-md); }
 .dashboard-subject-icon.chemistry { color: var(--success-muted-foreground); border-color: var(--success-border); background: var(--success-soft); }
+.dashboard-subject-icon.biology { color: #5eead4; border-color: rgba(45, 212, 191, 0.22); background: rgba(20, 184, 166, 0.12); }
+.dashboard-subject-icon.math { color: var(--warning-muted-foreground); border-color: var(--warning-border); background: var(--warning-soft); }
 .dashboard-subject-label { margin-bottom: var(--space-2); }
 .dashboard-subject-label strong { color: var(--foreground); font-size: var(--text-sm); font-weight: var(--weight-medium); }
 .dashboard-subject-label span,

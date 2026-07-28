@@ -1,7 +1,7 @@
 {
   "name": "ib-science-qbank",
   "version": "1.0.0",
-  "description": "IB Physics and Chemistry Question Bank and Practice App",
+  "description": "IB Physics, Chemistry, Biology, and Mathematics study app",
   "main": "main.js",
   "author": "Om Modi",
   "license": "ISC",
