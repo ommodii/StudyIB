@@ -1,0 +1,40 @@
+{
+  "id": "/",
+  "name": "StudyIB",
+  "short_name": "StudyIB",
+  "description": "IB topical questions, past papers, mock tests, notes, and study progress.",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "orientation": "any",
+  "background_color": "#09090b",
+  "theme_color": "#09090b",
+  "categories": ["education", "productivity"],
+  "icons": [
+    {
+      "src": "/assets/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    { "name": "Physics", "short_name": "Physics", "url": "/?subject=physics" },
+    { "name": "Chemistry", "short_name": "Chemistry", "url": "/?subject=chemistry" },
+    { "name": "Biology", "short_name": "Biology", "url": "/?subject=biology" },
+    { "name": "Mathematics", "short_name": "Math", "url": "/?subject=math" }
+  ]
+}

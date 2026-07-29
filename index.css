@@ -1824,6 +1824,44 @@ body {
 .notification-pill.error { border-color: #EF4444; box-shadow: var(--shadow-lg), 0 0 20px rgba(239, 68, 68, 0.25); }
 .notification-pill.info { border-color: #3B82F6; box-shadow: var(--shadow-lg), 0 0 20px rgba(59, 130, 246, 0.25); }
 
+.pwa-update-notice {
+    position: fixed;
+    right: max(var(--space-4), env(safe-area-inset-right));
+    bottom: max(var(--space-4), env(safe-area-inset-bottom));
+    z-index: 10020;
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    width: min(29rem, calc(100vw - 2rem));
+    padding: var(--space-3);
+    color: var(--foreground);
+    background: var(--popover);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+}
+
+.pwa-update-notice > div {
+    display: grid;
+    flex: 1;
+    gap: var(--space-1);
+    min-width: 0;
+}
+
+.pwa-update-notice span {
+    color: var(--muted-foreground);
+    font-size: var(--text-sm);
+}
+
+@media (max-width: 520px) {
+    .pwa-update-notice {
+        right: max(var(--space-2), env(safe-area-inset-right));
+        bottom: max(var(--space-2), env(safe-area-inset-bottom));
+        left: max(var(--space-2), env(safe-area-inset-left));
+        width: auto;
+    }
+}
+
 /* Mock Toggles Container and Pills */
 .mock-toggles-container {
     display: flex;

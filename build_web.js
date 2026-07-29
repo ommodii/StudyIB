@@ -21,11 +21,15 @@ const filesToCopy = [
     'math_data.js',
     'index.css',
     'atom.css',
+    'manifest.webmanifest',
+    'sw.js',
+    'pwa.js',
     '_headers'
 ];
 
 const foldersToCopy = [
-    'styles'
+    'styles',
+    'assets'
 ];
 
 function copyFileSync(src, dest) {
