@@ -7,9 +7,9 @@
     <title>StudyIB</title>
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-    <link rel="stylesheet" href="index.css?v=1.1.4">
+    <link rel="stylesheet" href="index.css?v=2.0.1">
     <link rel="stylesheet" href="atom.css?v=1.1.0">
-    <link rel="stylesheet" href="styles/tokens.css?v=1.1.1">
+    <link rel="stylesheet" href="styles/tokens.css?v=2.0.0">
     <link rel="stylesheet" href="styles/base.css?v=1.1.0">
     <link rel="stylesheet" href="styles/components.css?v=1.1.0">
     <link rel="stylesheet" href="styles/atom-components.css?v=1.1.0">
@@ -98,21 +98,21 @@
             </nav>
 
             <!-- Profile Widget Footer Card -->
-            <div class="sidebar-profile-card">
-                <div class="profile-avatar">PI</div>
+            <button type="button" class="sidebar-profile-card" id="accountBtn" aria-label="Open account and profile">
+                <div class="profile-avatar" id="sidebarProfileAvatar">G</div>
                 <div class="profile-meta">
-                    <div class="profile-name">PirateIB</div>
-                    <div class="profile-title" id="profileTitleLabel">Candidate HL</div>
+                    <div class="profile-name" id="sidebarProfileName">Guest</div>
+                    <div class="profile-title" id="profileTitleLabel">Progress stays on this device</div>
                 </div>
-                <button type="button" class="settings-gear-btn" id="settingsBtn" aria-label="Settings">
+                <span class="settings-gear-btn" aria-hidden="true">
                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none">
                         <circle cx="12" cy="12" r="3"></circle>
                         <path
                             d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
                         </path>
                     </svg>
-                </button>
-            </div>
+                </span>
+            </button>
 
             <!-- Hidden compatibility target for gamification script -->
             <div id="gamificationWidget" class="hidden"></div>
@@ -470,16 +470,43 @@
                 </button>
             </div>
             <div class="modal-body dialog-content">
+                <div class="shop-intro">
+                    <div>
+                        <span class="shop-kicker">Collection terminal</span>
+                        <h4>Make the workspace yours.</h4>
+                        <p>Spend DP on animated environments, companions, and profile titles.</p>
+                    </div>
+                    <div class="shop-intro-orbit" aria-hidden="true"><span></span></div>
+                </div>
                 <div class="shop-balance">
-                    <span>Balance:</span> <span><strong id="shopBalance">0</strong> DP Points 🪙</span>
+                    <span>Available balance</span> <span><strong id="shopBalance">0</strong> DP</span>
                 </div>
                 <div class="shop-tabs tab-list" role="tablist" aria-label="Shop categories">
                     <button type="button" class="shop-tab-btn tab-trigger active" data-tab="themes" role="tab" aria-selected="true">Themes</button>
+                    <button type="button" class="shop-tab-btn tab-trigger" data-tab="pets" role="tab" aria-selected="false">Companions</button>
                     <button type="button" class="shop-tab-btn tab-trigger" data-tab="titles" role="tab" aria-selected="false">Titles</button>
                 </div>
                 <div class="shop-items-container" id="shopItemsContainer">
                     <!-- Shop items will be rendered dynamically here -->
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Optional account and profile hub -->
+    <div id="accountModal" class="modal-overlay dialog-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="accountModalTitle">
+        <div class="modal-content account-modal-content dialog">
+            <div class="modal-header dialog-header">
+                <div>
+                    <span class="account-kicker">Optional account</span>
+                    <h3 class="dialog-title" id="accountModalTitle">Your StudyIB profile</h3>
+                </div>
+                <button type="button" id="closeAccountBtn" class="close-btn button button-ghost button-icon button-sm" aria-label="Close account panel">
+                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            <div class="modal-body dialog-content" id="accountModalBody">
+                <div class="loading-state"><div class="skeleton account-loading-line"></div><p>Loading account options…</p></div>
             </div>
         </div>
     </div>
@@ -637,15 +664,16 @@
                 </div>
                 <!-- Data and App Logic -->
                 <script src="config.js"></script>
+                <script src="vendor/supabase.js?v=2.111.0"></script>
+                <script src="account.js?v=2.0.1"></script>
+                <script src="topic_question_data.js?v=2026-07-28-v1"></script>
                 <script src="data.js"></script>
-                <script src="practice_data.js"></script>
                 <script src="chemistry_data.js?v=1.0.1"></script>
-                <script src="chemistry_practice_data.js?v=1.0.1"></script>
                 <script src="biology_data.js?v=1.0.0"></script>
                 <script src="math_data.js?v=1.0.0"></script>
                 <script src="boundaries_data.js"></script>
                 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-                <script src="gamification.js"></script>
+                <script src="gamification.js?v=2.0.0"></script>
                 <script>
                     if (typeof require === 'undefined') {
                         window.require = function(mod) {
@@ -668,7 +696,7 @@
                     }
                 </script>
                 <script src="atom.js"></script>
-                <script src="app.js?v=1.0.5"></script>
+                <script src="app.js?v=2.0.5"></script>
 </body>
 
 </html>

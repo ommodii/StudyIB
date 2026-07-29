@@ -145,6 +145,91 @@
     --color-error: var(--destructive);
 }
 
+[data-theme="light"] {
+    color-scheme: light;
+
+    --background: #f7f7f8;
+    --foreground: #18181b;
+    --surface-1: #ffffff;
+    --surface-2: #f4f4f5;
+    --surface-3: #e9e9ed;
+    --surface-hover: #eeeeF2;
+    --surface-active: #e4e4e7;
+    --card: #ffffff;
+    --card-foreground: #18181b;
+    --popover: #ffffff;
+    --popover-foreground: #18181b;
+
+    --primary: #4f46e5;
+    --primary-hover: #4338ca;
+    --primary-active: #3730a3;
+    --primary-foreground: #ffffff;
+    --primary-muted-foreground: #3730a3;
+    --primary-soft: rgba(79, 70, 229, 0.10);
+    --primary-soft-hover: rgba(79, 70, 229, 0.16);
+    --primary-border: rgba(79, 70, 229, 0.22);
+    --primary-border-strong: rgba(79, 70, 229, 0.34);
+
+    --secondary: #f1f1f3;
+    --secondary-hover: #e7e7ea;
+    --secondary-foreground: #27272a;
+    --muted: #f0f0f2;
+    --muted-foreground: #60606a;
+    --success: #15803d;
+    --success-foreground: #ffffff;
+    --success-muted-foreground: #166534;
+    --success-soft: rgba(22, 163, 74, 0.10);
+    --success-border: rgba(22, 163, 74, 0.24);
+    --warning: #b45309;
+    --warning-muted-foreground: #92400e;
+    --warning-soft: rgba(217, 119, 6, 0.10);
+    --warning-border: rgba(217, 119, 6, 0.25);
+    --destructive: #dc2626;
+    --destructive-hover: #b91c1c;
+    --destructive-foreground: #ffffff;
+    --destructive-muted-foreground: #b91c1c;
+    --destructive-muted-hover: #991b1b;
+    --destructive-soft: rgba(220, 38, 38, 0.09);
+    --destructive-border: rgba(220, 38, 38, 0.24);
+
+    --border: #dedee3;
+    --border-strong: #c8c8cf;
+    --input: #d4d4d8;
+    --ring: #4f46e5;
+    --sidebar: #ffffff;
+    --sidebar-foreground: #27272a;
+    --sidebar-accent: var(--primary-soft);
+    --sidebar-border: #e3e3e7;
+    --shadow-sm: 0 1px 2px rgba(24, 24, 27, 0.06);
+    --shadow-md: 0 12px 32px rgba(24, 24, 27, 0.12);
+    --shadow-document: 0 8px 24px rgba(24, 24, 27, 0.16);
+    --physics: #2563eb;
+    --chemistry: #047857;
+    --biology: #0f766e;
+    --math: #a16207;
+
+    --bg-main: var(--background);
+    --bg-sidebar: var(--sidebar);
+    --bg-card: var(--card);
+    --bg-elevated: var(--surface-2);
+    --text-primary: var(--foreground);
+    --text-secondary: var(--secondary-foreground);
+    --text-muted: var(--muted-foreground);
+    --border-light: var(--border);
+    --modal-overlay: rgba(24, 24, 27, 0.48);
+    --modal-bg: var(--popover);
+    --input-bg: var(--surface-1);
+    --btn-hover: var(--surface-hover);
+    --pdf-bg: #ececf0;
+    --shadow-lg: var(--shadow-md);
+    --accent-light: var(--primary-soft);
+    --accent-glow: rgba(79, 70, 229, 0.12);
+    --accent-solid: var(--primary);
+    --color-success: var(--success);
+    --color-warning: var(--warning);
+    --color-error: var(--destructive);
+}
+
 /* Subject identity remains available for dots and labels, while interactive
    emphasis uses one application-wide primary colour. */
 [data-color="physics"] { --subject-accent: var(--physics); }

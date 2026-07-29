@@ -2,17 +2,20 @@
   "name": "ib-science-qbank",
   "version": "1.0.0",
   "description": "IB Physics, Chemistry, Biology, and Mathematics study app",
-  "main": "main.js",
   "author": "Om Modi",
   "license": "ISC",
   "scripts": {
+    "test": "node tests/test_gamification_ledger.js && node tests/test_account_progression.js",
+    "build:topic-papers": "python -m scripts.topic_papers.cli --local-only",
+    "build:question-production": "python -m scripts.topic_papers.production --subjects all --local-only",
+    "build:question-web-data": "python -m scripts.topic_papers.build_web_dataset --version 2026-07-28-v1",
     "build:web": "node build_web.js",
-    "deploy:worker": "npm run build:web && wrangler deploy",
-    "deploy:pages": "npm run build:web && wrangler pages deploy www --project-name studyib --branch main",
-    "deploy:all": "npm run build:web && wrangler deploy && wrangler pages deploy www --project-name studyib --branch main"
+    "build:native": "npm run build:web",
+    "deploy:worker": "npm run build:web && wrangler deploy"
   },
   "dependencies": {
     "@capacitor/core": "^8.4.1",
-    "@capacitor/filesystem": "^8.1.2"
+    "@capacitor/filesystem": "^8.1.2",
+    "@supabase/supabase-js": "2.111.0"
   }
 }

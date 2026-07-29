@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- State ---
     let currentSubject = 'physics';
+    window.currentStudyIBSubject = currentSubject;
     let currentMode = 'topics'; // 'topics' or 'papers' or 'practice' or 'textbooks'
     let activeCategory = null; // Either a Topic name or a Year or a Textbook name
     let timerInterval = null;
@@ -72,6 +73,8 @@ document.addEventListener('DOMContentLoaded', () => {
         totalTime: 0,
         timerInterval: null,
         paperType: 'P1'
+        ,clientEventId: null
+        ,startedAt: null
     };
 
     // IB HL Topic Priority Weights (higher = more questions drawn)
@@ -120,35 +123,142 @@ document.addEventListener('DOMContentLoaded', () => {
             label: 'Physics HL',
             icon: 'physics',
             sidebarId: 'sidebarSubPhysics',
-            syllabus: () => syllabusData,
+            syllabus: () => topicQuestionSyllabusData.physics,
             papers: () => fullPapersData,
-            practice: () => practiceData
+            practice: () => topicQuestionPracticeData.physics
         },
         chemistry: {
             label: 'Chemistry HL',
             icon: 'chemistry',
             sidebarId: 'sidebarSubChem',
-            syllabus: () => chemistrySyllabusData,
+            syllabus: () => topicQuestionSyllabusData.chemistry,
             papers: () => chemistryFullPapersData,
-            practice: () => chemistryPracticeData
+            practice: () => topicQuestionPracticeData.chemistry
         },
         biology: {
             label: 'Biology HL',
             icon: 'biology',
             sidebarId: 'sidebarSubBiology',
-            syllabus: () => biologySyllabusData,
+            syllabus: () => topicQuestionSyllabusData.biology,
             papers: () => biologyFullPapersData,
-            practice: () => ({})
+            practice: () => topicQuestionPracticeData.biology
         },
         math: {
             label: 'Math AA HL',
             icon: 'math',
             sidebarId: 'sidebarSubMath',
-            syllabus: () => mathSyllabusData,
+            syllabus: () => topicQuestionSyllabusData.math,
             papers: () => mathFullPapersData,
-            practice: () => ({})
+            practice: () => topicQuestionPracticeData.math
         }
     };
+
+    const TOPIC_QUESTION_PROGRESS_KEY = 'science_qbank_topic_question_progress';
+    const topicQuestionIndex = new Map();
+    const topicQuestionSubjects = {};
+
+    Object.entries(subjectConfigs).forEach(([subjectId, config]) => {
+        const subjectQuestionIds = new Set();
+        const practiceData = config.practice() || {};
+
+        Object.values(practiceData).forEach(subtopics => {
+            Object.values(subtopics || {}).forEach(questions => {
+                (questions || []).forEach(question => {
+                    const filepath = question.filepath || question.qp_path;
+                    if (!filepath) return;
+                    subjectQuestionIds.add(filepath);
+                    if (!topicQuestionIndex.has(filepath)) {
+                        topicQuestionIndex.set(filepath, { ...question, subject: subjectId });
+                    }
+                });
+            });
+        });
+
+        topicQuestionSubjects[subjectId] = subjectQuestionIds;
+    });
+
+    function loadTopicQuestionProgress() {
+        let savedProgress = null;
+        try {
+            savedProgress = JSON.parse(localStorage.getItem(TOPIC_QUESTION_PROGRESS_KEY) || 'null');
+        } catch (error) {
+            console.warn('Unable to read topic-question progress; rebuilding it from valid legacy entries.', error);
+        }
+
+        const candidates = [
+            ...(Array.isArray(savedProgress && savedProgress.completed) ? savedProgress.completed : []),
+            ...completedQuestions
+        ];
+        const completed = [...new Set(candidates.filter(filepath => topicQuestionIndex.has(filepath)))];
+        const progress = {
+            datasetVersion: topicQuestionBankMetadata.version,
+            completed,
+            migratedAt: savedProgress && savedProgress.datasetVersion === topicQuestionBankMetadata.version
+                ? savedProgress.migratedAt
+                : new Date().toISOString()
+        };
+
+        localStorage.setItem(TOPIC_QUESTION_PROGRESS_KEY, JSON.stringify(progress));
+        return new Set(completed);
+    }
+
+    const completedTopicQuestions = loadTopicQuestionProgress();
+
+    window.addEventListener('studyib:account-snapshot', event => {
+        const cloudQuestions = event.detail?.snapshot?.question_progress || [];
+        completedTopicQuestions.clear();
+        cloudQuestions.filter(item => item.completed_at && topicQuestionIndex.has(item.question_id)).forEach(item => completedTopicQuestions.add(item.question_id));
+        saveTopicQuestionProgress();
+        if (activeView === 'home') renderDashboard();
+    });
+
+    function saveTopicQuestionProgress() {
+        let migratedAt = new Date().toISOString();
+        try {
+            migratedAt = JSON.parse(localStorage.getItem(TOPIC_QUESTION_PROGRESS_KEY) || '{}').migratedAt || migratedAt;
+        } catch (error) {
+            console.warn('Unable to preserve the topic-question migration timestamp.', error);
+        }
+        localStorage.setItem(TOPIC_QUESTION_PROGRESS_KEY, JSON.stringify({
+            datasetVersion: topicQuestionBankMetadata.version,
+            completed: [...completedTopicQuestions],
+            migratedAt,
+            updatedAt: new Date().toISOString()
+        }));
+    }
+
+    function isCurrentTopicQuestion(filepath) {
+        return topicQuestionIndex.has(filepath);
+    }
+
+    function getQuestionReward(filepath) {
+        const question = topicQuestionIndex.get(filepath);
+        const isPaperOne = question
+            ? question.paper_type === 'P1'
+            : filepath.toLowerCase().includes('paper_1') || filepath.toLowerCase().includes('paper 1');
+        return isPaperOne
+            ? { xp: 10, completedReason: 'Solved Paper 1 question', removedReason: 'Uncompleted Paper 1 question' }
+            : { xp: 50, completedReason: 'Completed structured question', removedReason: 'Uncompleted structured question' };
+    }
+
+    function setStoredQuestionCompletion(filepath, completed) {
+        if (isCurrentTopicQuestion(filepath)) {
+            if (completed) completedTopicQuestions.add(filepath);
+            else completedTopicQuestions.delete(filepath);
+            saveTopicQuestionProgress();
+            if (window.studyIBAccount?.signedIn) {
+                const subject = topicQuestionIndex.get(filepath)?.subject || currentSubject;
+                window.studyIBAccount.setQuestionCompletion(filepath, subject, completed)
+                    .catch(error => showNotification(error.message || 'Progress will sync when you are back online.', 'error'));
+            }
+            return;
+        }
+
+        const index = completedQuestions.indexOf(filepath);
+        if (completed && index === -1) completedQuestions.push(filepath);
+        if (!completed && index > -1) completedQuestions.splice(index, 1);
+        localStorage.setItem('science_qbank_completed_questions', JSON.stringify(completedQuestions));
+    }
 
     function getSubjectConfig(subjectId = currentSubject) {
         return subjectConfigs[subjectId] || subjectConfigs.physics;
@@ -220,6 +330,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const zoomDisplay = document.getElementById('zoomDisplay');
     let currentPdfDoc = null;
     let currentScale = 1.25;
+    let preferredPdfScale = 1.25;
+    let lastSuccessfulPdfScale = 1.25;
+    let viewerResizeTimer = null;
+    let currentRenderId = 0;
+    const activePdfRenderTasks = new Set();
+    let pdfPageObserver = null;
     
     let lastListViewState = null;
     function saveListViewState() {
@@ -263,8 +379,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const color = localStorage.getItem('color') || 'indigo';
         userAccentColor = color;
 
-        htmlRoot.setAttribute('data-theme', 'dark');
-        localStorage.removeItem('theme');
+        const appearance = localStorage.getItem('theme') || 'dark';
+        const resolvedTheme = appearance === 'system'
+            ? (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark')
+            : appearance;
+        htmlRoot.setAttribute('data-theme', resolvedTheme === 'light' ? 'light' : 'dark');
+        htmlRoot.setAttribute('data-appearance', appearance);
         htmlRoot.setAttribute('data-color', currentSubject);
         
         colorBtns.forEach(btn => {
@@ -296,9 +416,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    settingsBtn.addEventListener('click', () => settingsModal.classList.remove('hidden'));
-    closeSettingsBtn.addEventListener('click', () => settingsModal.classList.add('hidden'));
-    settingsModal.addEventListener('click', (e) => {
+    if (settingsBtn && settingsModal) settingsBtn.addEventListener('click', () => settingsModal.classList.remove('hidden'));
+    if (closeSettingsBtn && settingsModal) closeSettingsBtn.addEventListener('click', () => settingsModal.classList.add('hidden'));
+    if (settingsModal) settingsModal.addEventListener('click', (e) => {
         if (e.target === settingsModal) settingsModal.classList.add('hidden');
     });
 
@@ -443,24 +563,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Completed Status Helpers ---
     function isQuestionCompleted(filepath) {
-        return completedQuestions.includes(filepath);
+        return isCurrentTopicQuestion(filepath)
+            ? completedTopicQuestions.has(filepath)
+            : completedQuestions.includes(filepath);
     }
     
     function toggleQuestionCompletion(filepath, subcat = '', isBoss = false) {
-        const index = completedQuestions.indexOf(filepath);
-        if (index > -1) {
-            completedQuestions.splice(index, 1);
+        const wasCompleted = isQuestionCompleted(filepath);
+        const reward = getQuestionReward(filepath);
+        setStoredQuestionCompletion(filepath, !wasCompleted);
+
+        if (wasCompleted) {
             // Deduct XP and DP Points!
             if (window.gamification) {
                 if (isBoss) {
                     window.gamification.undefeatBoss(filepath, subcat || "Topic");
                 } else {
-                    const isPaper1 = filepath.toLowerCase().includes('paper_1') || filepath.toLowerCase().includes('paper 1');
-                    if (isPaper1) {
-                        window.gamification.removeXp(10, "Uncompleted Paper 1 MCQ");
-                    } else {
-                        window.gamification.removeXp(50, "Uncompleted Paper 2/3 structured question");
-                    }
+                    window.gamification.revokeReward(`question:${filepath}`, reward.removedReason);
                 }
             }
             // Remove SRS entry
@@ -468,18 +587,12 @@ document.addEventListener('DOMContentLoaded', () => {
             saveSrsData();
             hideSrsRating();
         } else {
-            completedQuestions.push(filepath);
             // Gamification reward triggers
             if (window.gamification) {
                 if (isBoss) {
                     window.gamification.defeatBoss(filepath, subcat || "Topic");
                 } else {
-                    const isPaper1 = filepath.toLowerCase().includes('paper_1') || filepath.toLowerCase().includes('paper 1');
-                    if (isPaper1) {
-                        window.gamification.addXp(10, "Solved Paper 1 MCQ");
-                    } else {
-                        window.gamification.addXp(50, "Completed Paper 2/3 structured question");
-                    }
+                    window.gamification.awardRewardOnce(`question:${filepath}`, reward.xp, 0, reward.completedReason);
                 }
             }
             // Show SRS difficulty rating prompt
@@ -487,26 +600,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         // Intercept Daily Challenge completion
-        if (activeDailyChallengeFile === filepath && completedQuestions.includes(filepath)) {
+        if (activeDailyChallengeFile === filepath && isQuestionCompleted(filepath)) {
             const today = new Date();
             const dateStr = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
             const dailyKey = `completedDailyChallenge_${currentSubject}_${dateStr}`;
             if (localStorage.getItem(dailyKey) !== 'true') {
                 localStorage.setItem(dailyKey, 'true');
                 if (window.gamification) {
-                    window.gamification.addXp(50, "🎯 Daily Challenge completed!");
-                    const currentPoints = parseInt(localStorage.getItem('revision_dojo_dop_points') || '0');
-                    localStorage.setItem('revision_dojo_dop_points', currentPoints + 15);
-                    if (typeof updateDojoPointsDisplay === 'function') {
-                        updateDojoPointsDisplay();
-                    }
+                    window.gamification.awardRewardOnce(`daily:${currentSubject}:${dateStr}`, 50, 15, "Daily Challenge completed!");
                 }
                 showNotification("🎯 Daily Challenge completed! Earned +50 XP and +15 DP Points!", "success");
                 activeDailyChallengeFile = null;
             }
         }
         
-        localStorage.setItem('science_qbank_completed_questions', JSON.stringify(completedQuestions));
         updateCompleteButtonUI(filepath);
         
         if (activeCategory) {
@@ -593,7 +700,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const now = Date.now();
         const due = [];
         for (const [filepath, entry] of Object.entries(srsData)) {
-            if (entry.nextReview <= now) {
+            if (isCurrentTopicQuestion(filepath) && entry.nextReview <= now) {
                 due.push({ filepath, ...entry });
             }
         }
@@ -701,6 +808,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (mainContent) mainContent.classList.remove('hidden');
 
         currentSubject = subjectId;
+        window.currentStudyIBSubject = currentSubject;
         activeView = 'subject';
         currentMode = 'topics';
         activeCategory = null;
@@ -730,27 +838,20 @@ document.addEventListener('DOMContentLoaded', () => {
         activeView = 'home';
         updateSidebarActiveState();
 
-        let streak = localStorage.getItem('gamification_streak') || 1;
-        let xp = localStorage.getItem('gamification_xp') || 3;
-        let dp = localStorage.getItem('gamification_dp') || 20;
-
-        if (window.gamification) {
-            streak = window.gamification.streak || streak;
-            xp = window.gamification.xp || xp;
-            dp = window.gamification.dpPoints || dp;
+        let savedGamification = {};
+        try {
+            savedGamification = JSON.parse(localStorage.getItem('science_qbank_gamification_state') || '{}');
+        } catch (error) {
+            console.warn('Unable to read saved gamification state.', error);
         }
-
-        const hour = new Date().getHours();
-        let greeting = 'Good afternoon';
-        if (hour < 12) {
-            greeting = 'Good morning';
-        } else if (hour >= 18) {
-            greeting = 'Good evening';
-        }
+        const gamificationState = window.gamification ? window.gamification.state : savedGamification;
+        const streak = Number(gamificationState.streak) || 0;
+        const xp = Number(gamificationState.xp) || 0;
+        const dp = Number(gamificationState.dpPoints) || 0;
 
         const buildSubjectProgress = (id, label, data) => {
-            let total = 0;
-            let completed = 0;
+            const questionIds = topicQuestionSubjects[id] || new Set();
+            let topicCount = 0;
             let nextTopic = '';
             let nextCategory = '';
             const searchEntries = [];
@@ -758,14 +859,12 @@ document.addEventListener('DOMContentLoaded', () => {
             sortCategories(Object.keys(data || {})).forEach(category => {
                 const subtopics = data[category] || {};
                 Object.entries(subtopics || {}).forEach(([subtopic, files]) => {
+                    topicCount += 1;
                     searchEntries.push({ subject: id, subjectLabel: label, category, title: subtopic });
                     (files || []).forEach(file => {
                         const filepath = file.filepath || file.qp_path;
                         if (!filepath) return;
-                        total += 1;
-                        if (isQuestionCompleted(filepath)) {
-                            completed += 1;
-                        } else if (!nextTopic) {
+                        if (!isQuestionCompleted(filepath) && !nextTopic) {
                             nextTopic = subtopic;
                             nextCategory = category;
                         }
@@ -773,9 +872,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             });
 
+            const completed = [...questionIds].filter(filepath => completedTopicQuestions.has(filepath)).length;
+            const total = questionIds.size;
             return {
                 id,
-                label,
+                label: label.replace(/\s+(HL|SL)$/i, ''),
+                topicCount,
                 total,
                 completed,
                 percent: total > 0 ? Math.round((completed / total) * 100) : 0,
@@ -786,17 +888,9 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         const subjectProgress = Object.entries(subjectConfigs).map(([id, config]) =>
-            buildSubjectProgress(id, config.label, config.syllabus())
+            buildSubjectProgress(id, config.label, config.practice())
         );
-        const totalResources = subjectProgress.reduce((sum, subject) => sum + subject.total, 0);
-        const completedResources = subjectProgress.reduce((sum, subject) => sum + subject.completed, 0);
-        const overallProgress = totalResources > 0 ? Math.round((completedResources / totalResources) * 100) : 0;
-        const nextSubject = [...subjectProgress].sort((a, b) => a.percent - b.percent)[0];
-        const dueReviewCount = Object.values(srsData).filter(entry => entry && entry.nextReview <= Date.now()).length;
         const dashboardSearchEntries = subjectProgress.flatMap(subject => subject.searchEntries);
-        const progressMessage = completedResources > 0
-            ? `${completedResources} of ${totalResources} topical resources completed.`
-            : 'Your progress will appear here as you complete resources.';
 
         let dojoHomeHTML = `
             <div class="dojo-top-row app-toolbar">
@@ -825,98 +919,58 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
 
             <div class="dojo-dashboard-content">
-                <section class="dashboard-overview-hero card">
-                    <div class="dashboard-overview-copy">
-                        <span class="dashboard-eyebrow">Study overview</span>
-                        <h1>${greeting}</h1>
-                        <p>${progressMessage}</p>
-                    </div>
-                    <div class="dashboard-progress-orb" style="--dashboard-progress: ${overallProgress * 3.6}deg" aria-label="${overallProgress}% overall progress">
+                <section class="dashboard-subjects-section" aria-labelledby="dashboardSubjectsTitle">
+                    <div class="dashboard-subjects-heading">
                         <div>
-                            <strong>${overallProgress}%</strong>
-                            <span>overall</span>
+                            <span class="dashboard-eyebrow">Topic question bank</span>
+                            <h1 id="dashboardSubjectsTitle">Choose a subject</h1>
                         </div>
+                        <span class="dashboard-dataset-status">${topicQuestionBankMetadata.question_count.toLocaleString()} current questions</span>
+                    </div>
+
+                    <div class="dashboard-subject-card-grid">
+                        ${subjectProgress.map(subject => `
+                            <button type="button" class="dashboard-subject-card card" data-dashboard-subject="${subject.id}" aria-label="Open ${subject.label} topic questions, ${subject.completed} of ${subject.total} complete">
+                                <div class="dashboard-subject-graphic ${subject.id}" aria-hidden="true">
+                                    ${getWorkspaceIcon(subject.id)}
+                                </div>
+                                <div class="dashboard-subject-card-header">
+                                    <div>
+                                        <span class="dashboard-eyebrow">IB subject</span>
+                                        <h2>${subject.label}</h2>
+                                    </div>
+                                    <span class="dashboard-subject-arrow">${getWorkspaceIcon('arrow')}</span>
+                                </div>
+                                <div class="dashboard-subject-metrics">
+                                    <div><strong>${subject.topicCount.toLocaleString()}</strong><span>Topics</span></div>
+                                    <div><strong>${subject.total.toLocaleString()}</strong><span>Questions</span></div>
+                                    <div><strong>${subject.completed.toLocaleString()}</strong><span>Completed</span></div>
+                                </div>
+                                <div class="dashboard-subject-progress-summary">
+                                    <span>${subject.percent}% complete</span>
+                                    <span>${subject.completed.toLocaleString()} / ${subject.total.toLocaleString()}</span>
+                                </div>
+                                <div class="dashboard-progress-track progress" aria-hidden="true">
+                                    <span class="progress-bar" style="width:${subject.percent}%"></span>
+                                </div>
+                            </button>
+                        `).join('')}
                     </div>
                 </section>
-
-                <div class="dashboard-focus-grid">
-                    <section class="dashboard-data-card dashboard-progress-card card">
-                        <div class="dashboard-card-heading">
-                            <div>
-                                <span class="dashboard-eyebrow">Topical completion</span>
-                                <h2>Your progress</h2>
-                            </div>
-                            <span class="dashboard-resource-count badge">${completedResources}/${totalResources}</span>
-                        </div>
-
-                        ${subjectProgress.map(subject => `
-                            <div class="dashboard-subject-progress">
-                                <div class="dashboard-subject-icon ${subject.id}">${getWorkspaceIcon(subject.id)}</div>
-                                <div class="dashboard-subject-details">
-                                    <div class="dashboard-subject-label">
-                                        <strong>${subject.label}</strong>
-                                        <span>${subject.percent}%</span>
-                                    </div>
-                                    <div class="dashboard-progress-track progress" aria-hidden="true">
-                                        <span class="progress-bar" style="width:${subject.percent}%"></span>
-                                    </div>
-                                    <small>${subject.completed} of ${subject.total} resources</small>
-                                </div>
-                            </div>
-                        `).join('')}
-                    </section>
-
-                    <section class="dashboard-data-card dashboard-next-card card">
-                        <div class="dashboard-next-icon">${getWorkspaceIcon('target')}</div>
-                        <span class="dashboard-eyebrow">Suggested next</span>
-                        <h2>${nextSubject.nextTopic || `Explore ${nextSubject.label}`}</h2>
-                        <p>Continue with ${nextSubject.label} and build on your least-completed subject.</p>
-                        <button type="button" class="dashboard-primary-action button button-primary" id="dashboardContinueBtn">
-                            <span>Continue studying</span>${getWorkspaceIcon('arrow')}
-                        </button>
-
-                        <div class="dashboard-review-status">
-                            <div class="dashboard-review-icon">${getWorkspaceIcon('reviews')}</div>
-                            <div>
-                                <strong>${dueReviewCount > 0 ? `${dueReviewCount} review${dueReviewCount === 1 ? '' : 's'} due` : 'Review queue clear'}</strong>
-                                <span>${dueReviewCount > 0 ? 'Revisit items scheduled for today.' : 'Nothing is waiting for review.'}</span>
-                            </div>
-                            ${dueReviewCount > 0 ? '<button type="button" class="button button-outline button-sm" id="dashboardReviewBtn" aria-label="Open review queue">Review</button>' : ''}
-                        </div>
-                    </section>
-                </div>
             </div>
         `;
 
         papersGrid.innerHTML = dojoHomeHTML;
 
-        const openDashboardTopic = (subject, category) => {
+        document.querySelectorAll('[data-dashboard-subject]').forEach(card => {
+            card.addEventListener('click', () => openSubject(card.dataset.dashboardSubject));
+        });
+
+        const openDashboardTopic = (subject, category, subtopic) => {
             openSubject(subject);
-            switchMode('topics');
-            activeCategory = category;
-            renderTopicCategory(category);
+            switchMode('practice');
+            renderPracticeCategory(`${category}|||${subtopic}`);
         };
-
-        const dashboardContinueBtn = document.getElementById('dashboardContinueBtn');
-        if (dashboardContinueBtn) {
-            dashboardContinueBtn.addEventListener('click', () => {
-                if (nextSubject.nextCategory) {
-                    openDashboardTopic(nextSubject.id, nextSubject.nextCategory);
-                } else {
-                    openSubject(nextSubject.id);
-                }
-            });
-        }
-
-        const dashboardReviewBtn = document.getElementById('dashboardReviewBtn');
-        if (dashboardReviewBtn) {
-            dashboardReviewBtn.addEventListener('click', () => {
-                activeView = 'subject';
-                currentSubject = nextSubject.id;
-                renderReviewQueue();
-                updateSidebarActiveState();
-            });
-        }
 
         // Bind global search input inside the home panel
         const dojoSearchInput = document.getElementById('dojoSearchInput');
@@ -927,7 +981,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const selectSearchResult = (index) => {
                 const match = visibleSearchMatches[index];
                 if (!match) return;
-                openDashboardTopic(match.subject, match.category);
+                openDashboardTopic(match.subject, match.category, match.title);
             };
 
             dojoSearchInput.addEventListener('input', () => {
@@ -1836,7 +1890,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const paperDefinitions = {
                 'P1': { title: 'Paper 1 — Multiple Choice', meta: 'MCQ' },
                 'P2': { title: 'Paper 2 — Structured', meta: 'Structured' },
-                'P3': { title: 'Paper 3 — Options & Data Analysis', meta: 'Data & Options' }
+                'P3': { title: 'Paper 3 — Options & Data Analysis', meta: 'Data & Options' },
+                'UNKNOWN': { title: 'Paper metadata unavailable', meta: 'Needs metadata review' }
             };
 
             for (const [ptype, pdef] of Object.entries(paperDefinitions)) {
@@ -1916,7 +1971,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Award XP for actively reviewing/marking up paper
         if (tool !== 'pan' && window.gamification) {
-            window.gamification.addXp(15, `Used ${tool} annotation tool`);
+            window.gamification.awardRewardOnce(`annotation:${currentPdfUrl}:${tool}`, 15, 0, `Used ${tool} annotation tool`);
         }
     }
 
@@ -1945,13 +2000,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // Zoom
     document.getElementById('toolZoomIn').addEventListener('click', () => { 
         if (currentScale < 3.0) { 
-            currentScale += 0.25; 
+            currentScale = Math.min(3.0, currentScale + 0.25);
+            preferredPdfScale = currentScale;
             reRenderPdf().then(() => saveScrollPosition()); 
         } 
     });
     document.getElementById('toolZoomOut').addEventListener('click', () => { 
         if (currentScale > 0.5) { 
-            currentScale -= 0.25; 
+            currentScale = Math.max(0.5, currentScale - 0.25);
+            preferredPdfScale = currentScale;
             reRenderPdf().then(() => saveScrollPosition()); 
         } 
     });
@@ -1972,32 +2029,185 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.clearRect(0, 0, c.width, c.height);
         });
         document.querySelectorAll('.text-annotation').forEach(t => t.remove());
+        document.querySelectorAll('.pdf-page-wrapper').forEach(wrapper => {
+            wrapper.dataset.annotationDirty = 'false';
+        });
     });
     
-    let currentRenderId = 0;
+    function cancelActivePdfRender() {
+        activePdfRenderTasks.forEach(task => {
+            try { task.cancel(); }
+            catch (_) { /* The task may already have completed. */ }
+        });
+        activePdfRenderTasks.clear();
+    }
+
+    function disconnectPdfPageObserver() {
+        if (pdfPageObserver) pdfPageObserver.disconnect();
+        pdfPageObserver = null;
+    }
+
+    function createPdfPagePlaceholder(pageNum, message = `Loading page ${pageNum}…`) {
+        const placeholder = document.createElement('div');
+        placeholder.className = 'pdf-page-placeholder';
+        placeholder.textContent = message;
+        placeholder.setAttribute('aria-hidden', 'true');
+        return placeholder;
+    }
+
+    function getSafeCanvasPixelRatio(viewport) {
+        // Supersample even on standard-density displays so fine PDF text and
+        // equations remain as crisp as they are in Atom.
+        const deviceRatio = Math.min(Math.max(window.devicePixelRatio || 1, 1.5), 2);
+        const cssPixelsPerPage = Math.max(1, viewport.width * viewport.height);
+
+        // Only nearby pages are rendered, so each visible page can keep a high
+        // backing resolution without allocating canvases for the entire paper.
+        const perPageLayerBudget = 8000000;
+        const budgetRatio = Math.sqrt(perPageLayerBudget / cssPixelsPerPage);
+        const dimensionRatio = Math.min(8192 / viewport.width, 8192 / viewport.height);
+        return Math.max(0.5, Math.min(deviceRatio, budgetRatio, dimensionRatio));
+    }
+
+    function releaseUnannotatedPage(wrapper) {
+        if (wrapper.dataset.rendered !== 'true' || wrapper.dataset.rendering === 'true') return;
+        if (wrapper.dataset.annotationDirty === 'true') return;
+        const pageNum = Number(wrapper.dataset.pageNumber) || 1;
+        wrapper.replaceChildren(createPdfPagePlaceholder(pageNum));
+        wrapper.dataset.rendered = 'false';
+        wrapper.classList.add('pdf-page-pending');
+    }
+
+    function setupPdfPageObserver(renderId, wrappers) {
+        disconnectPdfPageObserver();
+
+        if (typeof IntersectionObserver === 'undefined') {
+            wrappers.forEach((wrapper, index) => {
+                if (index === 0 || wrapper.dataset.rendered === 'true') return;
+                renderPage(renderId, index + 1, wrapper).catch(error => {
+                    if (error?.name !== 'RenderingCancelledException') console.error('PDF page render failed:', error);
+                });
+            });
+            return;
+        }
+
+        pdfPageObserver = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                const wrapper = entry.target;
+                const pageNum = Number(wrapper.dataset.pageNumber);
+                if (entry.isIntersecting) {
+                    renderPage(renderId, pageNum, wrapper).catch(error => {
+                        if (error?.name === 'RenderingCancelledException' || renderId !== currentRenderId) return;
+                        console.error(`PDF page ${pageNum} render failed:`, error);
+                        wrapper.replaceChildren(createPdfPagePlaceholder(pageNum, 'Page could not be rendered. Scroll away and back to retry.'));
+                        wrapper.dataset.rendered = 'error';
+                    });
+                } else {
+                    releaseUnannotatedPage(wrapper);
+                }
+            });
+        }, {
+            root: pdfContainer,
+            rootMargin: '75% 0px',
+            threshold: 0.01
+        });
+
+        wrappers.forEach(wrapper => pdfPageObserver.observe(wrapper));
+    }
 
     async function reRenderPdf() {
         if (!currentPdfDoc) return;
         currentRenderId++;
         const renderId = currentRenderId;
-
-        pdfContainer.innerHTML = ''; // Clear
+        disconnectPdfPageObserver();
+        cancelActivePdfRender();
         zoomDisplay.textContent = `${Math.round(currentScale * 100)}%`;
-        for (let i = 1; i <= currentPdfDoc.numPages; i++) {
-            if (renderId !== currentRenderId) return; // Abort if another render has started
-            await renderPage(renderId, i);
+
+        const previousScrollableHeight = Math.max(1, pdfContainer.scrollHeight - pdfContainer.clientHeight);
+        const previousScrollRatio = pdfContainer.scrollTop / previousScrollableHeight;
+        const fragment = document.createDocumentFragment();
+        const wrappers = [];
+
+        try {
+            for (let i = 1; i <= currentPdfDoc.numPages; i++) {
+                if (renderId !== currentRenderId) return false;
+                const page = await currentPdfDoc.getPage(i);
+                if (renderId !== currentRenderId) return false;
+                const viewport = page.getViewport({ scale: currentScale });
+                const wrapper = document.createElement('div');
+                wrapper.className = 'pdf-page-wrapper pdf-page-pending';
+                wrapper.dataset.pageNumber = String(i);
+                wrapper.dataset.rendered = 'false';
+                wrapper.dataset.annotationDirty = 'false';
+                wrapper.style.width = `${viewport.width}px`;
+                wrapper.style.height = `${viewport.height}px`;
+                wrapper.replaceChildren(createPdfPagePlaceholder(i));
+                wrappers.push(wrapper);
+                fragment.appendChild(wrapper);
+            }
+
+            const focusPage = Math.min(wrappers.length, Math.max(1, Math.round(previousScrollRatio * Math.max(0, wrappers.length - 1)) + 1));
+            const rendered = await renderPage(renderId, focusPage, wrappers[focusPage - 1]);
+            if (!rendered || renderId !== currentRenderId) return false;
+
+            // The old view remains intact until the page nearest the user's
+            // position is sharp and ready to replace it.
+            pdfContainer.replaceChildren(fragment);
+            const nextScrollableHeight = Math.max(0, pdfContainer.scrollHeight - pdfContainer.clientHeight);
+            pdfContainer.scrollTop = nextScrollableHeight * previousScrollRatio;
+            setupPdfPageObserver(renderId, wrappers);
+            lastSuccessfulPdfScale = currentScale;
+            return true;
+        } catch (error) {
+            if (error?.name === 'RenderingCancelledException' || renderId !== currentRenderId) return false;
+            console.error('PDF zoom render failed:', error);
+            currentScale = lastSuccessfulPdfScale;
+            preferredPdfScale = lastSuccessfulPdfScale;
+            zoomDisplay.textContent = `${Math.round(currentScale * 100)}%`;
+            showNotification('That zoom could not be rendered safely. The previous view was restored.', 'error');
+            return false;
         }
     }
 
-    async function getMobileFitScale(pdfDoc) {
+    async function getViewerFitScale(pdfDoc) {
         const firstPage = await pdfDoc.getPage(1);
         const baseViewport = firstPage.getViewport({ scale: 1 });
-        const containerWidth = pdfContainer.clientWidth || window.innerWidth;
-        const availableWidth = Math.max(280, containerWidth - 12);
+        const viewerWidth = document.getElementById('viewerPane')?.clientWidth || pdfContainer.clientWidth || window.innerWidth;
+        const horizontalGutter = window.matchMedia('(max-width: 1180px)').matches ? 12 : 32;
+        const availableWidth = Math.max(280, viewerWidth - horizontalGutter);
         return Math.max(0.35, Math.min(1.25, availableWidth / baseViewport.width));
     }
 
+    async function adaptViewerScaleToWindow() {
+        if (!currentPdfDoc || !mainContentArea.classList.contains('viewing-pdf')) return;
+        const responsiveWindow = window.matchMedia('(max-width: 1440px)').matches;
+        const targetScale = responsiveWindow
+            ? Math.min(preferredPdfScale, await getViewerFitScale(currentPdfDoc))
+            : preferredPdfScale;
+        if (Math.abs(targetScale - currentScale) < 0.025) return;
+
+        const previousHeight = Math.max(1, pdfContainer.scrollHeight - pdfContainer.clientHeight);
+        const scrollRatio = pdfContainer.scrollTop / previousHeight;
+        currentScale = targetScale;
+        await reRenderPdf();
+        const nextHeight = Math.max(0, pdfContainer.scrollHeight - pdfContainer.clientHeight);
+        pdfContainer.scrollTop = nextHeight * scrollRatio;
+        saveScrollPosition();
+    }
+
+    window.addEventListener('resize', () => {
+        if (!mainContentArea.classList.contains('viewing-pdf')) return;
+        clearTimeout(viewerResizeTimer);
+        viewerResizeTimer = setTimeout(() => adaptViewerScaleToWindow().catch(error => {
+            console.warn('Could not adapt the paper viewer to the window size.', error);
+        }), 180);
+    });
+
     async function renderPdf(url) {
+        currentRenderId++;
+        const loadId = currentRenderId;
+        disconnectPdfPageObserver();
+        cancelActivePdfRender();
         pdfContainer.innerHTML = '<div class="loading-state viewer-loading-state">Loading document…</div>';
         try {
             // Restore scale
@@ -2006,14 +2216,21 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 currentScale = 1.25;
             }
+            preferredPdfScale = currentScale;
+            lastSuccessfulPdfScale = currentScale;
 
             const resolvedUrl = window.resolveStudyIBContentUrl
                 ? window.resolveStudyIBContentUrl(url)
                 : url;
             const loadingTask = pdfjsLib.getDocument(resolvedUrl);
-            currentPdfDoc = await loadingTask.promise;
-            if (isMobileUI()) {
-                currentScale = await getMobileFitScale(currentPdfDoc);
+            const loadedDoc = await loadingTask.promise;
+            if (loadId !== currentRenderId) {
+                loadedDoc.destroy?.();
+                return;
+            }
+            currentPdfDoc = loadedDoc;
+            if (window.matchMedia('(max-width: 1440px)').matches) {
+                currentScale = Math.min(preferredPdfScale, await getViewerFitScale(currentPdfDoc));
             }
             await reRenderPdf();
 
@@ -2024,28 +2241,39 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, 150);
             }
         } catch (error) {
+            if (loadId !== currentRenderId) return;
             console.error('Error rendering PDF:', error);
             pdfContainer.innerHTML = '<div class="error-state viewer-error-state">Failed to load PDF.</div>';
         }
     }
 
-    async function renderPage(renderId, pageNum) {
-        if (renderId !== currentRenderId) return; // Check before starting
-        const page = await currentPdfDoc.getPage(pageNum);
-        if (renderId !== currentRenderId) return; // Check after await
+    async function renderPage(renderId, pageNum, wrapper) {
+        if (renderId !== currentRenderId || !wrapper) return false;
+        if (wrapper.dataset.rendered === 'true') return true;
+        if (wrapper.dataset.rendering === 'true') return false;
+        wrapper.dataset.rendering = 'true';
+
+        let page;
+        try {
+            page = await currentPdfDoc.getPage(pageNum);
+        } catch (error) {
+            wrapper.dataset.rendering = 'false';
+            throw error;
+        }
+        if (renderId !== currentRenderId) {
+            wrapper.dataset.rendering = 'false';
+            return false;
+        }
         
         const viewport = page.getViewport({ scale: currentScale });
-        const pixelRatio = window.devicePixelRatio || 1;
-        
-        const wrapper = document.createElement('div');
-        wrapper.className = 'pdf-page-wrapper';
+        const pixelRatio = getSafeCanvasPixelRatio(viewport);
         wrapper.style.width = `${viewport.width}px`;
         wrapper.style.height = `${viewport.height}px`;
         
         const renderCanvas = document.createElement('canvas');
         renderCanvas.className = 'pdf-render-layer';
-        renderCanvas.width = viewport.width * pixelRatio;
-        renderCanvas.height = viewport.height * pixelRatio;
+        renderCanvas.width = Math.max(1, Math.floor(viewport.width * pixelRatio));
+        renderCanvas.height = Math.max(1, Math.floor(viewport.height * pixelRatio));
         renderCanvas.style.width = `${viewport.width}px`;
         renderCanvas.style.height = `${viewport.height}px`;
         
@@ -2053,26 +2281,39 @@ document.addEventListener('DOMContentLoaded', () => {
         annotCanvas.className = 'pdf-annotation-layer';
         if (activeTool === 'pan') annotCanvas.classList.add('cursor-pan');
         if (activeTool === 'text') annotCanvas.classList.add('cursor-text');
-        annotCanvas.width = viewport.width * pixelRatio;
-        annotCanvas.height = viewport.height * pixelRatio;
+        annotCanvas.width = Math.max(1, Math.floor(viewport.width * pixelRatio));
+        annotCanvas.height = Math.max(1, Math.floor(viewport.height * pixelRatio));
         annotCanvas.style.width = `${viewport.width}px`;
         annotCanvas.style.height = `${viewport.height}px`;
         
-        wrapper.appendChild(renderCanvas);
-        wrapper.appendChild(annotCanvas);
-        
-        if (renderId !== currentRenderId) return; // Check before appending
-        pdfContainer.appendChild(wrapper);
-        
+        const canvasContext = renderCanvas.getContext('2d');
+        if (!canvasContext) {
+            wrapper.dataset.rendering = 'false';
+            throw new Error('The browser could not allocate a PDF canvas.');
+        }
         const renderContext = {
-            canvasContext: renderCanvas.getContext('2d'),
+            canvasContext,
             viewport: viewport,
             transform: [pixelRatio, 0, 0, pixelRatio, 0, 0]
         };
-        await page.render(renderContext).promise;
+        const renderTask = page.render(renderContext);
+        activePdfRenderTasks.add(renderTask);
+        try {
+            await renderTask.promise;
+        } catch (error) {
+            if (error?.name === 'RenderingCancelledException' || renderId !== currentRenderId) return false;
+            throw error;
+        } finally {
+            activePdfRenderTasks.delete(renderTask);
+            wrapper.dataset.rendering = 'false';
+        }
         
-        if (renderId !== currentRenderId) return; // Check before final setup
+        if (renderId !== currentRenderId) return false; // Check before final setup
+        wrapper.replaceChildren(renderCanvas, annotCanvas);
         setupAnnotationCanvas(annotCanvas, wrapper, pixelRatio);
+        wrapper.dataset.rendered = 'true';
+        wrapper.classList.remove('pdf-page-pending');
+        return true;
     }
     
     function setupAnnotationCanvas(canvas, wrapper, pixelRatio) {
@@ -2094,6 +2335,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         canvas.addEventListener('mousedown', (e) => {
             if (activeTool === 'pan') return;
+            wrapper.dataset.annotationDirty = 'true';
             const coords = getCoords(e);
             
             if (activeTool === 'text') {
@@ -2143,6 +2385,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // --- Touch Listeners for Apple Pencil / Finger Draw on iOS ---
         canvas.addEventListener('touchstart', (e) => {
             if (activeTool === 'pan') return;
+            wrapper.dataset.annotationDirty = 'true';
             e.preventDefault(); // Prevent scrolling on iOS while drawing
             const coords = getCoords(e);
             
@@ -2201,6 +2444,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function spawnTextBox(wrapper, x, y) {
+        wrapper.dataset.annotationDirty = 'true';
         const div = document.createElement('div');
         div.className = 'text-annotation';
         div.contentEditable = true;
@@ -2302,6 +2546,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function closePdfViewer() {
+        currentRenderId++;
+        disconnectPdfPageObserver();
+        cancelActivePdfRender();
         mainContentArea.classList.remove('viewing-pdf');
         pdfContainer.innerHTML = ''; // Clear memory
         currentPdfDoc = null;
@@ -2535,15 +2782,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         if (completedAll) {
+            let blitzRewardAwarded = false;
             if (window.gamification) {
-                window.gamification.addXp(100, "⚡ Blitz Master Challenge completed!");
-                const currentPoints = parseInt(localStorage.getItem('revision_dojo_dop_points') || '0');
-                localStorage.setItem('revision_dojo_dop_points', currentPoints + 25);
-                if (typeof updateDojoPointsDisplay === 'function') {
-                    updateDojoPointsDisplay();
-                }
+                const today = window.gamification.getFormattedDate(new Date());
+                blitzRewardAwarded = window.gamification.awardRewardOnce(`blitz:${today}`, 100, 25, "Blitz Master Challenge completed!");
             }
-            alert(`⚡ Blitz Complete!\n\nYou solved ${blitzState.completedCount} out of 5 questions within the time limit!\n\nBonus Awarded: +100 XP & +25 DP Points! 🪙`);
+            const rewardMessage = blitzRewardAwarded
+                ? 'Bonus Awarded: +100 XP & +25 DP Points!'
+                : 'Daily Blitz bonus already claimed. Your completion still counts.';
+            alert(`⚡ Blitz Complete!\n\nYou solved ${blitzState.completedCount} out of 5 questions within the time limit!\n\n${rewardMessage}`);
         } else {
             alert(`⏰ Time's Up / Exit!\n\nBlitz challenge ended.\n\nYou completed ${blitzState.completedCount} out of 5 questions.`);
         }
@@ -2577,7 +2824,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (markschemeToggle.classList.contains('active')) {
             renderPdf(currentMsUrl);
             if (window.gamification) {
-                window.gamification.addXp(20, "Analyzing markscheme error loop");
+                window.gamification.awardRewardOnce(`markscheme:${currentPdfUrl}`, 20, 0, "Reviewed a markscheme");
             }
         } else {
             renderPdf(currentPdfUrl);
@@ -2601,27 +2848,21 @@ document.addEventListener('DOMContentLoaded', () => {
             if (blitzState.active) {
                 const currentQ = blitzState.questions[blitzState.currentIndex];
                 const filepath = currentQ.filepath || currentQ.qp_path;
-                if (!completedQuestions.includes(filepath)) {
-                    completedQuestions.push(filepath);
+                if (!isQuestionCompleted(filepath)) {
+                    setStoredQuestionCompletion(filepath, true);
                     blitzState.completedCount++;
                     if (window.gamification) {
-                        const isPaper1 = filepath.toLowerCase().includes('paper_1') || filepath.toLowerCase().includes('paper 1');
-                        if (isPaper1) {
-                            window.gamification.addXp(10, "Solved Paper 1 MCQ");
-                        } else {
-                            window.gamification.addXp(50, "Completed Paper 2/3 structured question");
-                        }
+                        const reward = getQuestionReward(filepath);
+                        window.gamification.awardRewardOnce(`question:${filepath}`, reward.xp, 0, reward.completedReason);
                     }
-                    localStorage.setItem('science_qbank_completed_questions', JSON.stringify(completedQuestions));
                 }
                 nextBlitzQuestion();
             } else if (mockState.active) {
                 const currentQ = mockState.questions[mockState.currentIndex];
                 const filepath = currentQ.filepath || currentQ.qp_path;
-                if (!completedQuestions.includes(filepath)) {
-                    completedQuestions.push(filepath);
+                if (!isQuestionCompleted(filepath)) {
+                    setStoredQuestionCompletion(filepath, true);
                     mockState.completedCount++;
-                    localStorage.setItem('science_qbank_completed_questions', JSON.stringify(completedQuestions));
                 }
                 nextMockQuestion();
             }
@@ -2764,7 +3005,8 @@ document.addEventListener('DOMContentLoaded', () => {
         timerPlayPause.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="10" y1="15" x2="10" y2="9"></line><line x1="14" y1="15" x2="14" y2="9"></line><circle cx="12" cy="12" r="10"></circle></svg>';
         
         if (window.gamification) {
-            window.gamification.addXp(15, `Started ${mins}-min exam session timer`);
+            const today = window.gamification.getFormattedDate(new Date());
+            window.gamification.awardRewardOnce(`timer:${today}`, 15, 0, `Started a ${mins}-minute exam session`);
         }
         
         if (timerInterval) clearInterval(timerInterval);
@@ -2976,6 +3218,8 @@ document.addEventListener('DOMContentLoaded', () => {
         mockState.timeRemaining = timeMinutes * 60;
         mockState.paperType = mockSelectedPaperType;
         mockState.currentIndex = 0;
+        mockState.clientEventId = `mock:${typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`}`;
+        mockState.startedAt = new Date().toISOString();
 
         // Execute PDF compilation check (detect if inside Electron with Node)
         let exec, fs;
@@ -3165,10 +3409,20 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('mockStatTime').textContent = `${m}:${s.toString().padStart(2, '0')}`;
         mockResultsOverlay.classList.remove('hidden');
 
-        // Award XP
-        if (window.gamification && mockState.completedCount > 0) {
+        if (window.studyIBAccount?.signedIn && mockState.completedCount > 0) {
+            window.studyIBAccount.recordMockResult({
+                clientEventId: mockState.clientEventId,
+                subject: currentSubject,
+                paperType: mockState.paperType,
+                totalQuestions: mockState.questions.length,
+                completedQuestions: mockState.completedCount,
+                scorePercent: pct,
+                durationSeconds: timeUsed,
+                topicIds: []
+            }).catch(error => showNotification(error.message || 'Mock result will sync when you are back online.', 'error'));
+        } else if (window.gamification && mockState.completedCount > 0) {
             const xp = mockState.completedCount * 25;
-            window.gamification.addXp(xp, `📝 Mock Exam: ${mockState.completedCount}/${mockState.questions.length} completed`);
+            window.gamification.awardRewardOnce(mockState.clientEventId || `mock:${Date.now()}`, xp, 0, `Mock Exam: ${mockState.completedCount}/${mockState.questions.length} completed`);
         }
     }
 

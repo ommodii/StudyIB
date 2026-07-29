@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://studyib.local/schemas/curriculum.json",
+  "title": "StudyIB curriculum taxonomy",
+  "type": "object",
+  "required": ["subject", "curriculum_version", "first_assessment", "sources", "topics"],
+  "properties": {
+    "subject": { "type": "string", "minLength": 1 },
+    "course": { "type": ["string", "null"] },
+    "curriculum_version": { "type": "string", "minLength": 1 },
+    "first_assessment": { "type": "integer", "minimum": 2000 },
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["title", "url"],
+        "properties": {
+          "title": { "type": "string" },
+          "url": { "type": "string", "format": "uri" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "topics": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["code", "title", "parent", "level", "keywords", "concepts", "exclusions", "legacy_topic_mappings"],
+        "properties": {
+          "code": { "type": "string", "minLength": 1 },
+          "title": { "type": "string", "minLength": 1 },
+          "parent": { "type": "string", "minLength": 1 },
+          "level": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": { "enum": ["SL", "HL"] }
+          },
+          "keywords": { "type": "array", "items": { "type": "string" } },
+          "concepts": { "type": "array", "items": { "type": "string" } },
+          "exclusions": { "type": "array", "items": { "type": "string" } },
+          "legacy_topic_mappings": { "type": "array", "items": { "type": "string" } }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

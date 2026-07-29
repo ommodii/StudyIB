@@ -1,0 +1,5 @@
+{
+  "version": 1,
+  "description": "Persistent human decisions. Keys are stable question IDs; automatic runs never overwrite this file.",
+  "questions": {}
+}
