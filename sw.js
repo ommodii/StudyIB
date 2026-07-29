@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'studyib-shell-v1';
+const CACHE_VERSION = 'studyib-shell-v2';
 const APP_SHELL = [
     '/',
     '/index.html',
@@ -9,10 +9,10 @@ const APP_SHELL = [
     '/styles/components.css?v=1.1.0',
     '/styles/atom-components.css?v=1.1.0',
     '/manifest.webmanifest',
-    '/assets/icons/studyib-icon.svg',
-    '/assets/icons/apple-touch-icon.png',
-    '/assets/icons/icon-192.png',
-    '/assets/icons/icon-512.png'
+    '/assets/icons/studyib-icon.svg?v=2',
+    '/assets/icons/apple-touch-icon.png?v=2',
+    '/assets/icons/icon-192.png?v=2',
+    '/assets/icons/icon-512.png?v=2'
 ];
 
 self.addEventListener('install', event => {
