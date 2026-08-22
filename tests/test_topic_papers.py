@@ -28,7 +28,7 @@ from scripts.topic_papers.local_guard import LocalOnlyViolation, assert_local_on
 from scripts.topic_papers.models import PageRegion, QuestionRecord
 from scripts.topic_papers.pdf_extract import Boundary, build_regions, detect_question_boundaries, extract_questions, stable_question_id
 from scripts.topic_papers.pipeline import PipelineOptions, run_pipeline
-from scripts.topic_papers.production import page_fingerprint, topic_priors
+from scripts.topic_papers.production import classify_with_priors, math_source_candidates, page_fingerprint, topic_priors
 from scripts.topic_papers.reporting import write_reports
 from scripts.topic_papers.taxonomy import load_taxonomy, validate_taxonomy
 
@@ -107,6 +107,12 @@ class BoundaryTests(unittest.TestCase):
         from scripts.topic_papers.pdf_extract import normalize_text
 
         self.assertEqual(normalize_text("– 3 – M15/4/PHYSI/HPM/ENG/TZ2/XX"), "")
+
+    def test_exam_code_does_not_erase_flattened_question_text(self) -> None:
+        from scripts.topic_papers.pdf_extract import normalize_text
+
+        text = "9. The matrix is singular. Find the values of k. M01/510/H(1) Turn over"
+        self.assertEqual(normalize_text(text), "9. the matrix is singular. find the values of k.")
 
     def test_lone_year_does_not_interrupt_option_question(self) -> None:
         words = [[
@@ -271,6 +277,47 @@ class TaxonomyAndClassificationTests(unittest.TestCase):
         taxonomy = load_taxonomy(REPO_ROOT / "config" / "curricula", "biology")
         priors = topic_priors(["Topic 1 Cell biology / 1.4 Membrane transport"], taxonomy)
         self.assertIn("B2.1", priors)
+
+    def test_math_source_compilation_provides_detailed_candidates(self) -> None:
+        candidates = math_source_candidates(["Topic 5 Calculus / 5.2 Integral calculus"])
+        self.assertEqual(candidates, {"AA 5.5", "AA 5.10", "AA 5.11"})
+
+    def test_math_content_overrides_incorrect_legacy_compilation(self) -> None:
+        taxonomy = load_taxonomy(REPO_ROOT / "config" / "curricula", "mathematics", "aa")
+        question = make_question("math_wrong_legacy_hint", "Find the roots of a complex number using de Moivre's theorem.")
+        question.subject = "mathematics"
+        question.course = "aa"
+        question.level = "HL"
+        classify_with_priors(
+            question,
+            taxonomy,
+            ["Topic 2 Functions / 2.1 Linear and quadratic functions"],
+            0.80,
+        )
+        self.assertEqual(question.primary_topic, "AA 1.14")
+        self.assertEqual(question.classification_method, "content_rules_over_legacy_compilation")
+
+    def test_math_taxonomy_uses_all_official_2021_syllabus_statements(self) -> None:
+        taxonomy = load_taxonomy(REPO_ROOT / "config" / "curricula", "mathematics", "aa")
+        self.assertEqual(len(taxonomy.topics), 83)
+        self.assertEqual(taxonomy.topics[0]["code"], "AA 1.1")
+        self.assertEqual(taxonomy.topics[-1]["code"], "AA 5.19")
+
+    def test_manual_override_can_resolve_false_duplicate_candidate(self) -> None:
+        taxonomy = load_taxonomy(REPO_ROOT / "config" / "curricula", "mathematics", "aa")
+        question = make_question("distinct_timezone_question", "Different derivative order in the timezone variant.")
+        question.subject = "mathematics"
+        question.course = "aa"
+        question.level = "HL"
+        classify_question(question, taxonomy, 0.8, {
+            question.question_id: {
+                "primary_topic": "AA 5.6",
+                "secondary_topics": [],
+                "duplicate_status": "related_but_distinct",
+            }
+        })
+        self.assertEqual(question.duplicate_status, "related_but_distinct")
+        self.assertFalse(question.review_required)
 
     def test_page_fingerprint_uses_actual_content_stream(self) -> None:
         with tempfile.TemporaryDirectory() as temp:

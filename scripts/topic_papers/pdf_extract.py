@@ -19,8 +19,10 @@ from .models import PageRegion, PaperRecord, QuestionRecord
 NUMBER_TOKEN_RE = re.compile(r"^(?P<number>[A-Z]?\d{1,3})(?:[.)])?$")
 LINE_START_RE = re.compile(r"(?m)^\s*(?P<number>[A-Z]?\d{1,3})(?:[.)])?\s+(?=[A-Z\[(])")
 REPEATED_HEADER_RE = re.compile(
-    r"(?im)^.*(?:international baccalaureate|candidate session number|turn over|question\s+\d+\s+continued|\b[MN]\d{2}/\d+/[A-Z0-9/()_-]+).*$"
+    r"(?i)(?:international baccalaureate(?: organization)?|candidate session number|turn over|"
+    r"question\s+\d+\s+continued|\b[MN]\d{2}/\d+/[A-Z0-9/()_-]+)"
 )
+PAGE_NUMBER_ORNAMENT_RE = re.compile(r"(?i)(?:[\u2013\u2014-]|â€“)\s*\d+\s*(?:[\u2013\u2014-]|â€“)")
 
 
 @dataclass(frozen=True)
@@ -34,7 +36,11 @@ class Boundary:
 
 def normalize_text(text: str) -> str:
     text = text.replace("\u00ad", "").replace("\u00a0", " ")
+    # Layout extraction can flatten a complete page region into one line. Strip
+    # only repeated header/footer tokens so an exam code at the end of that line
+    # cannot erase the actual question text that precedes it.
     text = REPEATED_HEADER_RE.sub(" ", text)
+    text = PAGE_NUMBER_ORNAMENT_RE.sub(" ", text)
     text = re.sub(r"(?<=\w)-\s*\n\s*(?=\w)", "", text)
     text = re.sub(r"\s+", " ", text)
     return text.strip().lower()

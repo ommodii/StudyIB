@@ -18,7 +18,7 @@ from reportlab.lib.pagesizes import A4, landscape
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen import canvas
 
-from .classify import classify_question
+from .classify import classify_question, load_manual_overrides
 from .dedupe import mark_duplicates
 from .inventory import parse_paper_metadata
 from .local_guard import LOCAL_BANNER, assert_local_only, assert_safe_process
@@ -167,17 +167,53 @@ STOPWORDS = {
 }
 
 
+MATH_SOURCE_TOPIC_CANDIDATES: dict[str, set[str]] = {
+    "1 1 sequences and series": {"AA 1.2", "AA 1.3", "AA 1.4", "AA 1.8"},
+    "1 2 exponents and logarithms": {"AA 1.1", "AA 1.5", "AA 1.7", "AA 2.9"},
+    "1 3 binomial theorem": {"AA 1.9", "AA 1.10"},
+    "1 4 complex numbers": {"AA 1.12", "AA 1.13", "AA 1.14"},
+    "1 5 proof": {"AA 1.6", "AA 1.15"},
+    "1 6 systems of equations": {"AA 1.11", "AA 1.16"},
+    "2 1 linear and quadratic functions": {"AA 2.1", "AA 2.6", "AA 2.7"},
+    "2 2 function concepts and graphs": {"AA 2.2", "AA 2.3", "AA 2.4", "AA 2.5", "AA 2.9", "AA 2.10"},
+    "2 3 polynomials and rational functions": {"AA 1.11", "AA 2.8", "AA 2.12", "AA 2.13"},
+    "2 4 transformations of functions": {"AA 2.11"},
+    "2 5 modulus and advanced functions": {"AA 2.14", "AA 2.15", "AA 2.16"},
+    "3 1 2d and 3d geometry": {"AA 3.1", "AA 3.2", "AA 3.3"},
+    "3 2 circular functions and trigonometry": {"AA 3.4", "AA 3.5", "AA 3.6", "AA 3.7", "AA 3.8"},
+    "3 3 advanced trigonometry": {"AA 3.9", "AA 3.10", "AA 3.11"},
+    "3 4 vectors": {"AA 3.12", "AA 3.13", "AA 3.14", "AA 3.15", "AA 3.16", "AA 3.17", "AA 3.18"},
+    "4 1 descriptive statistics": {"AA 4.1", "AA 4.2", "AA 4.3", "AA 4.4", "AA 4.10"},
+    "4 3 probability": {"AA 4.5", "AA 4.6", "AA 4.11", "AA 4.13"},
+    "4 4 probability distributions": {"AA 4.7", "AA 4.8", "AA 4.9", "AA 4.12"},
+    "4 5 continuous random variables and poisson": {"AA 4.14"},
+    "5 1 differential calculus": {"AA 5.1", "AA 5.2", "AA 5.3", "AA 5.4", "AA 5.6", "AA 5.7", "AA 5.8", "AA 5.9"},
+    "5 2 integral calculus": {"AA 5.5", "AA 5.10", "AA 5.11"},
+    "5 3 advanced calculus": {"AA 5.12", "AA 5.13", "AA 5.14", "AA 5.15", "AA 5.16", "AA 5.17", "AA 5.18", "AA 5.19"},
+}
+
+
 def _tokens(value: str) -> set[str]:
     return {token for token in _normalize(value).split() if token not in STOPWORDS and not token.isdigit()}
 
 
-def topic_priors(hints: list[str], taxonomy: Taxonomy) -> dict[str, float]:
+def math_source_candidates(hints: list[str]) -> set[str]:
+    candidates: set[str] = set()
+    for hint in hints:
+        leaf = _normalize(hint.split(" / ")[-1])
+        candidates.update(MATH_SOURCE_TOPIC_CANDIDATES.get(leaf, set()))
+    return candidates
+
+
+def topic_priors(hints: list[str], taxonomy: Taxonomy, allowed_codes: set[str] | None = None) -> dict[str, float]:
     scores: dict[str, float] = defaultdict(float)
     for hint in hints:
         hint_norm = _normalize(hint)
         leaf = _normalize(hint.split(" / ")[-1])
         hint_tokens = _tokens(leaf)
         for topic in taxonomy.topics:
+            if allowed_codes is not None and topic["code"] not in allowed_codes:
+                continue
             best = 0.0
             for candidate in [topic["title"], topic["parent"], *topic["legacy_topic_mappings"]]:
                 candidate_norm = _normalize(candidate)
@@ -196,10 +232,55 @@ def classify_with_priors(
     taxonomy: Taxonomy,
     hints: list[str],
     confidence_threshold: float,
+    manual_overrides: dict[str, dict[str, Any]] | None = None,
 ) -> None:
-    classify_question(question, taxonomy, confidence_threshold, {})
+    manual_overrides = manual_overrides or {}
+    if question.question_id in manual_overrides:
+        classify_question(question, taxonomy, confidence_threshold, manual_overrides)
+        return
+
+    source_codes = math_source_candidates(hints) if question.subject == "mathematics" else None
+    # The legacy Mathematics compilations are useful provenance, but the audit
+    # found many questions filed under the wrong broad compilation. Never use
+    # those labels as a hard classification constraint.
+    classify_question(question, taxonomy, confidence_threshold, manual_overrides)
     rule_primary, rule_confidence = question.primary_topic, question.confidence
-    ranked = sorted(topic_priors(hints, taxonomy).items(), key=lambda item: (-item[1], item[0]))
+    ranked = sorted(topic_priors(hints, taxonomy, source_codes or None).items(), key=lambda item: (-item[1], item[0]))
+
+    # Poisson distributions were removed from the current AA syllabus. Exclude
+    # a Poisson-only legacy question, but retain a mixed structured question
+    # when another current-syllabus topic is independently detected.
+    if (
+        question.subject == "mathematics"
+        and "poisson" in question.normalized_text
+        and (not rule_primary or rule_primary.startswith("AA 4."))
+    ):
+        question.primary_topic = None
+        question.secondary_topics = []
+        question.confidence = 1.0
+        question.classification_method = "current_syllabus_exclusion"
+        question.rationale = "Poisson-distribution content is not part of the current Mathematics AA syllabus."
+        question.review_required = False
+        question.status = "intentionally_excluded"
+        return
+
+    if question.subject == "mathematics" and not rule_primary:
+        if len(source_codes or ()) == 1:
+            question.primary_topic = next(iter(source_codes))
+            question.confidence = 0.88
+            question.classification_method = "single_compilation_candidate"
+            question.rationale = "The source compilation maps to one current AA syllabus statement."
+            question.review_required = False
+            question.status = "included"
+        else:
+            question.primary_topic = None
+            question.secondary_topics = []
+            question.confidence = 0.0
+            question.classification_method = "detailed_topic_review_required"
+            question.rationale = "The broad source compilation maps to multiple current AA syllabus statements and text evidence was not decisive."
+            question.review_required = True
+            question.status = "awaiting_review"
+        return
     if ranked:
         best_code, best_score = ranked[0]
         second_score = ranked[1][1] if len(ranked) > 1 else 0.0
@@ -207,9 +288,10 @@ def classify_with_priors(
             question.confidence = round(max(rule_confidence, min(0.97, 0.78 + best_score * 0.12)), 4)
             question.rationale += f" Source compilation also maps to {rule_primary}."
             question.review_required = question.confidence < confidence_threshold
-        elif rule_primary and rule_confidence >= 0.84:
-            question.secondary_topics = list(dict.fromkeys([*question.secondary_topics, best_code]))
-            question.rationale += f" Strong content evidence overrode source prior {best_code}."
+        elif rule_primary:
+            question.classification_method = "content_rules_over_legacy_compilation"
+            question.rationale += f" Content evidence overrides mismatched legacy compilation hint {best_code}."
+            question.review_required = rule_confidence < confidence_threshold
         elif best_score > second_score + 0.18:
             if rule_primary and rule_primary != best_code:
                 question.secondary_topics = list(dict.fromkeys([rule_primary, *question.secondary_topics]))
@@ -224,7 +306,7 @@ def classify_with_priors(
             question.classification_method = "ambiguous_compilation_prior"
             question.rationale += " Multiple current-topic mappings remain plausible."
             question.review_required = True
-    question.status = "included" if question.primary_topic else "awaiting_review"
+    question.status = "included" if question.primary_topic and not question.review_required else "awaiting_review"
     if not question.primary_topic:
         question.review_required = True
 
@@ -349,6 +431,7 @@ def run_production(
     output_dir.mkdir(parents=True, exist_ok=True)
     cache_dir.mkdir(parents=True, exist_ok=True)
     sources, taxonomies = _sources(repo_root), _load_taxonomies(repo_root)
+    manual_overrides = load_manual_overrides(repo_root / "config" / "manual_overrides.json")
     questions: list[QuestionRecord] = []
     paper_by_path: dict[str, PaperRecord] = {}
     inventory: list[PaperRecord] = []
@@ -379,7 +462,9 @@ def run_production(
                 continue
             inventory.append(paper)
             paper_by_path[path_string] = paper
-            extracted, failure = extract_questions(paper, output_dir / "_raw", cache_dir, dry_run=False)
+            extracted, failure = extract_questions(
+                paper, output_dir / "_raw", cache_dir, dry_run=False, boundary_overrides=manual_overrides
+            )
             if failure:
                 paper.inventory_status = "failed"
                 paper.reason = failure
@@ -392,7 +477,9 @@ def run_production(
                 if not region_pages & selected_set:
                     continue
                 hints = [hint for page_index in region_pages & selected_set for hint in selected_pages[page_index]]
-                classify_with_priors(question, taxonomies[_taxonomy_key(question)], hints, confidence_threshold)
+                classify_with_priors(
+                    question, taxonomies[_taxonomy_key(question)], hints, confidence_threshold, manual_overrides
+                )
                 question.manual_note = "Source compilation hints: " + " | ".join(sorted(set(hints)))
                 questions.append(question)
             if number % 25 == 0:

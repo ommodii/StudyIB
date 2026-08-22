@@ -51,6 +51,7 @@ def classify_question(
     taxonomy: Taxonomy,
     confidence_threshold: float,
     manual_overrides: dict[str, dict[str, Any]],
+    allowed_codes: set[str] | None = None,
 ) -> None:
     override = manual_overrides.get(question.question_id)
     if override:
@@ -72,6 +73,9 @@ def classify_question(
         question.rationale = "Persistent reviewer override applied."
         question.review_required = bool(override.get("review_required", False))
         question.manual_note = str(override.get("reviewer_note", ""))
+        duplicate_status = str(override.get("duplicate_status", "unique"))
+        if duplicate_status in {"unique", "related_but_distinct"}:
+            question.duplicate_status = duplicate_status
         include = override.get("include", True)
         question.status = "included" if include and question.primary_topic else "intentionally_excluded"
         return
@@ -79,6 +83,8 @@ def classify_question(
     text = question.normalized_text
     scored: list[tuple[float, str, dict[str, list[str]]]] = []
     for topic in taxonomy.topics:
+        if allowed_codes is not None and topic["code"] not in allowed_codes:
+            continue
         if question.level in {"SL", "HL"} and question.level not in topic["level"]:
             continue
         keyword_hits = _phrase_matches(text, topic["keywords"])
@@ -106,7 +112,11 @@ def classify_question(
 
     top_score, top_code, top_evidence = scored[0]
     second_score = scored[1][0] if len(scored) > 1 else 0.0
-    confidence = min(0.99, top_score / (top_score + second_score + 1.5))
+    # A single exact syllabus phrase is strong evidence when no competing topic
+    # matches. Keep genuinely competing matches conservative, but do not force
+    # every concise mathematics question into review merely because it contains
+    # one distinctive phrase.
+    confidence = min(0.99, top_score / (top_score + second_score + 0.5))
     secondary = [code for score, code, _ in scored[1:] if score >= max(2.0, top_score * 0.45)]
     question.primary_topic = top_code
     question.secondary_topics = secondary

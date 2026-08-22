@@ -147,9 +147,10 @@ def build_topic_outputs(
 
 QUESTION_CSV_FIELDS = [
     "question_id", "subject", "course", "year", "session", "timezone", "level", "paper",
-    "question_number", "source_path", "source_pages", "output_path", "page_count", "primary_topic",
+    "question_number", "source_path", "source_pages", "regions", "output_path", "page_count", "extracted_text",
+    "normalized_text", "primary_topic",
     "secondary_topics", "confidence", "classification_method", "review_required", "duplicate_status",
-    "duplicate_of", "status", "error", "rationale", "matched_evidence",
+    "duplicate_of", "status", "error", "rationale", "matched_evidence", "manual_note",
 ]
 
 

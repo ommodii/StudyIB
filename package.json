@@ -8,7 +8,8 @@
     "test": "node tests/test_gamification_ledger.js && node tests/test_account_progression.js",
     "build:topic-papers": "python -m scripts.topic_papers.cli --local-only",
     "build:question-production": "python -m scripts.topic_papers.production --subjects all --local-only",
-    "build:question-web-data": "python -m scripts.topic_papers.build_web_dataset --version 2026-07-28-v1",
+    "build:question-web-data": "python -m scripts.topic_papers.build_web_dataset --version 2026-08-22-math-aa-v2 --corpus-root output/math_aa_rebuild/final --base-js topic_question_data.js",
+    "upload:question-web-data": "node scripts/upload_r2_manifest.js output/math_aa_rebuild/final/web/upload_manifest.json 8",
     "build:web": "node build_web.js",
     "build:native": "npm run build:web",
     "deploy:worker": "npm run build:web && wrangler deploy"

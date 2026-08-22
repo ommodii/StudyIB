@@ -5,6 +5,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import re
 from typing import Any
 
 
@@ -42,7 +43,29 @@ def _file_entry(local_path: Path, object_key: str) -> dict[str, Any]:
     }
 
 
-def build(repo_root: Path, corpus_root: Path, version: str, js_output: Path) -> dict[str, Any]:
+def _load_data_js(path: Path) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
+    text = path.read_text(encoding="utf-8")
+    names = (
+        "topicQuestionBankMetadata",
+        "topicQuestionSyllabusData",
+        "topicQuestionPracticeData",
+    )
+    values: list[dict[str, Any]] = []
+    for name in names:
+        match = re.search(rf"const {name} = (.*?);\s*(?:\r?\n|$)", text)
+        if not match:
+            raise ValueError(f"Could not read {name} from {path}")
+        values.append(json.loads(match.group(1)))
+    return values[0], values[1], values[2]
+
+
+def build(
+    repo_root: Path,
+    corpus_root: Path,
+    version: str,
+    js_output: Path,
+    base_js: Path | None = None,
+) -> dict[str, Any]:
     prefix = f"Content/TopicQuestionBank/{version}"
     syllabus: dict[str, dict[str, dict[str, list[dict[str, str]]]]] = {
         subject: {} for subject in SUBJECT_IDS.values()
@@ -122,6 +145,58 @@ def build(repo_root: Path, corpus_root: Path, version: str, js_output: Path) -> 
             "master_pdf": master_key,
         })
 
+    # Keep the complete official AA syllabus visible even when this historical
+    # corpus has no matching question for a statement. Empty topics render the
+    # app's existing honest "No questions found" state instead of disappearing.
+    if syllabus["math"]:
+        taxonomy_path = repo_root / "config" / "curricula" / "mathematics_aa.json"
+        taxonomy = json.loads(taxonomy_path.read_text(encoding="utf-8"))
+        for topic in taxonomy.get("topics", []):
+            category = str(topic["parent"])
+            subtopic = f'{topic["code"]} {topic["title"]}'
+            syllabus["math"].setdefault(category, {}).setdefault(subtopic, [])
+            practice["math"].setdefault(category, {}).setdefault(subtopic, [])
+        for category in list(syllabus["math"]):
+            ordered_names = [
+                f'{topic["code"]} {topic["title"]}'
+                for topic in taxonomy.get("topics", [])
+                if str(topic["parent"]) == category
+            ]
+            existing_syllabus = syllabus["math"][category]
+            existing_practice = practice["math"][category]
+            syllabus["math"][category] = {
+                name: existing_syllabus[name] for name in ordered_names if name in existing_syllabus
+            }
+            practice["math"][category] = {
+                name: existing_practice[name] for name in ordered_names if name in existing_practice
+            }
+
+    if base_js:
+        _, base_syllabus, base_practice = _load_data_js(base_js)
+        for subject in SUBJECT_IDS.values():
+            if not syllabus[subject]:
+                syllabus[subject] = base_syllabus.get(subject, {})
+                practice[subject] = base_practice.get(subject, {})
+
+    topic_catalog = []
+    question_total = 0
+    for subject, categories in syllabus.items():
+        for category, subtopics in categories.items():
+            for subtopic, papers in subtopics.items():
+                questions = practice.get(subject, {}).get(category, {}).get(subtopic, [])
+                question_total += len(questions)
+                code_match = re.match(r"^(AA \d+\.\d+|[A-E]\d*\.\d+|(?:Structure|Reactivity) \d+\.\d+)", subtopic)
+                code = code_match.group(1) if code_match else subtopic
+                title = subtopic[len(code):].strip() or code
+                topic_catalog.append({
+                    "subject": subject,
+                    "category": category,
+                    "code": code,
+                    "title": title,
+                    "question_count": len(questions),
+                    "master_pdf": papers[0].get("filepath", "") if papers else "",
+                })
+
     metadata = {
         "version": version,
         "prefix": prefix,
@@ -163,11 +238,15 @@ def main() -> int:
     parser.add_argument("--corpus-root", type=Path, default=Path("output/local_topic_questions/production"))
     parser.add_argument("--version", default="2026-07-28-v1")
     parser.add_argument("--js-output", type=Path, default=Path("topic_question_data.js"))
+    parser.add_argument("--base-js", type=Path)
     args = parser.parse_args()
     repo_root = Path(__file__).resolve().parents[2]
     corpus_root = args.corpus_root if args.corpus_root.is_absolute() else repo_root / args.corpus_root
     js_output = args.js_output if args.js_output.is_absolute() else repo_root / args.js_output
-    result = build(repo_root, corpus_root.resolve(), args.version, js_output.resolve())
+    base_js = None
+    if args.base_js:
+        base_js = args.base_js if args.base_js.is_absolute() else repo_root / args.base_js
+    result = build(repo_root, corpus_root.resolve(), args.version, js_output.resolve(), base_js.resolve() if base_js else None)
     print(json.dumps(result, indent=2))
     return 0
 
