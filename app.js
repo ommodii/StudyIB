@@ -1209,7 +1209,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const icons = {
             physics: '<circle cx="12" cy="12" r="1.6" fill="currentColor"></circle><ellipse cx="12" cy="12" rx="9" ry="3.5"></ellipse><ellipse cx="12" cy="12" rx="9" ry="3.5" transform="rotate(60 12 12)"></ellipse><ellipse cx="12" cy="12" rx="9" ry="3.5" transform="rotate(120 12 12)"></ellipse>',
             chemistry: '<path d="M9 3h6"></path><path d="M10 3v6.2l-5 8.3A2.3 2.3 0 0 0 7 21h10a2.3 2.3 0 0 0 2-3.5l-5-8.3V3"></path><path d="M8 15h8"></path>',
-            biology: '<path d="M12 22c4.5-3.2 7-7.1 7-11.2C19 6 16.1 3 12 2 7.9 3 5 6 5 10.8 5 14.9 7.5 18.8 12 22z"></path><path d="M8.5 15c2.2-1.8 4.4-4.4 6.5-8"></path><path d="M9 10c1.5.1 2.7.6 3.6 1.5"></path>',
+            biology: '<path d="M7 3c0 6 10 6 10 12 0 3-2 5-5 6"></path><path d="M17 3c0 6-10 6-10 12 0 3 2 5 5 6"></path><path d="M8.5 6h7M7.5 10h9M7.5 14h9M8.5 18h7"></path>',
             math: '<path d="M18 4H7l5 8-5 8h11"></path><path d="M15 8h4M15 16h4"></path>',
             math_ai: '<path d="M4 19V5"></path><path d="M4 19h16"></path><path d="m7 15 4-5 3 2 4-6"></path><circle cx="7" cy="15" r="1"></circle><circle cx="11" cy="10" r="1"></circle><circle cx="14" cy="12" r="1"></circle><circle cx="18" cy="6" r="1"></circle>',
             economics: '<path d="M4 19V5"></path><path d="M4 19h16"></path><path d="m7 15 3-3 3 2 5-7"></path><path d="M15 7h3v3"></path>',
@@ -1244,13 +1244,15 @@ document.addEventListener('DOMContentLoaded', () => {
         let homescreenHTML = `
             <!-- Top Nav Bar (Stationary) -->
             <div class="workspace-top-nav">
-                <button type="button" class="subject-back-btn" id="homeBackBtn" aria-label="Back to all subjects">
-                    <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg>
-                    <span>Back</span>
-                </button>
-                <div class="workspace-logo" title="${subjectLabel}">
-                    ${getWorkspaceIcon(subjectIcon)}
-                    <span>${subjectLabel}</span>
+                <div class="workspace-nav-leading">
+                    <button type="button" class="subject-back-btn" id="homeBackBtn" aria-label="Back to all subjects">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg>
+                        <span>Back</span>
+                    </button>
+                    <div class="workspace-logo" title="${subjectLabel}">
+                        ${getWorkspaceIcon(subjectIcon)}
+                        <span>${subjectLabel}</span>
+                    </div>
                 </div>
                 <nav class="workspace-menu" aria-label="Subject tools">
                     <button type="button" class="workspace-nav-item is-active" id="homeNavSyllabus" aria-current="page" aria-label="Syllabus themes" title="Syllabus themes">
@@ -1280,35 +1282,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
 
             <div class="workspace-scroll-container">
-
-                <!-- Slide 1: Welcome Slide -->
-                <div class="scroll-slide hero-slide">
-                    <div class="workspace-center-content">
-                        <div class="science-orb-container">
-                            <div class="orb-nucleus"></div>
-                            <div class="orb-ring ring-1">
-                                <div class="orb-particle p-1"></div>
-                            </div>
-                            <div class="orb-ring ring-2">
-                                <div class="orb-particle p-2"></div>
-                            </div>
-                            <div class="orb-ring ring-3">
-                                <div class="orb-particle p-3"></div>
-                            </div>
-                            <div class="orb-particles-glow"></div>
-                        </div>
-                        <p class="workspace-body-text">
-                            We organize high-utility review resources that finally reflect what you need to master.<br>
-                            For candidate students whose ambitions demand a structured digital workspace.
-                        </p>
-                    </div>
-                    <div class="scroll-down-hint">
-                        <span>Scroll to explore themes</span>
-                        <div class="hint-arrow">↓</div>
-                    </div>
-                </div>
-
-                <!-- Slides 2+: Syllabus Themes -->
+                <!-- Syllabus Themes -->
                 ${categories.map((category, catIdx) => {
                     const subcategories = syllabusData[category] || {};
                     return `
