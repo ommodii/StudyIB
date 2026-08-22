@@ -155,25 +155,25 @@ document.addEventListener('DOMContentLoaded', () => {
             label: 'Math AI HL',
             icon: 'math_ai',
             sidebarId: 'sidebarSubMathAi',
-            syllabus: () => additionalSubjectSyllabusData.math_ai,
+            syllabus: () => topicQuestionSyllabusData.math_ai,
             papers: () => additionalSubjectFullPapersData.math_ai,
-            practice: () => additionalSubjectPracticeData.math_ai
+            practice: () => topicQuestionPracticeData.math_ai
         },
         economics: {
             label: 'Economics HL',
             icon: 'economics',
             sidebarId: 'sidebarSubEconomics',
-            syllabus: () => additionalSubjectSyllabusData.economics,
+            syllabus: () => topicQuestionSyllabusData.economics,
             papers: () => additionalSubjectFullPapersData.economics,
-            practice: () => additionalSubjectPracticeData.economics
+            practice: () => topicQuestionPracticeData.economics
         },
         business: {
             label: 'Business Management HL',
             icon: 'business',
             sidebarId: 'sidebarSubBusiness',
-            syllabus: () => additionalSubjectSyllabusData.business,
+            syllabus: () => topicQuestionSyllabusData.business,
             papers: () => additionalSubjectFullPapersData.business,
-            practice: () => additionalSubjectPracticeData.business
+            practice: () => topicQuestionPracticeData.business
         }
     };
 
@@ -329,6 +329,46 @@ document.addEventListener('DOMContentLoaded', () => {
         if (header) header.style.display = 'none';
         papersGrid.classList.add('no-grid');
         if (mainContentArea) mainContentArea.classList.add('mobile-home-view');
+    }
+
+    function navigateSubjectBack() {
+        activeCategory = null;
+        if (activeView === 'subject') {
+            renderDashboard();
+        } else {
+            renderDojoHome();
+        }
+    }
+
+    function renderSubjectModeBar(activeMode) {
+        const bar = document.getElementById('subjectModeBar');
+        if (!bar) return;
+        const selectedMode = activeMode === 'papers' ? 'papers' : activeMode === 'topics' ? 'topics' : 'syllabus';
+        bar.innerHTML = `
+            <button type="button" class="subject-back-btn" id="subjectBackBtn" aria-label="Back to subject overview">
+                <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg>
+                <span>Back</span>
+            </button>
+            <div class="workspace-logo subject-mode-logo" title="${getSubjectLabel()}">
+                ${getWorkspaceIcon(getSubjectConfig().icon)}
+                <span>${getSubjectLabel()}</span>
+            </div>
+            <nav class="workspace-menu" aria-label="Subject tools">
+                <button type="button" class="workspace-nav-item${selectedMode === 'syllabus' ? ' is-active' : ''}" data-subject-mode="syllabus" ${selectedMode === 'syllabus' ? 'aria-current="page"' : ''}>${getWorkspaceIcon('syllabus')}<span>Syllabus</span></button>
+                <button type="button" class="workspace-nav-item${selectedMode === 'topics' ? ' is-active' : ''}" data-subject-mode="topics" ${selectedMode === 'topics' ? 'aria-current="page"' : ''}>${getWorkspaceIcon('topics')}<span>Topical</span></button>
+                <button type="button" class="workspace-nav-item${selectedMode === 'papers' ? ' is-active' : ''}" data-subject-mode="papers" ${selectedMode === 'papers' ? 'aria-current="page"' : ''}>${getWorkspaceIcon('papers')}<span>Papers</span></button>
+            </nav>
+        `;
+        document.getElementById('subjectBackBtn')?.addEventListener('click', navigateSubjectBack);
+        bar.querySelector('[data-subject-mode="syllabus"]')?.addEventListener('click', renderDashboard);
+        bar.querySelector('[data-subject-mode="topics"]')?.addEventListener('click', () => {
+            switchMode('topics');
+            renderTopicsList();
+        });
+        bar.querySelector('[data-subject-mode="papers"]')?.addEventListener('click', () => {
+            switchMode('papers');
+            renderPapersList();
+        });
     }
 
     function sortCategories(keys) {
@@ -1204,6 +1244,10 @@ document.addEventListener('DOMContentLoaded', () => {
         let homescreenHTML = `
             <!-- Top Nav Bar (Stationary) -->
             <div class="workspace-top-nav">
+                <button type="button" class="subject-back-btn" id="homeBackBtn" aria-label="Back to all subjects">
+                    <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg>
+                    <span>Back</span>
+                </button>
                 <div class="workspace-logo" title="${subjectLabel}">
                     ${getWorkspaceIcon(subjectIcon)}
                     <span>${subjectLabel}</span>
@@ -1274,8 +1318,12 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                             <div class="theme-cards-grid">
                                 ${Object.entries(subcategories).map(([subcat, files]) => {
-                                    const totalCount = files.length;
-                                    const doneCount = files.filter(f => isQuestionCompleted(f.filepath || f.qp_path)).length;
+                                    const practiceQuestions = (getPracticeData()[category] && getPracticeData()[category][subcat]) || [];
+                                    const statItems = hasQuestionLevelContent
+                                        ? [...new Map(practiceQuestions.map(question => [question.filepath || question.qp_path, question])).values()]
+                                        : files;
+                                    const totalCount = statItems.length;
+                                    const doneCount = statItems.filter(f => isQuestionCompleted(f.filepath || f.qp_path)).length;
                                     const pct = totalCount > 0 ? Math.round((doneCount / totalCount) * 100) : 0;
                                     
                                     return `
@@ -1289,7 +1337,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                             </div>
                                             <div class="card-meta">
                                                 <h3>${subcat}</h3>
-                                                <p>${totalCount} snippets • ${doneCount} completed</p>
+                                                <p>${totalCount} questions • ${doneCount} completed</p>
                                             </div>
                                             <div class="card-arrow">↗</div>
                                         </button>
@@ -1306,6 +1354,8 @@ document.addEventListener('DOMContentLoaded', () => {
         refreshAOS();
 
         // Bind top menu click events
+        document.getElementById('homeBackBtn').addEventListener('click', renderDojoHome);
+
         document.getElementById('homeNavSyllabus').addEventListener('click', () => {
             const firstThemeSlide = document.getElementById('theme-0');
             if (firstThemeSlide) {
@@ -1373,6 +1423,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderTopicsList() {
         showContentHeader();
+        activeCategory = null;
+        renderSubjectModeBar('topics');
         currentCategoryTitle.textContent = "Topics";
         categoryStats.textContent = "";
         updateBreadcrumbs([getSubjectLabel(), 'Topics']);
@@ -1437,6 +1489,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderPapersList() {
         showContentHeader();
+        activeCategory = null;
+        renderSubjectModeBar('papers');
         currentCategoryTitle.textContent = "Past Papers";
         categoryStats.textContent = "";
         updateBreadcrumbs([getSubjectLabel(), 'Past Papers']);
@@ -1808,6 +1862,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderPaperCategory(year) {
         activeCategory = year;
         showContentHeader();
+        renderSubjectModeBar('papers');
         
         if (year === "Save My Exams" || year === "Save My Exams Mocks" || year === "Save My Exams Topics") {
             const isMocksMode = (year !== "Save My Exams Topics");
@@ -1905,9 +1960,44 @@ document.addEventListener('DOMContentLoaded', () => {
         refreshAOS();
     }
 
+    function getPaperDefinitions(subjectId = currentSubject) {
+        const unknown = { title: 'Paper metadata unavailable', meta: 'Needs metadata review' };
+        if (subjectId === 'math' || subjectId === 'math_ai') {
+            return {
+                P1: { title: 'Paper 1 — No technology', meta: 'No technology' },
+                P2: { title: 'Paper 2 — Technology', meta: 'Technology allowed' },
+                P3: { title: 'Paper 3 — HL extension', meta: 'HL extension' },
+                UNKNOWN: unknown
+            };
+        }
+        if (subjectId === 'economics') {
+            return {
+                P1: { title: 'Paper 1 — Extended response', meta: 'Extended response' },
+                P2: { title: 'Paper 2 — Data response', meta: 'Data response' },
+                P3: { title: 'Paper 3 — Policy paper', meta: 'Policy paper' },
+                UNKNOWN: unknown
+            };
+        }
+        if (subjectId === 'business') {
+            return {
+                P1: { title: 'Paper 1 — Case study', meta: 'Case study' },
+                P2: { title: 'Paper 2 — Business contexts', meta: 'Business contexts' },
+                P3: { title: 'Paper 3 — Social enterprise', meta: 'Social enterprise' },
+                UNKNOWN: unknown
+            };
+        }
+        return {
+            P1: { title: 'Paper 1 — Multiple Choice', meta: 'MCQ' },
+            P2: { title: 'Paper 2 — Structured', meta: 'Structured' },
+            P3: { title: 'Paper 3 — Options & Data Analysis', meta: 'Data & Options' },
+            UNKNOWN: unknown
+        };
+    }
+
     function renderPracticeCategory(key) {
         activeCategory = key;
         showContentHeader();
+        renderSubjectModeBar('topics');
         const [category, subtopic] = key.split('|||');
         currentCategoryTitle.textContent = subtopic;
         updateBreadcrumbs([
@@ -1927,12 +2017,7 @@ document.addEventListener('DOMContentLoaded', () => {
             html = `<div class="empty-state"><h3>No questions found</h3><p>This sub-topic has no extracted questions.</p></div>`;
             categoryStats.textContent = '';
         } else {
-            const paperDefinitions = {
-                'P1': { title: 'Paper 1 — Multiple Choice', meta: 'MCQ' },
-                'P2': { title: 'Paper 2 — Structured', meta: 'Structured' },
-                'P3': { title: 'Paper 3 — Options & Data Analysis', meta: 'Data & Options' },
-                'UNKNOWN': { title: 'Paper metadata unavailable', meta: 'Needs metadata review' }
-            };
+            const paperDefinitions = getPaperDefinitions();
 
             for (const [ptype, pdef] of Object.entries(paperDefinitions)) {
                 const qs = questions.filter(q => q.paper_type === ptype);
@@ -2995,7 +3080,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         ${filtered.map(q => `
                             <button type="button" class="pdf-card" data-pdf-url="${q.filepath}" data-full-paper="${q.full_paper_path}" data-pdf-name="${q.filename}">
                                 ${getPdfIcon()}
-                                <div class="pdf-info"><div class="pdf-name">${q.source} Q${q.qnum}</div><div class="pdf-meta">${q.paper_type === 'P1' ? 'MCQ' : 'Structured'}</div></div>
+                                <div class="pdf-info"><div class="pdf-name">${q.source} Q${q.qnum}</div><div class="pdf-meta">${(getPaperDefinitions()[q.paper_type] || getPaperDefinitions().UNKNOWN).meta}</div></div>
                             </button>
                         `).join('')}
                     </div></div>`;

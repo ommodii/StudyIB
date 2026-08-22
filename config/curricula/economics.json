@@ -1,0 +1,792 @@
+{
+  "subject": "economics",
+  "course": null,
+  "curriculum_version": "DP Economics, first assessment 2022 with legacy mapping from the 2013 course",
+  "first_assessment": 2022,
+  "sources": [
+    {
+      "title": "IB Economics subject brief",
+      "url": "https://www.ibo.org/globalassets/new-structure/programmes/dp/pdfs/hl-economics-en.pdf"
+    }
+  ],
+  "topics": [
+    {
+      "code": "ECON 1.1",
+      "title": "What is economics?",
+      "parent": "Unit 1. Introduction to economics",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "scarcity",
+        "choice",
+        "choices have to be made",
+        "production possibilities curve",
+        "ppc",
+        "opportunity cost",
+        "factors of production",
+        "economic well-being",
+        "economic wellbeing"
+      ],
+      "concepts": [
+        "what is economics?"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "foundations of economics"
+      ]
+    },
+    {
+      "code": "ECON 1.2",
+      "title": "How do economists approach the world?",
+      "parent": "Unit 1. Introduction to economics",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "economic model",
+        "positive economics",
+        "normative economics",
+        "ceteris paribus",
+        "economic assumption",
+        "economic methodology"
+      ],
+      "concepts": [
+        "how do economists approach the world?"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "foundations of economics"
+      ]
+    },
+    {
+      "code": "ECON 2.1",
+      "title": "Demand",
+      "parent": "Unit 2. Microeconomics",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "demand",
+        "law of demand",
+        "demand curve",
+        "change in demand",
+        "consumer surplus"
+      ],
+      "concepts": [
+        "demand"
+      ],
+      "exclusions": [
+        "aggregate demand"
+      ],
+      "legacy_topic_mappings": [
+        "competitive markets: demand and supply"
+      ]
+    },
+    {
+      "code": "ECON 2.2",
+      "title": "Supply",
+      "parent": "Unit 2. Microeconomics",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "supply",
+        "law of supply",
+        "supply curve",
+        "change in supply",
+        "producer surplus"
+      ],
+      "concepts": [
+        "supply"
+      ],
+      "exclusions": [
+        "aggregate supply"
+      ],
+      "legacy_topic_mappings": [
+        "competitive markets: demand and supply"
+      ]
+    },
+    {
+      "code": "ECON 2.3",
+      "title": "Competitive market equilibrium",
+      "parent": "Unit 2. Microeconomics",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "market equilibrium",
+        "equilibrium price",
+        "equilibrium quantity",
+        "excess demand",
+        "excess supply",
+        "price mechanism"
+      ],
+      "concepts": [
+        "competitive market equilibrium"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "competitive markets: demand and supply"
+      ]
+    },
+    {
+      "code": "ECON 2.4",
+      "title": "Critique of maximizing behaviour",
+      "parent": "Unit 2. Microeconomics",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "utility maximization",
+        "profit maximization",
+        "bounded rationality",
+        "behavioural economics",
+        "behavioral economics",
+        "bias"
+      ],
+      "concepts": [
+        "critique of maximizing behaviour"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "theory of the firm"
+      ]
+    },
+    {
+      "code": "ECON 2.5",
+      "title": "Elasticity of demand",
+      "parent": "Unit 2. Microeconomics",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "price elasticity of demand",
+        "income elasticity of demand",
+        "cross elasticity of demand",
+        "ped",
+        "yed",
+        "xed"
+      ],
+      "concepts": [
+        "elasticity of demand"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "elasticities"
+      ]
+    },
+    {
+      "code": "ECON 2.6",
+      "title": "Elasticity of supply",
+      "parent": "Unit 2. Microeconomics",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "price elasticity of supply",
+        "pes",
+        "elastic supply",
+        "inelastic supply"
+      ],
+      "concepts": [
+        "elasticity of supply"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "elasticities"
+      ]
+    },
+    {
+      "code": "ECON 2.7",
+      "title": "Government intervention in microeconomics",
+      "parent": "Unit 2. Microeconomics",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "indirect tax",
+        "tax the consumption",
+        "subsidy",
+        "subsidies",
+        "subsidize",
+        "subsidise",
+        "price ceiling",
+        "price floor",
+        "price floors",
+        "minimum price",
+        "maximum price",
+        "government regulation",
+        "government regulations",
+        "government intervention"
+      ],
+      "concepts": [
+        "government intervention in microeconomics"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "government intervention"
+      ]
+    },
+    {
+      "code": "ECON 2.8",
+      "title": "Externalities and common access resources",
+      "parent": "Unit 2. Microeconomics",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "externality",
+        "external cost",
+        "external benefit",
+        "external benefits",
+        "private benefit",
+        "private benefits",
+        "social cost",
+        "social benefit",
+        "common access resource",
+        "overuse of common access",
+        "tragedy of the commons"
+      ],
+      "concepts": [
+        "externalities and common access resources"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "market failure"
+      ]
+    },
+    {
+      "code": "ECON 2.9",
+      "title": "Public goods",
+      "parent": "Unit 2. Microeconomics",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "public good",
+        "non-rivalrous",
+        "non-excludable",
+        "free rider"
+      ],
+      "concepts": [
+        "public goods"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "market failure"
+      ]
+    },
+    {
+      "code": "ECON 2.10",
+      "title": "Asymmetric information",
+      "parent": "Unit 2. Microeconomics",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "asymmetric information",
+        "adverse selection",
+        "moral hazard",
+        "signalling",
+        "screening"
+      ],
+      "concepts": [
+        "asymmetric information"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "market failure"
+      ]
+    },
+    {
+      "code": "ECON 2.11",
+      "title": "Market power",
+      "parent": "Unit 2. Microeconomics",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "monopoly",
+        "oligopoly",
+        "oligopolistic",
+        "monopolistic competition",
+        "perfect competition",
+        "market power",
+        "non-price competition",
+        "barriers to entry",
+        "long-run average total cost",
+        "marginal product",
+        "marginal cost",
+        "productive efficiency",
+        "price discrimination",
+        "collusion",
+        "collude"
+      ],
+      "concepts": [
+        "market power"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "theory of the firm and market structures"
+      ]
+    },
+    {
+      "code": "ECON 2.12",
+      "title": "Market inability to achieve equity",
+      "parent": "Unit 2. Microeconomics",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "equity",
+        "income redistribution",
+        "inequality",
+        "fairness",
+        "progressive tax"
+      ],
+      "concepts": [
+        "market inability to achieve equity"
+      ],
+      "exclusions": [
+        "income inequality",
+        "lorenz curve",
+        "gini coefficient",
+        "poverty"
+      ],
+      "legacy_topic_mappings": [
+        "market failure",
+        "equity"
+      ]
+    },
+    {
+      "code": "ECON 3.1",
+      "title": "Measuring economic activity",
+      "parent": "Unit 3. Macroeconomics",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "gross domestic product",
+        "gdp",
+        "gross national income",
+        "gni",
+        "national income statistics",
+        "standard of living",
+        "circular flow",
+        "injections and leakages",
+        "nominal gdp",
+        "real gdp",
+        "business cycle"
+      ],
+      "concepts": [
+        "measuring economic activity"
+      ],
+      "exclusions": [
+        "human development index",
+        "gni per capita"
+      ],
+      "legacy_topic_mappings": [
+        "measuring national income"
+      ]
+    },
+    {
+      "code": "ECON 3.2",
+      "title": "Variations in economic activity: aggregate demand and supply",
+      "parent": "Unit 3. Macroeconomics",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "aggregate demand",
+        "aggregate supply",
+        "ad-as",
+        "ad as",
+        "short-run aggregate supply",
+        "long-run aggregate supply",
+        "output gap"
+      ],
+      "concepts": [
+        "variations in economic activity: aggregate demand and supply"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "aggregate demand and aggregate supply"
+      ]
+    },
+    {
+      "code": "ECON 3.3",
+      "title": "Macroeconomic objectives",
+      "parent": "Unit 3. Macroeconomics",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "economic growth",
+        "unemployment",
+        "inflation",
+        "deflation",
+        "price stability",
+        "full employment"
+      ],
+      "concepts": [
+        "macroeconomic objectives"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "macroeconomic objectives"
+      ]
+    },
+    {
+      "code": "ECON 3.4",
+      "title": "Economics of inequality and poverty",
+      "parent": "Unit 3. Macroeconomics",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "lorenz curve",
+        "gini coefficient",
+        "poverty",
+        "income inequality",
+        "wealth inequality",
+        "poverty cycle"
+      ],
+      "concepts": [
+        "economics of inequality and poverty"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "inequality and poverty"
+      ]
+    },
+    {
+      "code": "ECON 3.5",
+      "title": "Monetary policy",
+      "parent": "Unit 3. Macroeconomics",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "monetary policy",
+        "interest rate",
+        "money supply",
+        "central bank",
+        "quantitative easing",
+        "exchange rate intervention"
+      ],
+      "concepts": [
+        "monetary policy"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "demand-side policies: monetary policy"
+      ]
+    },
+    {
+      "code": "ECON 3.6",
+      "title": "Fiscal policy",
+      "parent": "Unit 3. Macroeconomics",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "fiscal policy",
+        "government spending",
+        "taxation",
+        "budget deficit",
+        "budget surplus",
+        "public debt"
+      ],
+      "concepts": [
+        "fiscal policy"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "demand-side policies: fiscal policy"
+      ]
+    },
+    {
+      "code": "ECON 3.7",
+      "title": "Supply-side policies",
+      "parent": "Unit 3. Macroeconomics",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "supply-side policy",
+        "market-based policy",
+        "interventionist policy",
+        "labour market reform",
+        "infrastructure spending",
+        "deregulation"
+      ],
+      "concepts": [
+        "supply-side policies"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "supply-side policies"
+      ]
+    },
+    {
+      "code": "ECON 4.1",
+      "title": "Benefits of international trade",
+      "parent": "Unit 4. The global economy",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "international trade",
+        "comparative advantage",
+        "absolute advantage",
+        "gains from trade",
+        "trade liberalization"
+      ],
+      "concepts": [
+        "benefits of international trade"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "international trade"
+      ]
+    },
+    {
+      "code": "ECON 4.2",
+      "title": "Types of trade protection",
+      "parent": "Unit 4. The global economy",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "tariff",
+        "quota",
+        "subsidy",
+        "administrative barrier",
+        "trade protection",
+        "protectionism"
+      ],
+      "concepts": [
+        "types of trade protection"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "trade protection"
+      ]
+    },
+    {
+      "code": "ECON 4.3",
+      "title": "Arguments for and against trade protection",
+      "parent": "Unit 4. The global economy",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "infant industry",
+        "dumping",
+        "domestic employment",
+        "national security",
+        "arguments for protection"
+      ],
+      "concepts": [
+        "arguments for and against trade protection"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "trade protection"
+      ]
+    },
+    {
+      "code": "ECON 4.4",
+      "title": "Economic integration",
+      "parent": "Unit 4. The global economy",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "free trade area",
+        "customs union",
+        "common market",
+        "monetary union",
+        "economic integration",
+        "trading bloc"
+      ],
+      "concepts": [
+        "economic integration"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "economic integration"
+      ]
+    },
+    {
+      "code": "ECON 4.5",
+      "title": "Exchange rates",
+      "parent": "Unit 4. The global economy",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "exchange rate",
+        "currency appreciation",
+        "currency depreciation",
+        "fixed exchange rate",
+        "floating exchange rate",
+        "managed exchange rate"
+      ],
+      "concepts": [
+        "exchange rates"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "exchange rates"
+      ]
+    },
+    {
+      "code": "ECON 4.6",
+      "title": "Balance of payments",
+      "parent": "Unit 4. The global economy",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "balance of payments",
+        "current account",
+        "capital account",
+        "financial account",
+        "current account deficit",
+        "current account surplus"
+      ],
+      "concepts": [
+        "balance of payments"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "balance of payments"
+      ]
+    },
+    {
+      "code": "ECON 4.7",
+      "title": "Sustainable development",
+      "parent": "Unit 4. The global economy",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "sustainable development",
+        "sustainability",
+        "environmental sustainability",
+        "sustainable development goal",
+        "sdg"
+      ],
+      "concepts": [
+        "sustainable development"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "economic development"
+      ]
+    },
+    {
+      "code": "ECON 4.8",
+      "title": "Measuring development",
+      "parent": "Unit 4. The global economy",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "human development index",
+        "hdi",
+        "development indicator",
+        "gni per capita",
+        "multidimensional poverty index"
+      ],
+      "concepts": [
+        "measuring development"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "measuring development"
+      ]
+    },
+    {
+      "code": "ECON 4.9",
+      "title": "Barriers to economic growth and development",
+      "parent": "Unit 4. The global economy",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "poverty trap",
+        "barrier to development",
+        "corruption",
+        "capital flight",
+        "indebtedness",
+        "institutional factor"
+      ],
+      "concepts": [
+        "barriers to economic growth and development"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "barriers to economic development"
+      ]
+    },
+    {
+      "code": "ECON 4.10",
+      "title": "Economic growth and development strategies",
+      "parent": "Unit 4. The global economy",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "development strategy",
+        "foreign aid",
+        "microfinance",
+        "foreign direct investment",
+        "fdi",
+        "export promotion",
+        "import substitution",
+        "market-oriented strategy"
+      ],
+      "concepts": [
+        "economic growth and development strategies"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "development strategies"
+      ]
+    }
+  ]
+}

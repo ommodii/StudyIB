@@ -323,6 +323,8 @@ def _load_taxonomies(repo_root: Path) -> dict[tuple[str, str], Taxonomy]:
         ("biology", "NONE"): load_taxonomy(config, "biology"),
         ("mathematics", "aa"): load_taxonomy(config, "mathematics", "aa"),
         ("mathematics", "ai"): load_taxonomy(config, "mathematics", "ai"),
+        ("business", "NONE"): load_taxonomy(config, "business"),
+        ("economics", "NONE"): load_taxonomy(config, "economics"),
     }
 
 

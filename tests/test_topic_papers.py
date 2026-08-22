@@ -90,6 +90,23 @@ class BoundaryTests(unittest.TestCase):
         boundaries = detect_question_boundaries(texts, words, [595.0], [842.0])
         self.assertEqual([(item.question_number, item.top) for item in boundaries], [("1", 100.0), ("2", 600.0)])
 
+    def test_indented_numbered_source_paragraphs_are_not_questions(self) -> None:
+        words = [[
+            {"text": "1.", "x0": 42, "x1": 52, "top": 100},
+            {"text": "Study", "x0": 70, "x1": 100, "top": 100},
+            {"text": "1", "x0": 62, "x1": 68, "top": 160},
+            {"text": "First", "x0": 76, "x1": 100, "top": 160},
+            {"text": "2", "x0": 62, "x1": 68, "top": 220},
+            {"text": "Second", "x0": 76, "x1": 110, "top": 220},
+            {"text": "2.", "x0": 56, "x1": 66, "top": 300},
+            {"text": "Table", "x0": 72, "x1": 100, "top": 300},
+        ], [
+            {"text": "2.", "x0": 42, "x1": 52, "top": 100},
+            {"text": "Study", "x0": 70, "x1": 100, "top": 100},
+        ]]
+        boundaries = detect_question_boundaries(["1. Study\n1 First\n2 Second", "2. Study"], words, [595, 595], [842, 842])
+        self.assertEqual([item.question_number for item in boundaries], ["1", "2"])
+
     def test_geometry_boundary_detection_rejects_inline_answer_label(self) -> None:
         texts = ["39. Units\nA. s4 A2 m-2 kg-1\n40. Photons"]
         words = [[
@@ -247,7 +264,7 @@ class BoundaryTests(unittest.TestCase):
 
 class TaxonomyAndClassificationTests(unittest.TestCase):
     def test_all_taxonomies_validate(self) -> None:
-        for filename in ("chemistry.json", "physics.json", "biology.json", "mathematics_aa.json", "mathematics_ai.json"):
+        for filename in ("chemistry.json", "physics.json", "biology.json", "mathematics_aa.json", "mathematics_ai.json", "business.json", "economics.json"):
             data = json.loads((REPO_ROOT / "config" / "curricula" / filename).read_text(encoding="utf-8"))
             self.assertEqual(validate_taxonomy(data), [], filename)
 
@@ -267,6 +284,15 @@ class TaxonomyAndClassificationTests(unittest.TestCase):
         classify_question(question, taxonomy, 0.5, {})
         self.assertEqual(question.primary_topic, "A.1")
         self.assertIn("A.3", question.secondary_topics)
+
+    def test_keyword_matching_does_not_match_inside_another_word(self) -> None:
+        taxonomy = load_taxonomy(REPO_ROOT / "config" / "curricula", "mathematics", "ai")
+        question = make_question("model_not_mode", "A mathematical model has a limiting value.")
+        question.subject = "mathematics"
+        question.course = "ai"
+        question.level = "HL"
+        classify_question(question, taxonomy, 0.0, {})
+        self.assertNotIn("AI 4.3", question.matched_evidence)
 
     def test_deterministic_question_ordering(self) -> None:
         older = make_question("older", "text", year=2019)
@@ -302,6 +328,12 @@ class TaxonomyAndClassificationTests(unittest.TestCase):
         self.assertEqual(len(taxonomy.topics), 83)
         self.assertEqual(taxonomy.topics[0]["code"], "AA 1.1")
         self.assertEqual(taxonomy.topics[-1]["code"], "AA 5.19")
+
+    def test_math_ai_taxonomy_uses_all_official_2021_syllabus_statements(self) -> None:
+        taxonomy = load_taxonomy(REPO_ROOT / "config" / "curricula", "mathematics", "ai")
+        self.assertEqual(len(taxonomy.topics), 78)
+        self.assertEqual(taxonomy.topics[0]["code"], "AI 1.1")
+        self.assertEqual(taxonomy.topics[-1]["code"], "AI 5.18")
 
     def test_manual_override_can_resolve_false_duplicate_candidate(self) -> None:
         taxonomy = load_taxonomy(REPO_ROOT / "config" / "curricula", "mathematics", "aa")

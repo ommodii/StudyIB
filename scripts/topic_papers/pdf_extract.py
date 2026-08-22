@@ -129,7 +129,10 @@ def _select_monotonic(candidates: list[Boundary]) -> list[Boundary]:
         local: list[Boundary] = []
         for item in ordered[start_index:]:
             number = int(re.sub(r"\D", "", item.question_number))
-            aligned = not anchor_x or not item.x0 or abs(item.x0 - anchor_x) <= 35
+            # Main question labels are consistently aligned. A wider tolerance
+            # mistakes numbered source paragraphs in Economics data-response
+            # papers for new questions (typically indented by about 20 pt).
+            aligned = not anchor_x or not item.x0 or abs(item.x0 - anchor_x) <= 10
             if previous == 0 or (number == previous + 1 and aligned):
                 local.append(item)
                 previous = number
@@ -233,6 +236,25 @@ def _load_layout(path: Path, cache_dir: Path) -> dict[str, Any]:
     temp.write_text(json.dumps({"source_hash": source_hash, "pages": pages}, ensure_ascii=False), encoding="utf-8")
     os.replace(temp, cache_path)
     return {"source_hash": source_hash, "pages": pages}
+
+
+def extract_question_text_index(path: Path, cache_dir: Path) -> dict[str, str]:
+    """Return question-number keyed text used only as classification evidence."""
+    layout = _load_layout(path, cache_dir)
+    pages = layout.get("pages", [])
+    if not pages:
+        return {}
+    boundaries = detect_question_boundaries(
+        [page["text"] for page in pages],
+        [page["words"] for page in pages],
+        [float(page["width"]) for page in pages],
+        [float(page["height"]) for page in pages],
+    )
+    region_groups = build_regions(boundaries, [float(page["height"]) for page in pages])
+    return {
+        boundary.question_number.upper(): _region_text_from_layout(pages, regions)
+        for boundary, regions in zip(boundaries, region_groups)
+    }
 
 
 def _region_text(path: Path, regions: list[PageRegion]) -> str:
@@ -339,7 +361,56 @@ def extract_questions(
     if not pages:
         return [], "source PDF has zero pages"
     if paper.text_pages == 0:
-        return [], "native text extraction produced no usable text; OCR/manual review required"
+        image_only = [
+            (question_id, override)
+            for question_id, override in (boundary_overrides or {}).items()
+            if override.get("source_file") == path.name
+            and str(override.get("source_parent", "")).lower() in str(path.parent).lower()
+        ]
+        if not image_only:
+            return [], "native text extraction produced no usable text; OCR/manual review required"
+        questions: list[QuestionRecord] = []
+        source_reader = PdfReader(str(path), strict=False) if not dry_run else None
+        for question_id, override in sorted(image_only, key=lambda item: int(item[1]["question_number"])):
+            regions: list[PageRegion] = []
+            for item in override.get("regions", []):
+                page_index = int(item["page"]) - 1
+                if not 0 <= page_index < len(heights):
+                    raise ValueError(f"manual image-only page is outside source PDF for {question_id}")
+                top = float(item.get("top", 0))
+                bottom = float(item.get("bottom", heights[page_index]))
+                regions.append(PageRegion(page_index, top, bottom, top == 0 and bottom == heights[page_index], False))
+            if not regions:
+                raise ValueError(f"manual image-only override has no regions for {question_id}")
+            extracted = str(override.get("extracted_text", ""))
+            normalized = normalize_text(extracted)
+            question = QuestionRecord(
+                question_id=question_id,
+                subject=paper.subject,
+                course=paper.course,
+                year=paper.year,
+                session=paper.session,
+                timezone=paper.timezone,
+                level=paper.level,
+                paper=paper.paper,
+                question_number=str(override["question_number"]),
+                source_path=paper.source_path,
+                source_pages=[region.page_index + 1 for region in regions],
+                regions=regions,
+                extracted_text=extracted,
+                normalized_text=normalized,
+                text_hash=hashlib.sha256(normalized.encode("utf-8")).hexdigest(),
+            )
+            destination = output_dir / "_questions" / paper.subject / f"{question_id}.pdf"
+            question.output_path = str(destination.resolve())
+            if dry_run:
+                question.page_count = len(regions)
+            else:
+                question.page_count, question.pdf_hash, question.page_fingerprint = write_question_pdf(
+                    path, regions, destination, source_reader
+                )
+            questions.append(question)
+        return questions, None
     boundaries = detect_question_boundaries(page_texts, page_words, widths, heights)
     if not boundaries:
         return [], "no reliable question boundaries detected"

@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'studyib-shell-v3';
+const CACHE_VERSION = 'studyib-shell-v7';
 const APP_SHELL = [
     '/',
     '/index.html',

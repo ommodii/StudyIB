@@ -15,6 +15,8 @@ SOURCE_ROOTS = {
     "chemistry": Path("Content/Exam_Papers/IB_Chemistry"),
     "biology": Path("Content/IB_Biology"),
     "mathematics": Path("Content/IB_Math"),
+    "business": Path("Content/Business_management_HL"),
+    "economics": Path("Content/Economics_HL"),
 }
 
 SESSION_RE = re.compile(r"(?P<year>\d{4})\s+(?P<session>May|November)\s+Examination\s+Session", re.I)
@@ -61,7 +63,12 @@ def parse_paper_metadata(path: Path, subject: str) -> PaperRecord:
     timezone_match = TZ_RE.search(filename)
     level_match = LEVEL_RE.search(filename)
     language = next((code for token, code in LANGUAGES.items() if token in lowered), "EN")
-    role = "markscheme" if "markscheme" in lowered or "mark_scheme" in lowered else "question_paper"
+    if "markscheme" in lowered or "mark_scheme" in lowered:
+        role = "markscheme"
+    elif "case_study" in lowered:
+        role = "case_study"
+    else:
+        role = "question_paper"
     specimen = "specimen" in lowered or "sample" in lowered
     course = _math_course(filename, year) if subject == "mathematics" else "NONE"
     record = PaperRecord(

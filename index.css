@@ -5164,3 +5164,105 @@ body:has(.modal-overlay:not(.hidden)) .workspace-top-nav {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
 }
+
+/* Reliable subject navigation and shell-only overflow containment. */
+html,
+body,
+.app-container,
+.content-area,
+.list-pane,
+.papers-grid,
+.workspace-scroll-container {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+body { overscroll-behavior-x: none; }
+.content-area,
+.list-pane,
+.workspace-scroll-container,
+.dashboard-grid,
+.cards-grid { min-width: 0; }
+
+.subject-mode-bar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    width: 100%;
+    min-width: 0;
+    margin-bottom: var(--space-4);
+    padding: var(--space-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface-1);
+    box-shadow: var(--shadow-sm);
+}
+
+.subject-mode-bar .workspace-menu {
+    margin-left: auto;
+}
+
+.subject-back-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    gap: var(--space-1);
+    min-height: 2.25rem;
+    padding: 0 var(--space-3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--surface-2);
+    color: var(--foreground);
+    font: inherit;
+    font-size: var(--text-xs);
+    font-weight: var(--weight-medium);
+    cursor: pointer;
+}
+
+.subject-back-btn:hover { border-color: var(--border-strong); background: var(--surface-hover); }
+.subject-back-btn:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.subject-back-btn svg { width: 1rem; height: 1rem; }
+.workspace-top-nav > .subject-back-btn { margin-right: calc(var(--space-1) * -1); }
+
+@media (max-width: 768px) {
+    .workspace-top-nav,
+    .subject-mode-bar {
+        width: auto;
+        max-width: calc(100% - (var(--space-3) * 2));
+        gap: var(--space-2);
+    }
+    .subject-mode-bar {
+        max-width: 100%;
+        margin-bottom: var(--space-3);
+    }
+    .workspace-top-nav .workspace-logo,
+    .subject-mode-logo,
+    .workspace-top-nav .workspace-cta-btn,
+    #homeNavMock,
+    #homeNavReviews { display: none; }
+    .workspace-top-nav .workspace-menu,
+    .subject-mode-bar .workspace-menu {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        flex: 1 1 auto;
+        width: auto;
+        min-width: 0;
+        overflow: hidden;
+    }
+    .workspace-top-nav .workspace-nav-item,
+    .subject-mode-bar .workspace-nav-item {
+        width: 100%;
+        min-width: 0;
+        padding: 0 var(--space-2);
+    }
+    .workspace-top-nav .workspace-nav-item span,
+    .subject-mode-bar .workspace-nav-item span { display: none; }
+    .subject-back-btn {
+        min-width: 2.75rem;
+        min-height: 2.75rem;
+        padding: 0 var(--space-2);
+    }
+    .subject-back-btn span { display: none; }
+    .paper-filter { max-width: 100%; }
+}

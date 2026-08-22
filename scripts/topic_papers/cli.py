@@ -12,12 +12,14 @@ SUBJECT_ALIASES = {
     "biology": "biology",
     "math": "mathematics",
     "mathematics": "mathematics",
+    "business": "business",
+    "economics": "economics",
 }
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Build local, reviewable IB topic-paper PDFs.")
-    parser.add_argument("--subject", choices=["chemistry", "physics", "biology", "math", "all"], default="all")
+    parser.add_argument("--subject", choices=["chemistry", "physics", "biology", "math", "business", "economics", "all"], default="all")
     parser.add_argument("--course", choices=["aa", "ai"], help="Required to disambiguate Math fixture/legacy sources.")
     parser.add_argument("--source-dir", type=Path, help="Optional controlled source directory for a sample run.")
     parser.add_argument("--output-dir", type=Path, default=Path("output/local_topic_papers"))
@@ -28,6 +30,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--include-secondary-copies", action="store_true")
     parser.add_argument("--confidence-threshold", type=float, default=0.80)
     parser.add_argument("--max-papers", type=int, help="Deterministic sample limit; does not affect inventory accounting.")
+    parser.add_argument("--min-year", type=int, help="Exclude question papers older than this examination year.")
+    parser.add_argument("--max-year", type=int, help="Exclude question papers newer than this examination year.")
+    parser.add_argument("--english-only", action="store_true", help="Exclude non-English question papers.")
     parser.add_argument("--local-only", action="store_true", default=True, help="Accepted for explicitness; local-only is always enforced.")
     return parser
 
@@ -56,6 +61,9 @@ def main(argv: list[str] | None = None) -> int:
         include_secondary_copies=args.include_secondary_copies,
         confidence_threshold=args.confidence_threshold,
         max_papers=args.max_papers,
+        min_year=args.min_year,
+        max_year=args.max_year,
+        english_only=args.english_only,
     )
     run_pipeline(options)
     return 0

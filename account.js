@@ -5,8 +5,16 @@
     const LOCAL_PROGRESS_KEY = 'science_qbank_topic_question_progress';
     const LOCAL_GAME_KEY = 'science_qbank_gamification_state';
     const QUEUE_KEY = 'studyib_cloud_operation_queue_v1';
-    const DATASET_VERSION = config.datasetVersion || '2026-07-28-v1';
-    const SUBJECT_LABELS = { physics: 'Physics', chemistry: 'Chemistry', biology: 'Biology', math: 'Mathematics' };
+    const DATASET_VERSION = config.datasetVersion || '2026-08-22-expanded-topicals-v1';
+    const SUBJECT_LABELS = {
+        physics: 'Physics',
+        chemistry: 'Chemistry',
+        biology: 'Biology',
+        math: 'Mathematics AA',
+        math_ai: 'Mathematics AI',
+        economics: 'Economics',
+        business: 'Business Management'
+    };
 
     const escapeHtml = value => String(value == null ? '' : value)
         .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')

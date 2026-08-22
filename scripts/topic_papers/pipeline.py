@@ -13,7 +13,7 @@ from .dedupe import mark_duplicates
 from .inventory import inventory_sources
 from .local_guard import LOCAL_BANNER, assert_local_only
 from .models import PaperRecord, QuestionRecord
-from .pdf_extract import extract_questions
+from .pdf_extract import extract_question_text_index, extract_questions, normalize_text
 from .reporting import atomic_json, build_topic_outputs, write_csv, write_reports
 from .taxonomy import Taxonomy, load_taxonomy
 
@@ -32,6 +32,9 @@ class PipelineOptions:
     include_secondary_copies: bool = False
     confidence_threshold: float = 0.80
     max_papers: int | None = None
+    min_year: int | None = None
+    max_year: int | None = None
+    english_only: bool = False
 
 
 class StructuredLogger:
@@ -137,6 +140,7 @@ def run_pipeline(options: PipelineOptions) -> dict[str, Any]:
     logger = StructuredLogger(options.output_dir / "reports" / "run.log.jsonl")
     taxonomies = _load_taxonomies(options)
     manual_overrides = load_manual_overrides(options.repo_root / "config" / "manual_overrides.json")
+    manual_overrides.update(load_manual_overrides(options.repo_root / "config" / "additional_question_overrides.json"))
     logger.emit("startup", "ok", LOCAL_BANNER)
 
     inventory = inventory_sources(
@@ -150,6 +154,16 @@ def run_pipeline(options: PipelineOptions) -> dict[str, Any]:
         record for record in inventory
         if record.role == "question_paper" and record.inventory_status == "discovered"
     ]
+    for record in candidates:
+        outside_years = (
+            (options.min_year is not None and (record.year is None or record.year < options.min_year))
+            or (options.max_year is not None and (record.year is None or record.year > options.max_year))
+        )
+        wrong_language = options.english_only and record.language != "EN"
+        if outside_years or wrong_language:
+            record.inventory_status = "skipped"
+            record.reason = "excluded by curriculum year window" if outside_years else "excluded non-English paper"
+    candidates = [record for record in candidates if record.inventory_status == "discovered"]
     if options.course in {"aa", "ai"}:
         for record in candidates:
             if record.subject == "mathematics" and record.course == "UNKNOWN" and options.source_dir:
@@ -196,6 +210,24 @@ def run_pipeline(options: PipelineOptions) -> dict[str, Any]:
             logger.emit("extract", "failed", failure, paper.source_path, error_type="extraction")
         else:
             paper.inventory_status = "processed"
+            if paper.paired_markscheme:
+                try:
+                    markscheme_text = extract_question_text_index(Path(paper.paired_markscheme), options.cache_dir)
+                    for question in paper_questions:
+                        supplemental = markscheme_text.get(question.question_number.upper(), "")
+                        # Some legacy markschemes have malformed internal tables
+                        # that make a detected region swallow the rest of the
+                        # document. Never let that unrelated text dominate the
+                        # question's classification evidence.
+                        # Markscheme fallback is intentionally limited to short
+                        # formula-heavy questions and short matching answers.
+                        # Long prose questions already contain better evidence.
+                        maximum_supplement = min(1500, max(500, len(question.extracted_text) * 3))
+                        if len(question.extracted_text) <= 750 and supplemental and len(supplemental) <= maximum_supplement:
+                            question.extracted_text += "\n[MARKSCHEME CLASSIFICATION TEXT]\n" + supplemental
+                            question.normalized_text = normalize_text(question.extracted_text)
+                except Exception as exc:
+                    logger.emit("markscheme-text", "warning", f"Could not index paired markscheme: {type(exc).__name__}: {exc}", paper.paired_markscheme)
             questions.extend(paper_questions)
             logger.emit("extract", "ok", f"Detected {len(paper_questions)} questions", paper.source_path)
         checkpoint["papers"][paper.source_path] = {

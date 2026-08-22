@@ -5,13 +5,13 @@
   "author": "Om Modi",
   "license": "ISC",
   "scripts": {
-    "test": "node tests/test_gamification_ledger.js && node tests/test_account_progression.js && node tests/test_additional_subjects.js",
+    "test": "node tests/test_gamification_ledger.js && node tests/test_account_progression.js && node tests/test_additional_subjects.js && node tests/test_expanded_topicals.js",
     "build:additional-subjects": "node scripts/build_additional_subjects.js",
     "upload:additional-subjects": "node scripts/upload_r2_manifest.js output/additional_subjects/web/upload_manifest.json 8",
     "build:topic-papers": "python -m scripts.topic_papers.cli --local-only",
     "build:question-production": "python -m scripts.topic_papers.production --subjects all --local-only",
-    "build:question-web-data": "python -m scripts.topic_papers.build_web_dataset --version 2026-08-22-math-aa-v2 --corpus-root output/math_aa_rebuild/final --base-js topic_question_data.js",
-    "upload:question-web-data": "node scripts/upload_r2_manifest.js output/math_aa_rebuild/final/web/upload_manifest.json 8",
+    "build:question-web-data": "python -m scripts.topic_papers.build_web_dataset --version 2026-08-22-expanded-topicals-v1 --corpus-root output/topicals_2026-08-22 --base-js topic_question_data.js",
+    "upload:question-web-data": "node scripts/upload_r2_manifest.js output/topicals_2026-08-22/web/upload_manifest.json 8",
     "build:web": "node build_web.js",
     "build:native": "npm run build:web",
     "deploy:worker": "npm run build:web && wrangler deploy"

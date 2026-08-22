@@ -1,0 +1,76 @@
+{
+  "version": 1,
+  "description": "Reviewed question boundaries/classifications for image-only or otherwise exceptional additional-subject papers.",
+  "questions": {
+    "economics_2013_may_tz1_hl_p1_q04": {
+      "primary_topic": "ECON 3.7",
+      "secondary_topics": ["ECON 3.3"],
+      "reviewer_note": "Reviewed manually: labour-market reform and market-oriented supply-side policy are the principal focus; economic growth is secondary."
+    },
+    "economics_2013_may_tz2_hl_p1_q04": {
+      "primary_topic": "ECON 3.7",
+      "secondary_topics": ["ECON 3.3"],
+      "reviewer_note": "Reviewed manually: labour-market reform and market-oriented supply-side policy are the principal focus; economic growth is secondary."
+    },
+    "economics_2015_may_tz1_hl_p1_q04": {
+      "primary_topic": "ECON 3.7",
+      "secondary_topics": ["ECON 3.2", "ECON 3.3"],
+      "reviewer_note": "Reviewed manually: interventionist supply-side policy is the principal focus, with LRAS and growth as supporting concepts."
+    },
+    "economics_2015_may_tz2_hl_p1_q04": {
+      "primary_topic": "ECON 3.7",
+      "secondary_topics": ["ECON 3.2", "ECON 3.3"],
+      "reviewer_note": "Reviewed manually: interventionist supply-side policy is the principal focus, with LRAS and growth as supporting concepts."
+    },
+    "economics_2016_may_tz1_hl_p1_q04": {
+      "primary_topic": "ECON 3.2",
+      "secondary_topics": ["ECON 3.3"],
+      "reviewer_note": "Reviewed manually: Keynesian AD/AS equilibrium is the main analytical framework; growth through investment is secondary."
+    },
+    "economics_2016_may_tz2_hl_p1_q04": {
+      "primary_topic": "ECON 3.2",
+      "secondary_topics": ["ECON 3.3"],
+      "reviewer_note": "Reviewed manually: Keynesian AD/AS equilibrium is the main analytical framework; growth through investment is secondary."
+    },
+    "economics_2018_may_tz0_hl_p2_q01": {
+      "source_file": "Economics_paper_2__HL.pdf",
+      "source_parent": "2018 May Examination Session",
+      "question_number": "1",
+      "regions": [{"page": 2}, {"page": 3}],
+      "extracted_text": "Canada and United States trade dispute: anti-dumping tariffs, subsidies, exchange rates, demand and supply, and consequences of trade protection.",
+      "primary_topic": "ECON 4.2",
+      "secondary_topics": ["ECON 4.3", "ECON 4.5", "ECON 2.1"],
+      "reviewer_note": "Image-only paper manually reviewed; complete Question 1 occupies source pages 2-3."
+    },
+    "economics_2018_may_tz0_hl_p2_q02": {
+      "source_file": "Economics_paper_2__HL.pdf",
+      "source_parent": "2018 May Examination Session",
+      "question_number": "2",
+      "regions": [{"page": 4}, {"page": 5}],
+      "extracted_text": "Britain current account deficit: currency depreciation, foreign direct investment, exchange rates, Keynesian aggregate demand and aggregate supply, and balance of payments.",
+      "primary_topic": "ECON 4.6",
+      "secondary_topics": ["ECON 4.5", "ECON 3.2"],
+      "reviewer_note": "Image-only paper manually reviewed; complete Question 2 occupies source pages 4-5."
+    },
+    "economics_2018_may_tz0_hl_p2_q03": {
+      "source_file": "Economics_paper_2__HL.pdf",
+      "source_parent": "2018 May Examination Session",
+      "question_number": "3",
+      "regions": [{"page": 6}, {"page": 7}],
+      "extracted_text": "Economic growth and development in Cote d'Ivoire: relative poverty, underemployment, investment, Lorenz curve, Gini coefficient, market-oriented and interventionist development policies.",
+      "primary_topic": "ECON 4.10",
+      "secondary_topics": ["ECON 3.4", "ECON 3.3", "ECON 4.8"],
+      "reviewer_note": "Image-only paper manually reviewed; complete Question 3 occupies source pages 6-7."
+    },
+    "economics_2018_may_tz0_hl_p2_q04": {
+      "source_file": "Economics_paper_2__HL.pdf",
+      "source_parent": "2018 May Examination Session",
+      "question_number": "4",
+      "regions": [{"page": 8}, {"page": 9}],
+      "extracted_text": "Nigeria economic development: recession, cartels, economies of scale, monopoly welfare loss, import substitution, diversification, human development and poverty.",
+      "primary_topic": "ECON 4.10",
+      "secondary_topics": ["ECON 2.11", "ECON 4.2", "ECON 4.8"],
+      "reviewer_note": "Image-only paper manually reviewed; complete Question 4 occupies source pages 8-9."
+    }
+  }
+}

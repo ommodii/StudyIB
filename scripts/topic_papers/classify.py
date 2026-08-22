@@ -9,6 +9,9 @@ from .models import QuestionRecord
 from .taxonomy import Taxonomy
 
 
+CLASSIFIER_VERSION = "rules_v3_word_boundaries"
+
+
 def load_manual_overrides(path: Path) -> dict[str, dict[str, Any]]:
     if not path.exists():
         return {}
@@ -41,7 +44,14 @@ def _phrase_matches(text: str, phrases: list[str]) -> list[str]:
     evidence: list[str] = []
     for phrase in phrases:
         normalized = re.sub(r"\s+", " ", phrase.lower()).strip()
-        if normalized and normalized in text:
+        if not normalized:
+            continue
+        pattern = re.escape(normalized).replace(r"\ ", r"\s+")
+        if normalized[0].isalnum():
+            pattern = rf"(?<!\w){pattern}"
+        if normalized[-1].isalnum():
+            pattern = rf"{pattern}(?!\w)"
+        if re.search(pattern, text):
             evidence.append(phrase)
     return evidence
 
@@ -137,4 +147,4 @@ def classify_question(
 def classification_cache_path(cache_dir: Path, taxonomy: Taxonomy, question: QuestionRecord) -> Path:
     version = re.sub(r"[^a-z0-9]+", "_", taxonomy.curriculum_version.lower()).strip("_")
     level = question.level.lower() if question.level else "unknown"
-    return cache_dir / "classifications" / version / f"{level}_{question.text_hash}.json"
+    return cache_dir / "classifications" / CLASSIFIER_VERSION / version / f"{level}_{question.text_hash}.json"

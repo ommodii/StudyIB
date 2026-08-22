@@ -14,7 +14,17 @@ SUBJECT_IDS = {
     "chemistry": "chemistry",
     "biology": "biology",
     "mathematics": "math",
+    "business": "business",
+    "economics": "economics",
 }
+
+WEB_SUBJECTS = ("physics", "chemistry", "biology", "math", "math_ai", "business", "economics")
+
+
+def _web_subject(corpus_subject: str, course: str | None) -> str:
+    if corpus_subject == "mathematics":
+        return "math_ai" if str(course).lower() == "ai" else "math"
+    return SUBJECT_IDS[corpus_subject]
 
 
 def _slug(value: str) -> str:
@@ -67,11 +77,20 @@ def build(
     base_js: Path | None = None,
 ) -> dict[str, Any]:
     prefix = f"Content/TopicQuestionBank/{version}"
+    paper_lookup: dict[str, str] = {}
+    paper_manifest = repo_root / "output" / "additional_subjects" / "web" / "upload_manifest.json"
+    if paper_manifest.exists():
+        paper_payload = json.loads(paper_manifest.read_text(encoding="utf-8"))
+        paper_lookup = {
+            str(Path(item["local_path"]).resolve()).lower(): item["object_key"]
+            for item in paper_payload.get("files", [])
+            if item.get("content_type") == "application/pdf"
+        }
     syllabus: dict[str, dict[str, dict[str, list[dict[str, str]]]]] = {
-        subject: {} for subject in SUBJECT_IDS.values()
+        subject: {} for subject in WEB_SUBJECTS
     }
     practice: dict[str, dict[str, dict[str, list[dict[str, Any]]]]] = {
-        subject: {} for subject in SUBJECT_IDS.values()
+        subject: {} for subject in WEB_SUBJECTS
     }
     uploads: list[dict[str, Any]] = []
     topic_catalog: list[dict[str, Any]] = []
@@ -88,7 +107,7 @@ def build(
         if not questions or not topic.get("code"):
             continue
         corpus_subject = questions[0]["subject"]
-        subject = SUBJECT_IDS[corpus_subject]
+        subject = _web_subject(corpus_subject, questions[0].get("course"))
         code = str(topic["code"])
         title = str(topic.get("title") or code)
         category = str(topic.get("parent") or "Topics")
@@ -109,10 +128,12 @@ def build(
             local_path = manifest_path.parent / "questions" / f"{question_id}.pdf"
             object_key = f"{prefix}/{subject}/questions/{question_id}.pdf"
             source_path = Path(question["source_path"])
-            try:
-                full_paper_path = source_path.resolve().relative_to(repo_root.resolve()).as_posix()
-            except ValueError:
-                full_paper_path = ""
+            full_paper_path = paper_lookup.get(str(source_path.resolve()).lower(), "")
+            if not full_paper_path:
+                try:
+                    full_paper_path = source_path.resolve().relative_to(repo_root.resolve()).as_posix()
+                except ValueError:
+                    full_paper_path = ""
             source_parts = [
                 str(question.get("year") or "Unknown year"),
                 str(question.get("session") or "").title(),
@@ -145,35 +166,43 @@ def build(
             "master_pdf": master_key,
         })
 
-    # Keep the complete official AA syllabus visible even when this historical
-    # corpus has no matching question for a statement. Empty topics render the
-    # app's existing honest "No questions found" state instead of disappearing.
-    if syllabus["math"]:
-        taxonomy_path = repo_root / "config" / "curricula" / "mathematics_aa.json"
+    # Keep each complete official syllabus visible even when the selected corpus
+    # has no matching question for a statement. Empty topics render the app's
+    # existing honest "No questions found" state instead of disappearing.
+    taxonomy_files = {
+        "math": "mathematics_aa.json",
+        "math_ai": "mathematics_ai.json",
+        "business": "business.json",
+        "economics": "economics.json",
+    }
+    for web_subject, filename in taxonomy_files.items():
+        if not syllabus[web_subject]:
+            continue
+        taxonomy_path = repo_root / "config" / "curricula" / filename
         taxonomy = json.loads(taxonomy_path.read_text(encoding="utf-8"))
         for topic in taxonomy.get("topics", []):
             category = str(topic["parent"])
             subtopic = f'{topic["code"]} {topic["title"]}'
-            syllabus["math"].setdefault(category, {}).setdefault(subtopic, [])
-            practice["math"].setdefault(category, {}).setdefault(subtopic, [])
-        for category in list(syllabus["math"]):
+            syllabus[web_subject].setdefault(category, {}).setdefault(subtopic, [])
+            practice[web_subject].setdefault(category, {}).setdefault(subtopic, [])
+        for category in list(syllabus[web_subject]):
             ordered_names = [
                 f'{topic["code"]} {topic["title"]}'
                 for topic in taxonomy.get("topics", [])
                 if str(topic["parent"]) == category
             ]
-            existing_syllabus = syllabus["math"][category]
-            existing_practice = practice["math"][category]
-            syllabus["math"][category] = {
+            existing_syllabus = syllabus[web_subject][category]
+            existing_practice = practice[web_subject][category]
+            syllabus[web_subject][category] = {
                 name: existing_syllabus[name] for name in ordered_names if name in existing_syllabus
             }
-            practice["math"][category] = {
+            practice[web_subject][category] = {
                 name: existing_practice[name] for name in ordered_names if name in existing_practice
             }
 
     if base_js:
         _, base_syllabus, base_practice = _load_data_js(base_js)
-        for subject in SUBJECT_IDS.values():
+        for subject in WEB_SUBJECTS:
             if not syllabus[subject]:
                 syllabus[subject] = base_syllabus.get(subject, {})
                 practice[subject] = base_practice.get(subject, {})
@@ -185,7 +214,7 @@ def build(
             for subtopic, papers in subtopics.items():
                 questions = practice.get(subject, {}).get(category, {}).get(subtopic, [])
                 question_total += len(questions)
-                code_match = re.match(r"^(AA \d+\.\d+|[A-E]\d*\.\d+|(?:Structure|Reactivity) \d+\.\d+)", subtopic)
+                code_match = re.match(r"^((?:AA|AI|BM|ECON) \d+\.\d+|[A-E]\d*\.\d+|(?:Structure|Reactivity) \d+\.\d+)", subtopic)
                 code = code_match.group(1) if code_match else subtopic
                 title = subtopic[len(code):].strip() or code
                 topic_catalog.append({
@@ -197,11 +226,19 @@ def build(
                     "master_pdf": papers[0].get("filepath", "") if papers else "",
                 })
 
+    unique_question_ids = {
+        question.get("filepath")
+        for categories in practice.values()
+        for subtopics in categories.values()
+        for questions in subtopics.values()
+        for question in questions
+        if question.get("filepath")
+    }
     metadata = {
         "version": version,
         "prefix": prefix,
         "topic_count": len(topic_catalog),
-        "question_count": question_total,
+        "question_count": len(unique_question_ids),
         "subjects": {subject: sum(1 for topic in topic_catalog if topic["subject"] == subject) for subject in syllabus},
     }
     js_output.parent.mkdir(parents=True, exist_ok=True)
@@ -218,6 +255,7 @@ def build(
     catalog = {"metadata": metadata, "topics": topic_catalog}
     catalog_path.write_text(json.dumps(catalog, indent=2), encoding="utf-8")
     uploads.append(_file_entry(catalog_path, f"{prefix}/catalog.json"))
+    uploads = list({item["object_key"]: item for item in uploads}.values())
     upload_manifest = {
         "version": version,
         "prefix": prefix,

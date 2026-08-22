@@ -1,29 +1,1673 @@
 {
   "subject": "mathematics",
   "course": "ai",
-  "curriculum_version": "DP Mathematics: applications and interpretation first assessment 2021",
+  "curriculum_version": "DP Mathematics: applications and interpretation, first assessment 2021 (current through 2028)",
   "first_assessment": 2021,
   "sources": [
-    {"title":"IB Mathematics: applications and interpretation subject brief (first assessment 2021)","url":"https://www.ibo.org/programmes/diploma-programme/curriculum/mathematics/"}
+    {
+      "title": "IB Mathematics: applications and interpretation guide",
+      "url": "https://www.ibo.org/globalassets/new-structure/university-admission/pdfs/subject-guides/mathematics-applications-interpretation-guide.pdf"
+    }
   ],
   "topics": [
-    {"code":"AI 1.1","title":"Number, sequences and financial mathematics","parent":"1. Number and algebra","level":["SL","HL"],"keywords":["arithmetic sequence","geometric sequence","compound interest","annuity","loan repayment"],"concepts":["financial model","growth and decay"],"exclusions":[],"legacy_topic_mappings":["Sequences and series"]},
-    {"code":"AI 1.2","title":"Approximation, error and logarithms","parent":"1. Number and algebra","level":["SL","HL"],"keywords":["percentage error","significant figures","approximation","logarithm","order of magnitude"],"concepts":["numerical accuracy","logarithmic scale"],"exclusions":[],"legacy_topic_mappings":["Algebra"]},
-    {"code":"AI 1.3","title":"Matrices and linear systems","parent":"1. Number and algebra","level":["HL"],"keywords":["matrix","eigenvalue","transition matrix","system of equations","inverse matrix"],"concepts":["matrix transformation","linear system"],"exclusions":[],"legacy_topic_mappings":["Matrices"]},
-    {"code":"AI 2.1","title":"Function concepts and modelling","parent":"2. Functions","level":["SL","HL"],"keywords":["function","domain","range","mathematical model","regression model"],"concepts":["function notation","model interpretation"],"exclusions":[],"legacy_topic_mappings":["Functions and equations"]},
-    {"code":"AI 2.2","title":"Linear, quadratic and piecewise models","parent":"2. Functions","level":["SL","HL"],"keywords":["linear model","quadratic model","piecewise function","intersection","vertex"],"concepts":["graph interpretation","model parameters"],"exclusions":[],"legacy_topic_mappings":["Functions"]},
-    {"code":"AI 2.3","title":"Exponential, logarithmic and logistic models","parent":"2. Functions","level":["SL","HL"],"keywords":["exponential model","logistic model","logarithmic model","population growth","half-life model"],"concepts":["growth model","carrying capacity"],"exclusions":[],"legacy_topic_mappings":["Exponential and logarithmic functions"]},
-    {"code":"AI 2.4","title":"Trigonometric models","parent":"2. Functions","level":["SL","HL"],"keywords":["sinusoidal model","periodic model","amplitude","phase shift","trigonometric function"],"concepts":["periodic phenomena","parameter interpretation"],"exclusions":[],"legacy_topic_mappings":["Trigonometric functions"]},
-    {"code":"AI 3.1","title":"Measurement and trigonometry","parent":"3. Geometry and trigonometry","level":["SL","HL"],"keywords":["sine rule","cosine rule","bearing","surface area","volume"],"concepts":["non-right triangle","three-dimensional measurement"],"exclusions":[],"legacy_topic_mappings":["Geometry and trigonometry"]},
-    {"code":"AI 3.2","title":"Voronoi diagrams and networks","parent":"3. Geometry and trigonometry","level":["SL","HL"],"keywords":["voronoi","delaunay","network","minimum spanning tree","route"],"concepts":["nearest-neighbour region","graph network"],"exclusions":[],"legacy_topic_mappings":["Graph theory"]},
-    {"code":"AI 3.3","title":"Vectors and geometric transformations","parent":"3. Geometry and trigonometry","level":["HL"],"keywords":["vector","transformation matrix","rotation matrix","vector equation"],"concepts":["vector geometry","linear transformation"],"exclusions":[],"legacy_topic_mappings":["Vectors"]},
-    {"code":"AI 4.1","title":"Descriptive statistics and data representation","parent":"4. Statistics and probability","level":["SL","HL"],"keywords":["mean","median","standard deviation","box plot","histogram"],"concepts":["data distribution","summary statistics"],"exclusions":[],"legacy_topic_mappings":["Statistics"]},
-    {"code":"AI 4.2","title":"Correlation, regression and statistical modelling","parent":"4. Statistics and probability","level":["SL","HL"],"keywords":["correlation","regression","pearson","spearman","coefficient of determination"],"concepts":["bivariate data","model fit"],"exclusions":[],"legacy_topic_mappings":["Statistics"]},
-    {"code":"AI 4.3","title":"Probability and distributions","parent":"4. Statistics and probability","level":["SL","HL"],"keywords":["probability","binomial distribution","normal distribution","expected value","poisson"],"concepts":["random variable","probability model"],"exclusions":["binomial expansion"],"legacy_topic_mappings":["Probability"]},
-    {"code":"AI 4.4","title":"Statistical tests and inference","parent":"4. Statistics and probability","level":["SL","HL"],"keywords":["chi-squared","hypothesis test","t-test","confidence interval","p-value"],"concepts":["statistical significance","goodness of fit"],"exclusions":[],"legacy_topic_mappings":["Statistics"]},
-    {"code":"AI 5.1","title":"Differentiation and rates of change","parent":"5. Calculus","level":["SL","HL"],"keywords":["derivative","gradient","rate of change","tangent","differentiation"],"concepts":["instantaneous rate","local linearity"],"exclusions":[],"legacy_topic_mappings":["Calculus"]},
-    {"code":"AI 5.2","title":"Optimization and numerical methods","parent":"5. Calculus","level":["SL","HL"],"keywords":["optimization","maximum","minimum","newton-raphson","numerical solution"],"concepts":["model optimization","root approximation"],"exclusions":[],"legacy_topic_mappings":["Applications of calculus"]},
-    {"code":"AI 5.3","title":"Integration and applications","parent":"5. Calculus","level":["SL","HL"],"keywords":["integral","area under curve","trapezoidal rule","volume","accumulation"],"concepts":["definite integral","numerical integration"],"exclusions":[],"legacy_topic_mappings":["Calculus"]},
-    {"code":"AI 5.4","title":"Differential equations and slope fields","parent":"5. Calculus","level":["HL"],"keywords":["differential equation","slope field","phase portrait","euler method","coupled differential equation"],"concepts":["dynamic model","numerical solution"],"exclusions":[],"legacy_topic_mappings":["Differential equations"]}
+    {
+      "code": "AI 1.1",
+      "title": "Scientific notation",
+      "parent": "1. Number and algebra",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "scientific notation",
+        "standard form",
+        "order of magnitude"
+      ],
+      "concepts": [
+        "scientific notation"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 1.2",
+      "title": "Arithmetic sequences and series",
+      "parent": "1. Number and algebra",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "arithmetic sequence",
+        "arithmetic series",
+        "common difference",
+        "sigma notation",
+        "more than the previous day",
+        "constant amount each day"
+      ],
+      "concepts": [
+        "arithmetic sequences and series"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 1.3",
+      "title": "Geometric sequences and series",
+      "parent": "1. Number and algebra",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "geometric sequence",
+        "geometric series",
+        "common ratio",
+        "percentage of the previous day",
+        "distance travelled in the previous minute",
+        "increased by a percentage",
+        "bounces on the ground",
+        "maximum height reached after each bounce"
+      ],
+      "concepts": [
+        "geometric sequences and series"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 1.4",
+      "title": "Financial applications of geometric sequences",
+      "parent": "1. Number and algebra",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "compound interest",
+        "compounded quarterly",
+        "annual depreciation",
+        "financial application",
+        "investment growth",
+        "fixed deposit account"
+      ],
+      "concepts": [
+        "financial applications of geometric sequences"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 1.5",
+      "title": "Integer exponents and logarithms",
+      "parent": "1. Number and algebra",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "integer exponent",
+        "base 10 logarithm",
+        "natural logarithm",
+        "laws of exponents"
+      ],
+      "concepts": [
+        "integer exponents and logarithms"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 1.6",
+      "title": "Approximation, estimation and percentage error",
+      "parent": "1. Number and algebra",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "approximation",
+        "estimate",
+        "percentage error",
+        "significant figure",
+        "upper bound",
+        "lower bound",
+        "measured correct to the nearest",
+        "maximum possible"
+      ],
+      "concepts": [
+        "approximation, estimation and percentage error"
+      ],
+      "exclusions": [
+        "voronoi diagram",
+        "probability distribution",
+        "minimum spanning tree",
+        "lower bound for the travelling time"
+      ],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 1.7",
+      "title": "Loans, amortization and annuities",
+      "parent": "1. Number and algebra",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "loan repayment",
+        "loan of",
+        "amortization",
+        "annuity",
+        "financial solver",
+        "monthly instalment",
+        "monthly installment",
+        "fixed monthly",
+        "outstanding balance",
+        "future value",
+        "deposits an additional",
+        "invest each year"
+      ],
+      "concepts": [
+        "loans, amortization and annuities"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 1.8",
+      "title": "Technology solutions of equations",
+      "parent": "1. Number and algebra",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "solve using technology",
+        "system of linear equations",
+        "polynomial equation",
+        "simultaneous equations",
+        "write down three equations",
+        "number of each type"
+      ],
+      "concepts": [
+        "technology solutions of equations"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 1.9",
+      "title": "Laws of logarithms",
+      "parent": "1. Number and algebra",
+      "level": [
+        "HL"
+      ],
+      "keywords": [
+        "laws of logarithms",
+        "change of base",
+        "logarithmic equation"
+      ],
+      "concepts": [
+        "laws of logarithms"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 1.10",
+      "title": "Rational exponents",
+      "parent": "1. Number and algebra",
+      "level": [
+        "HL"
+      ],
+      "keywords": [
+        "rational exponent",
+        "non-integer exponent",
+        "fractional exponent"
+      ],
+      "concepts": [
+        "rational exponents"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 1.11",
+      "title": "Infinite geometric sequences",
+      "parent": "1. Number and algebra",
+      "level": [
+        "HL"
+      ],
+      "keywords": [
+        "infinite geometric",
+        "sum to infinity",
+        "convergent geometric"
+      ],
+      "concepts": [
+        "infinite geometric sequences"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 1.12",
+      "title": "Complex numbers in Cartesian form",
+      "parent": "1. Number and algebra",
+      "level": [
+        "HL"
+      ],
+      "keywords": [
+        "complex number",
+        "cartesian form",
+        "complex conjugate",
+        "imaginary part",
+        "argand"
+      ],
+      "concepts": [
+        "complex numbers in cartesian form"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 1.13",
+      "title": "Complex numbers in polar and Euler form",
+      "parent": "1. Number and algebra",
+      "level": [
+        "HL"
+      ],
+      "keywords": [
+        "polar form",
+        "modulus-argument",
+        "euler form",
+        "cis",
+        "complex plane",
+        "total voltage in the circuit",
+        "time of sunrise",
+        "time of sunset",
+        "same frequency"
+      ],
+      "concepts": [
+        "complex numbers in polar and euler form"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 1.14",
+      "title": "Matrices and systems of equations",
+      "parent": "1. Number and algebra",
+      "level": [
+        "HL"
+      ],
+      "keywords": [
+        "matrix",
+        "determinant",
+        "inverse matrix",
+        "identity matrix",
+        "matrix multiplication"
+      ],
+      "concepts": [
+        "matrices and systems of equations"
+      ],
+      "exclusions": [
+        "adjacency matrix",
+        "adjacency table",
+        "transition matrix",
+        "markov chain"
+      ],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 1.15",
+      "title": "Eigenvalues and eigenvectors",
+      "parent": "1. Number and algebra",
+      "level": [
+        "HL"
+      ],
+      "keywords": [
+        "eigenvalue",
+        "eigenvector",
+        "characteristic polynomial",
+        "diagonalization",
+        "diagonalisation"
+      ],
+      "concepts": [
+        "eigenvalues and eigenvectors"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 2.1",
+      "title": "Equations of straight lines",
+      "parent": "2. Functions",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "straight line",
+        "gradient",
+        "y-intercept",
+        "parallel lines",
+        "perpendicular lines"
+      ],
+      "concepts": [
+        "equations of straight lines"
+      ],
+      "exclusions": [
+        "direction vector",
+        "slope field",
+        "differential equation",
+        "voronoi diagram",
+        "volume of revolution",
+        "calculate its volume"
+      ],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 2.2",
+      "title": "Function concepts, domain and range",
+      "parent": "2. Functions",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "domain",
+        "range",
+        "function notation",
+        "inverse function",
+        "function as a model"
+      ],
+      "concepts": [
+        "function concepts, domain and range"
+      ],
+      "exclusions": [
+        "modelled the percentage",
+        "modeled the percentage"
+      ],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 2.3",
+      "title": "Graphs of functions",
+      "parent": "2. Functions",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "graph of a function",
+        "sketch the graph",
+        "graphing technology"
+      ],
+      "concepts": [
+        "graphs of functions"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 2.4",
+      "title": "Key features and intersections of graphs",
+      "parent": "2. Functions",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "point of intersection",
+        "graphs intersect",
+        "intersect at",
+        "key features of a graph",
+        "zeros",
+        "maximum point",
+        "minimum point"
+      ],
+      "concepts": [
+        "key features and intersections of graphs"
+      ],
+      "exclusions": [
+        "slope field",
+        "differential equation"
+      ],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 2.5",
+      "title": "Modelling with common functions",
+      "parent": "2. Functions",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "linear model",
+        "quadratic model",
+        "exponential model",
+        "cubic model",
+        "sinusoidal model",
+        "direct variation",
+        "inverse variation",
+        "height can be modelled",
+        "temperature could be modelled",
+        "could be modelled by the following function",
+        "can be modelled by",
+        "amplitude of the function",
+        "modelled by the function",
+        "modeled by the function",
+        "modelled the percentage",
+        "modeled the percentage"
+      ],
+      "concepts": [
+        "modelling with common functions"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 2.6",
+      "title": "The modelling cycle",
+      "parent": "2. Functions",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "develop a model",
+        "fit a model",
+        "test the model",
+        "model validity",
+        "reasonable domain",
+        "limitations of the model"
+      ],
+      "concepts": [
+        "the modelling cycle"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 2.7",
+      "title": "Composite and inverse functions",
+      "parent": "2. Functions",
+      "level": [
+        "HL"
+      ],
+      "keywords": [
+        "composite function",
+        "inverse function",
+        "domain restriction",
+        "f(g(x))"
+      ],
+      "concepts": [
+        "composite and inverse functions"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 2.8",
+      "title": "Transformations of graphs",
+      "parent": "2. Functions",
+      "level": [
+        "HL"
+      ],
+      "keywords": [
+        "transformation of graph",
+        "translation",
+        "translated by",
+        "reflection",
+        "vertical stretch",
+        "horizontal stretch",
+        "let g(x)",
+        "draw the graph of y = g"
+      ],
+      "concepts": [
+        "transformations of graphs"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 2.9",
+      "title": "Advanced function models",
+      "parent": "2. Functions",
+      "level": [
+        "HL"
+      ],
+      "keywords": [
+        "logistic model",
+        "piecewise model",
+        "non-linear model",
+        "model parameter",
+        "least squares"
+      ],
+      "concepts": [
+        "advanced function models"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 2.10",
+      "title": "Scaling and linearization",
+      "parent": "2. Functions",
+      "level": [
+        "HL"
+      ],
+      "keywords": [
+        "log-log graph",
+        "semi-log graph",
+        "linearization",
+        "linearisation",
+        "scaling large numbers",
+        "power model",
+        "classified by their brightness",
+        "star visible without magnification",
+        "magnitude of another star"
+      ],
+      "concepts": [
+        "scaling and linearization"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 3.1",
+      "title": "Three-dimensional geometry and measurement",
+      "parent": "3. Geometry and trigonometry",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "three-dimensional",
+        "surface area",
+        "volume",
+        "midpoint",
+        "distance between two points"
+      ],
+      "concepts": [
+        "three-dimensional geometry and measurement"
+      ],
+      "exclusions": [
+        "differential equation"
+      ],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 3.2",
+      "title": "Right and non-right triangle trigonometry",
+      "parent": "3. Geometry and trigonometry",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "sine rule",
+        "cosine rule",
+        "right-angled triangle",
+        "area of a triangle",
+        "pythagoras"
+      ],
+      "concepts": [
+        "right and non-right triangle trigonometry"
+      ],
+      "exclusions": [
+        "minimize the area",
+        "cross product"
+      ],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 3.3",
+      "title": "Applications of trigonometry",
+      "parent": "3. Geometry and trigonometry",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "angle of elevation",
+        "angle of depression",
+        "looks upward at an angle",
+        "bearing",
+        "labelled diagram"
+      ],
+      "concepts": [
+        "applications of trigonometry"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 3.4",
+      "title": "Circles, arcs and sectors",
+      "parent": "3. Geometry and trigonometry",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "arc length",
+        "area of a sector",
+        "circle geometry",
+        "sector area"
+      ],
+      "concepts": [
+        "circles, arcs and sectors"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 3.5",
+      "title": "Intersections and perpendicular bisectors",
+      "parent": "3. Geometry and trigonometry",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "perpendicular bisector",
+        "intersection of lines",
+        "equidistant point"
+      ],
+      "concepts": [
+        "intersections and perpendicular bisectors"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 3.6",
+      "title": "Voronoi diagrams",
+      "parent": "3. Geometry and trigonometry",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "voronoi",
+        "nearest neighbour",
+        "nearest neighbor",
+        "site point",
+        "cell boundary"
+      ],
+      "concepts": [
+        "voronoi diagrams"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 3.7",
+      "title": "Radian measure",
+      "parent": "3. Geometry and trigonometry",
+      "level": [
+        "HL"
+      ],
+      "keywords": [
+        "radian",
+        "radian measure",
+        "arc length in radians",
+        "sector in radians"
+      ],
+      "concepts": [
+        "radian measure"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 3.8",
+      "title": "Unit circle and trigonometric equations",
+      "parent": "3. Geometry and trigonometry",
+      "level": [
+        "HL"
+      ],
+      "keywords": [
+        "unit circle",
+        "pythagorean identity",
+        "trigonometric equation",
+        "periodic solution"
+      ],
+      "concepts": [
+        "unit circle and trigonometric equations"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 3.9",
+      "title": "Matrix transformations",
+      "parent": "3. Geometry and trigonometry",
+      "level": [
+        "HL"
+      ],
+      "keywords": [
+        "transformation matrix",
+        "geometric transformation",
+        "image of the point",
+        "rotation matrix",
+        "reflection matrix",
+        "enlargement matrix"
+      ],
+      "concepts": [
+        "matrix transformations"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 3.10",
+      "title": "Vectors and vector operations",
+      "parent": "3. Geometry and trigonometry",
+      "level": [
+        "HL"
+      ],
+      "keywords": [
+        "vector",
+        "position vector",
+        "displacement vector",
+        "magnitude of a vector",
+        "unit vector"
+      ],
+      "concepts": [
+        "vectors and vector operations"
+      ],
+      "exclusions": [
+        "position vector when",
+        "velocity vector",
+        "acceleration vector"
+      ],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 3.11",
+      "title": "Vector equations of lines",
+      "parent": "3. Geometry and trigonometry",
+      "level": [
+        "HL"
+      ],
+      "keywords": [
+        "vector equation of a line",
+        "two lines l 1 and l 2",
+        "lines intersect",
+        "angle between two lines",
+        "intersection of vector lines",
+        "direction vector",
+        "line along which it travels"
+      ],
+      "concepts": [
+        "vector equations of lines"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 3.12",
+      "title": "Vector applications to kinematics",
+      "parent": "3. Geometry and trigonometry",
+      "level": [
+        "HL"
+      ],
+      "keywords": [
+        "vector kinematics",
+        "velocity vector",
+        "acceleration vector",
+        "position vector"
+      ],
+      "concepts": [
+        "vector applications to kinematics"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 3.13",
+      "title": "Scalar and vector products",
+      "parent": "3. Geometry and trigonometry",
+      "level": [
+        "HL"
+      ],
+      "keywords": [
+        "scalar product",
+        "dot product",
+        "vector product",
+        "cross product",
+        "perpendicular vectors",
+        "hence find the area of the triangle"
+      ],
+      "concepts": [
+        "scalar and vector products"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 3.14",
+      "title": "Graph theory",
+      "parent": "3. Geometry and trigonometry",
+      "level": [
+        "HL"
+      ],
+      "keywords": [
+        "graph theory",
+        "vertex",
+        "edge",
+        "degree of a vertex",
+        "connected graph",
+        "weighted graph"
+      ],
+      "concepts": [
+        "graph theory"
+      ],
+      "exclusions": [
+        "voronoi diagram",
+        "adjacency matrix",
+        "minimum spanning tree",
+        "chinese postman",
+        "travelling salesman"
+      ],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 3.15",
+      "title": "Adjacency matrices and tables",
+      "parent": "3. Geometry and trigonometry",
+      "level": [
+        "HL"
+      ],
+      "keywords": [
+        "adjacency matrix",
+        "adjacency table",
+        "walk in a graph",
+        "subgraph"
+      ],
+      "concepts": [
+        "adjacency matrices and tables"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 3.16",
+      "title": "Graph algorithms and route optimization",
+      "parent": "3. Geometry and trigonometry",
+      "level": [
+        "HL"
+      ],
+      "keywords": [
+        "minimum spanning tree",
+        "kruskal",
+        "prim's algorithm",
+        "chinese postman",
+        "travelling salesman",
+        "traveling salesman",
+        "nearest neighbour algorithm"
+      ],
+      "concepts": [
+        "graph algorithms and route optimization"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 4.1",
+      "title": "Populations, samples and data",
+      "parent": "4. Statistics and probability",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "population",
+        "sample",
+        "random sample",
+        "discrete data",
+        "continuous data",
+        "sampling bias"
+      ],
+      "concepts": [
+        "populations, samples and data"
+      ],
+      "exclusions": [
+        "differential equation",
+        "phase portrait"
+      ],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 4.2",
+      "title": "Presentation of data",
+      "parent": "4. Statistics and probability",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "frequency table",
+        "histogram",
+        "cumulative frequency",
+        "box plot",
+        "box-and-whisker"
+      ],
+      "concepts": [
+        "presentation of data"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 4.3",
+      "title": "Measures of central tendency and dispersion",
+      "parent": "4. Statistics and probability",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "mean",
+        "median",
+        "mode",
+        "standard deviation",
+        "variance",
+        "interquartile range"
+      ],
+      "concepts": [
+        "measures of central tendency and dispersion"
+      ],
+      "exclusions": [
+        "poisson distribution",
+        "normal distribution",
+        "random variable"
+      ],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 4.4",
+      "title": "Linear correlation and regression",
+      "parent": "4. Statistics and probability",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "pearson",
+        "correlation coefficient",
+        "scatter diagram",
+        "regression line",
+        "line of best fit"
+      ],
+      "concepts": [
+        "linear correlation and regression"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 4.5",
+      "title": "Probability concepts",
+      "parent": "4. Statistics and probability",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "sample space",
+        "relative frequency",
+        "complementary event",
+        "expected number of occurrences"
+      ],
+      "concepts": [
+        "probability concepts"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 4.6",
+      "title": "Combined and conditional probability",
+      "parent": "4. Statistics and probability",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "venn diagram",
+        "tree diagram",
+        "conditional probability",
+        "either the arts programme or the sciences programme",
+        "telling the truth or not",
+        "mutually exclusive",
+        "independent events"
+      ],
+      "concepts": [
+        "combined and conditional probability"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 4.7",
+      "title": "Discrete random variables",
+      "parent": "4. Statistics and probability",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "discrete random variable",
+        "probability distribution",
+        "expected value",
+        "game is fair",
+        "probability of knocking over"
+      ],
+      "concepts": [
+        "discrete random variables"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 4.8",
+      "title": "Binomial distribution",
+      "parent": "4. Statistics and probability",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "binomial distribution",
+        "binomial probability",
+        "mean of a binomial",
+        "variance of a binomial"
+      ],
+      "concepts": [
+        "binomial distribution"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 4.9",
+      "title": "Normal distribution",
+      "parent": "4. Statistics and probability",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "normal distribution",
+        "normal curve",
+        "inverse normal",
+        "normal probability"
+      ],
+      "concepts": [
+        "normal distribution"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 4.10",
+      "title": "Spearman rank correlation",
+      "parent": "4. Statistics and probability",
+      "level": [
+        "HL"
+      ],
+      "keywords": [
+        "spearman",
+        "rank correlation",
+        "ranked data"
+      ],
+      "concepts": [
+        "spearman rank correlation"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 4.11",
+      "title": "Chi-square tests",
+      "parent": "4. Statistics and probability",
+      "level": [
+        "HL"
+      ],
+      "keywords": [
+        "chi-square",
+        "chi squared",
+        "goodness of fit",
+        "test for independence",
+        "expected frequency"
+      ],
+      "concepts": [
+        "chi-square tests"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 4.12",
+      "title": "Data collection and reliability",
+      "parent": "4. Statistics and probability",
+      "level": [
+        "HL"
+      ],
+      "keywords": [
+        "reliability",
+        "validity",
+        "sampling technique",
+        "outlier",
+        "data collection"
+      ],
+      "concepts": [
+        "data collection and reliability"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 4.13",
+      "title": "Non-linear regression",
+      "parent": "4. Statistics and probability",
+      "level": [
+        "HL"
+      ],
+      "keywords": [
+        "non-linear regression",
+        "nonlinear regression",
+        "coefficient of determination",
+        "residual plot"
+      ],
+      "concepts": [
+        "non-linear regression"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 4.14",
+      "title": "Linear transformations of random variables",
+      "parent": "4. Statistics and probability",
+      "level": [
+        "HL"
+      ],
+      "keywords": [
+        "linear transformation of a random variable",
+        "unbiased estimator",
+        "expectation of",
+        "variance of"
+      ],
+      "concepts": [
+        "linear transformations of random variables"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 4.15",
+      "title": "Central limit theorem",
+      "parent": "4. Statistics and probability",
+      "level": [
+        "HL"
+      ],
+      "keywords": [
+        "central limit theorem",
+        "sample mean distribution",
+        "sampling distribution"
+      ],
+      "concepts": [
+        "central limit theorem"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 4.16",
+      "title": "Confidence intervals",
+      "parent": "4. Statistics and probability",
+      "level": [
+        "HL"
+      ],
+      "keywords": [
+        "confidence interval",
+        "confidence level",
+        "population mean",
+        "population proportion"
+      ],
+      "concepts": [
+        "confidence intervals"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 4.17",
+      "title": "Poisson distribution",
+      "parent": "4. Statistics and probability",
+      "level": [
+        "HL"
+      ],
+      "keywords": [
+        "poisson distribution",
+        "poisson process",
+        "poisson probability"
+      ],
+      "concepts": [
+        "poisson distribution"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 4.18",
+      "title": "Hypothesis tests and errors",
+      "parent": "4. Statistics and probability",
+      "level": [
+        "HL"
+      ],
+      "keywords": [
+        "hypothesis test",
+        "t-test",
+        "z-test",
+        "type i error",
+        "type ii error",
+        "p-value",
+        "significance level"
+      ],
+      "concepts": [
+        "hypothesis tests and errors"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 4.19",
+      "title": "Transition matrices and Markov chains",
+      "parent": "4. Statistics and probability",
+      "level": [
+        "HL"
+      ],
+      "keywords": [
+        "transition matrix",
+        "markov chain",
+        "steady state",
+        "state vector",
+        "transition diagram"
+      ],
+      "concepts": [
+        "transition matrices and markov chains"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 5.1",
+      "title": "Limits and rates of change",
+      "parent": "5. Calculus",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "limit",
+        "rate of change",
+        "gradient function",
+        "derivative interpreted"
+      ],
+      "concepts": [
+        "limits and rates of change"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 5.2",
+      "title": "Increasing and decreasing functions",
+      "parent": "5. Calculus",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "increasing function",
+        "decreasing function",
+        "derivative positive",
+        "derivative negative"
+      ],
+      "concepts": [
+        "increasing and decreasing functions"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 5.3",
+      "title": "Derivatives of power functions",
+      "parent": "5. Calculus",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "differentiate",
+        "derivative",
+        "power rule",
+        "gradient function"
+      ],
+      "concepts": [
+        "derivatives of power functions"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 5.4",
+      "title": "Tangents and normals",
+      "parent": "5. Calculus",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "tangent",
+        "normal to the curve",
+        "equation of the normal",
+        "equation of the tangent"
+      ],
+      "concepts": [
+        "tangents and normals"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 5.5",
+      "title": "Introduction to integration",
+      "parent": "5. Calculus",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "anti-differentiation",
+        "antiderivative",
+        "definite integral",
+        "area under the curve"
+      ],
+      "concepts": [
+        "introduction to integration"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 5.6",
+      "title": "Stationary points",
+      "parent": "5. Calculus",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "stationary point",
+        "local maximum",
+        "local minimum",
+        "turning point"
+      ],
+      "concepts": [
+        "stationary points"
+      ],
+      "exclusions": [
+        "slope field",
+        "differential equation"
+      ],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 5.7",
+      "title": "Optimization",
+      "parent": "5. Calculus",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "optimization",
+        "optimisation",
+        "maximize",
+        "minimize",
+        "maximum volume",
+        "minimum cost",
+        "minimize the area",
+        "minimum area",
+        "minimum possible area"
+      ],
+      "concepts": [
+        "optimization"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 5.8",
+      "title": "Trapezoidal rule",
+      "parent": "5. Calculus",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "trapezoidal rule",
+        "trapezium rule",
+        "numerical area"
+      ],
+      "concepts": [
+        "trapezoidal rule"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 5.9",
+      "title": "Derivative rules and standard functions",
+      "parent": "5. Calculus",
+      "level": [
+        "HL"
+      ],
+      "keywords": [
+        "chain rule",
+        "product rule",
+        "quotient rule",
+        "derivative of sine",
+        "derivative of exponential",
+        "derivative of logarithm"
+      ],
+      "concepts": [
+        "derivative rules and standard functions"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 5.10",
+      "title": "Second derivatives and classification",
+      "parent": "5. Calculus",
+      "level": [
+        "HL"
+      ],
+      "keywords": [
+        "second derivative",
+        "second derivative test",
+        "point of inflexion",
+        "concavity"
+      ],
+      "concepts": [
+        "second derivatives and classification"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 5.11",
+      "title": "Advanced integration methods",
+      "parent": "5. Calculus",
+      "level": [
+        "HL"
+      ],
+      "keywords": [
+        "indefinite integral",
+        "reverse chain rule",
+        "integration by substitution",
+        "substitution in integration"
+      ],
+      "concepts": [
+        "advanced integration methods"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 5.12",
+      "title": "Areas and volumes of revolution",
+      "parent": "5. Calculus",
+      "level": [
+        "HL"
+      ],
+      "keywords": [
+        "area between curves",
+        "volume of revolution",
+        "rotation about the x-axis",
+        "rotation about the y-axis",
+        "rotating the graph",
+        "calculate its volume"
+      ],
+      "concepts": [
+        "areas and volumes of revolution"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 5.13",
+      "title": "Kinematics",
+      "parent": "5. Calculus",
+      "level": [
+        "HL"
+      ],
+      "keywords": [
+        "displacement",
+        "velocity",
+        "acceleration",
+        "total distance travelled",
+        "kinematic"
+      ],
+      "concepts": [
+        "kinematics"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 5.14",
+      "title": "Separable differential equations",
+      "parent": "5. Calculus",
+      "level": [
+        "HL"
+      ],
+      "keywords": [
+        "differential equation",
+        "separation of variables",
+        "separable"
+      ],
+      "concepts": [
+        "separable differential equations"
+      ],
+      "exclusions": [
+        "slope field"
+      ],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 5.15",
+      "title": "Slope fields",
+      "parent": "5. Calculus",
+      "level": [
+        "HL"
+      ],
+      "keywords": [
+        "slope field",
+        "direction field",
+        "isocline",
+        "solution curve"
+      ],
+      "concepts": [
+        "slope fields"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 5.16",
+      "title": "Euler's method for first-order equations",
+      "parent": "5. Calculus",
+      "level": [
+        "HL"
+      ],
+      "keywords": [
+        "euler's method",
+        "euler method",
+        "first-order differential equation",
+        "numerical solution"
+      ],
+      "concepts": [
+        "euler's method for first-order equations"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 5.17",
+      "title": "Phase portraits",
+      "parent": "5. Calculus",
+      "level": [
+        "HL"
+      ],
+      "keywords": [
+        "phase portrait",
+        "phase plane",
+        "equilibrium point",
+        "trajectory"
+      ],
+      "concepts": [
+        "phase portraits"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    },
+    {
+      "code": "AI 5.18",
+      "title": "Euler's method for second-order equations",
+      "parent": "5. Calculus",
+      "level": [
+        "HL"
+      ],
+      "keywords": [
+        "second-order differential equation",
+        "euler method for second order",
+        "coupled first-order equations"
+      ],
+      "concepts": [
+        "euler's method for second-order equations"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": []
+    }
   ]
 }

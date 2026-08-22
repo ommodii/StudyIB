@@ -1,0 +1,935 @@
+{
+  "subject": "business",
+  "course": null,
+  "curriculum_version": "DP Business management, first assessment 2024 with legacy mapping from the 2016 course",
+  "first_assessment": 2024,
+  "sources": [
+    {
+      "title": "IB Business management guide",
+      "url": "https://www.ibo.org/globalassets/new-structure/university-admission/pdfs/subject-guides/business-management-guide.pdf"
+    }
+  ],
+  "topics": [
+    {
+      "code": "BM 1.1",
+      "title": "What is a business?",
+      "parent": "Unit 1. Introduction to business management",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "business activity",
+        "business sector",
+        "primary sector",
+        "secondary sector",
+        "tertiary sector",
+        "entrepreneurship",
+        "starting the business",
+        "start a business"
+      ],
+      "concepts": [
+        "what is a business?"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "nature of business activity"
+      ]
+    },
+    {
+      "code": "BM 1.2",
+      "title": "Types of business entities",
+      "parent": "Unit 1. Introduction to business management",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "sole trader",
+        "partnership",
+        "private limited",
+        "public limited",
+        "cooperative",
+        "social enterprise",
+        "franchise",
+        "microfinance provider"
+      ],
+      "concepts": [
+        "types of business entities"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "types of organizations",
+        "types of organisation"
+      ]
+    },
+    {
+      "code": "BM 1.3",
+      "title": "Business objectives",
+      "parent": "Unit 1. Introduction to business management",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "business objective",
+        "mission statement",
+        "vision statement",
+        "ethical objective",
+        "ethical issue",
+        "ethical issues",
+        "business ethics",
+        "ethics on organizational strategy",
+        "ethics on organisational strategy",
+        "ethics on organizational change",
+        "ethics on organisational change",
+        "organizational ethics",
+        "organisational ethics",
+        "corporate social responsibility",
+        "csr"
+      ],
+      "concepts": [
+        "business objectives"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "organizational objectives",
+        "organisation objectives"
+      ]
+    },
+    {
+      "code": "BM 1.4",
+      "title": "Stakeholders",
+      "parent": "Unit 1. Introduction to business management",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "stakeholder",
+        "shareholder",
+        "stakeholder conflict",
+        "internal stakeholder",
+        "external stakeholder"
+      ],
+      "concepts": [
+        "stakeholders"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "stakeholders"
+      ]
+    },
+    {
+      "code": "BM 1.5",
+      "title": "Growth and evolution",
+      "parent": "Unit 1. Introduction to business management",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "economies of scale",
+        "diseconomies of scale",
+        "organic growth",
+        "internal growth",
+        "external growth",
+        "merger",
+        "acquisition",
+        "joint venture",
+        "strategic alliance"
+      ],
+      "concepts": [
+        "growth and evolution"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "organizational growth and evolution",
+        "globalization"
+      ]
+    },
+    {
+      "code": "BM 1.6",
+      "title": "Multinational companies",
+      "parent": "Unit 1. Introduction to business management",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "multinational company",
+        "multinational corporation",
+        "mnc",
+        "foreign direct investment",
+        "global company"
+      ],
+      "concepts": [
+        "multinational companies"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "multinational companies"
+      ]
+    },
+    {
+      "code": "BM 2.1",
+      "title": "Introduction to human resource management",
+      "parent": "Unit 2. Human resource management",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "human resource management",
+        "human resource planning",
+        "workforce planning",
+        "recruitment",
+        "training",
+        "dismissal",
+        "dismiss",
+        "redundancy",
+        "labour turnover"
+      ],
+      "concepts": [
+        "introduction to human resource management"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "human resource planning"
+      ]
+    },
+    {
+      "code": "BM 2.2",
+      "title": "Organizational structure",
+      "parent": "Unit 2. Human resource management",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "organizational structure",
+        "organisation structure",
+        "span of control",
+        "chain of command",
+        "delegation",
+        "centralization",
+        "decentralization",
+        "matrix structure"
+      ],
+      "concepts": [
+        "organizational structure"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "organizational structure"
+      ]
+    },
+    {
+      "code": "BM 2.3",
+      "title": "Leadership and management",
+      "parent": "Unit 2. Human resource management",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "leadership style",
+        "autocratic",
+        "democratic",
+        "paternalistic",
+        "laissez-faire",
+        "management style",
+        "functions of management"
+      ],
+      "concepts": [
+        "leadership and management"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "leadership and management"
+      ]
+    },
+    {
+      "code": "BM 2.4",
+      "title": "Motivation and demotivation",
+      "parent": "Unit 2. Human resource management",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "motivation",
+        "demotivation",
+        "maslow",
+        "herzberg",
+        "taylor",
+        "non-financial reward",
+        "financial reward"
+      ],
+      "concepts": [
+        "motivation and demotivation"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "motivation"
+      ]
+    },
+    {
+      "code": "BM 2.5",
+      "title": "Organizational culture",
+      "parent": "Unit 2. Human resource management",
+      "level": [
+        "HL"
+      ],
+      "keywords": [
+        "organizational culture",
+        "organisation culture",
+        "culture clash",
+        "cultural change",
+        "culture can promote",
+        "culture can inhibit",
+        "culture on organizational ethics",
+        "culture on organisational ethics",
+        "impact of culture"
+      ],
+      "concepts": [
+        "organizational culture"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "organizational culture"
+      ]
+    },
+    {
+      "code": "BM 2.6",
+      "title": "Communication",
+      "parent": "Unit 2. Human resource management",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "communication",
+        "communication barrier",
+        "formal communication",
+        "informal communication",
+        "communication method"
+      ],
+      "concepts": [
+        "communication"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "communication"
+      ]
+    },
+    {
+      "code": "BM 2.7",
+      "title": "Industrial and employee relations",
+      "parent": "Unit 2. Human resource management",
+      "level": [
+        "HL"
+      ],
+      "keywords": [
+        "industrial relations",
+        "employee relations",
+        "trade union",
+        "collective bargaining",
+        "industrial action",
+        "strike",
+        "conciliation",
+        "arbitration"
+      ],
+      "concepts": [
+        "industrial and employee relations"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "industrial/employee relations"
+      ]
+    },
+    {
+      "code": "BM 3.1",
+      "title": "Introduction to finance",
+      "parent": "Unit 3. Finance and accounts",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "finance function",
+        "financial objective",
+        "capital expenditure",
+        "revenue expenditure"
+      ],
+      "concepts": [
+        "introduction to finance"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "sources of finance"
+      ]
+    },
+    {
+      "code": "BM 3.2",
+      "title": "Sources of finance",
+      "parent": "Unit 3. Finance and accounts",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "source of finance",
+        "external finance",
+        "share capital",
+        "loan capital",
+        "overdraft",
+        "trade credit",
+        "venture capital",
+        "retained profit",
+        "leasing"
+      ],
+      "concepts": [
+        "sources of finance"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "sources of finance"
+      ]
+    },
+    {
+      "code": "BM 3.3",
+      "title": "Costs and revenues",
+      "parent": "Unit 3. Finance and accounts",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "fixed cost",
+        "variable cost",
+        "total cost",
+        "revenue",
+        "contribution",
+        "contribution per unit"
+      ],
+      "concepts": [
+        "costs and revenues"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "costs and revenues"
+      ]
+    },
+    {
+      "code": "BM 3.4",
+      "title": "Final accounts",
+      "parent": "Unit 3. Finance and accounts",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "profit and loss account",
+        "income statement",
+        "balance sheet",
+        "statement of financial position",
+        "gross profit",
+        "net profit",
+        "depreciation"
+      ],
+      "concepts": [
+        "final accounts"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "final accounts"
+      ]
+    },
+    {
+      "code": "BM 3.5",
+      "title": "Profitability and liquidity ratio analysis",
+      "parent": "Unit 3. Finance and accounts",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "gross profit margin",
+        "profit margin",
+        "return on capital employed",
+        "current ratio",
+        "acid test ratio",
+        "liquidity ratio"
+      ],
+      "concepts": [
+        "profitability and liquidity ratio analysis"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "profitability and liquidity ratio analysis"
+      ]
+    },
+    {
+      "code": "BM 3.6",
+      "title": "Debt and equity ratio analysis",
+      "parent": "Unit 3. Finance and accounts",
+      "level": [
+        "HL"
+      ],
+      "keywords": [
+        "gearing ratio",
+        "debt to equity",
+        "debt-equity ratio",
+        "highly geared",
+        "debt finance"
+      ],
+      "concepts": [
+        "debt and equity ratio analysis"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "efficiency ratio analysis"
+      ]
+    },
+    {
+      "code": "BM 3.7",
+      "title": "Cash flow",
+      "parent": "Unit 3. Finance and accounts",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "cash flow",
+        "cash-flow forecast",
+        "cash inflow",
+        "cash outflow",
+        "working capital",
+        "cash shortage"
+      ],
+      "concepts": [
+        "cash flow"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "cash flow"
+      ]
+    },
+    {
+      "code": "BM 3.8",
+      "title": "Investment appraisal",
+      "parent": "Unit 3. Finance and accounts",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "payback period",
+        "average rate of return",
+        "arr",
+        "net present value",
+        "npv",
+        "discounted cash flow"
+      ],
+      "concepts": [
+        "investment appraisal"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "investment appraisal"
+      ]
+    },
+    {
+      "code": "BM 3.9",
+      "title": "Budgets",
+      "parent": "Unit 3. Finance and accounts",
+      "level": [
+        "HL"
+      ],
+      "keywords": [
+        "budget",
+        "variance analysis",
+        "favourable variance",
+        "adverse variance",
+        "cost centre",
+        "profit centre"
+      ],
+      "concepts": [
+        "budgets"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "budgets"
+      ]
+    },
+    {
+      "code": "BM 4.1",
+      "title": "Introduction to marketing",
+      "parent": "Unit 4. Marketing",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "market orientation",
+        "product orientation",
+        "market share",
+        "market growth",
+        "commercial marketing",
+        "social marketing",
+        "unique selling point",
+        "usp"
+      ],
+      "concepts": [
+        "introduction to marketing"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "the role of marketing"
+      ]
+    },
+    {
+      "code": "BM 4.2",
+      "title": "Marketing planning",
+      "parent": "Unit 4. Marketing",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "marketing plan",
+        "marketing strategy",
+        "marketing strategies",
+        "marketing objective",
+        "segmentation",
+        "target market",
+        "positioning",
+        "market map",
+        "marketing mix"
+      ],
+      "concepts": [
+        "marketing planning"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "marketing planning"
+      ]
+    },
+    {
+      "code": "BM 4.3",
+      "title": "Sales forecasting",
+      "parent": "Unit 4. Marketing",
+      "level": [
+        "HL"
+      ],
+      "keywords": [
+        "sales forecast",
+        "moving average",
+        "seasonal variation",
+        "trend line",
+        "extrapolation"
+      ],
+      "concepts": [
+        "sales forecasting"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "sales forecasting"
+      ]
+    },
+    {
+      "code": "BM 4.4",
+      "title": "Market research",
+      "parent": "Unit 4. Marketing",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "market research",
+        "primary research",
+        "secondary research",
+        "questionnaire",
+        "focus group",
+        "sampling method",
+        "methods of sampling"
+      ],
+      "concepts": [
+        "market research"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "market research"
+      ]
+    },
+    {
+      "code": "BM 4.5",
+      "title": "The seven Ps of the marketing mix",
+      "parent": "Unit 4. Marketing",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "product life cycle",
+        "branding",
+        "pricing strategy",
+        "promotion",
+        "place",
+        "people",
+        "process",
+        "physical evidence",
+        "seven ps",
+        "marketing mix"
+      ],
+      "concepts": [
+        "the seven ps of the marketing mix"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "the four Ps",
+        "marketing mix"
+      ]
+    },
+    {
+      "code": "BM 4.6",
+      "title": "International marketing",
+      "parent": "Unit 4. Marketing",
+      "level": [
+        "HL"
+      ],
+      "keywords": [
+        "international marketing",
+        "global marketing",
+        "standardization",
+        "standardisation",
+        "adaptation strategy",
+        "cultural difference"
+      ],
+      "concepts": [
+        "international marketing"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "international marketing",
+        "e-commerce"
+      ]
+    },
+    {
+      "code": "BM 5.1",
+      "title": "Introduction to operations management",
+      "parent": "Unit 5. Operations management",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "operations management",
+        "production process",
+        "inputs outputs",
+        "added value",
+        "sustainability"
+      ],
+      "concepts": [
+        "introduction to operations management"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "the role of operations management"
+      ]
+    },
+    {
+      "code": "BM 5.2",
+      "title": "Operations methods",
+      "parent": "Unit 5. Operations management",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "job production",
+        "customized production",
+        "customised production",
+        "batch production",
+        "mass production",
+        "cell production",
+        "labour intensive",
+        "capital intensive"
+      ],
+      "concepts": [
+        "operations methods"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "production methods"
+      ]
+    },
+    {
+      "code": "BM 5.3",
+      "title": "Lean production and quality management",
+      "parent": "Unit 5. Operations management",
+      "level": [
+        "HL"
+      ],
+      "keywords": [
+        "lean production",
+        "just in time",
+        "jit",
+        "kaizen",
+        "quality control",
+        "quality assurance",
+        "total quality management",
+        "tqm"
+      ],
+      "concepts": [
+        "lean production and quality management"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "lean production and quality management"
+      ]
+    },
+    {
+      "code": "BM 5.4",
+      "title": "Location",
+      "parent": "Unit 5. Operations management",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "location decision",
+        "two possible locations",
+        "relocate",
+        "re-location",
+        "offshoring",
+        "reshoring",
+        "outsourcing",
+        "outsource",
+        "location factor"
+      ],
+      "concepts": [
+        "location"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "location"
+      ]
+    },
+    {
+      "code": "BM 5.5",
+      "title": "Break-even analysis",
+      "parent": "Unit 5. Operations management",
+      "level": [
+        "SL",
+        "HL"
+      ],
+      "keywords": [
+        "break-even",
+        "breakeven",
+        "margin of safety",
+        "contribution",
+        "break-even chart"
+      ],
+      "concepts": [
+        "break-even analysis"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "break-even analysis"
+      ]
+    },
+    {
+      "code": "BM 5.6",
+      "title": "Production planning",
+      "parent": "Unit 5. Operations management",
+      "level": [
+        "HL"
+      ],
+      "keywords": [
+        "capacity utilization",
+        "capacity utilisation",
+        "stock control",
+        "inventory control",
+        "buffer stock",
+        "lead time",
+        "productivity"
+      ],
+      "concepts": [
+        "production planning"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "production planning"
+      ]
+    },
+    {
+      "code": "BM 5.7",
+      "title": "Crisis management and contingency planning",
+      "parent": "Unit 5. Operations management",
+      "level": [
+        "HL"
+      ],
+      "keywords": [
+        "crisis management",
+        "contingency planning",
+        "business continuity",
+        "crisis response"
+      ],
+      "concepts": [
+        "crisis management and contingency planning"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "crisis management and contingency planning"
+      ]
+    },
+    {
+      "code": "BM 5.8",
+      "title": "Research and development",
+      "parent": "Unit 5. Operations management",
+      "level": [
+        "HL"
+      ],
+      "keywords": [
+        "research and development",
+        "r&d",
+        "innovation",
+        "intellectual property",
+        "patent",
+        "copyright"
+      ],
+      "concepts": [
+        "research and development"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "research and development"
+      ]
+    },
+    {
+      "code": "BM 5.9",
+      "title": "Management information systems",
+      "parent": "Unit 5. Operations management",
+      "level": [
+        "HL"
+      ],
+      "keywords": [
+        "management information system",
+        "mis",
+        "data analytics",
+        "database",
+        "cybersecurity",
+        "information technology"
+      ],
+      "concepts": [
+        "management information systems"
+      ],
+      "exclusions": [],
+      "legacy_topic_mappings": [
+        "management information systems"
+      ]
+    }
+  ]
+}
