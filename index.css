@@ -3673,10 +3673,67 @@ body:has(.modal-overlay:not(.hidden)) .workspace-top-nav {
 .content-area,
 .list-pane { min-height: 0; }
 .papers-grid:has(.dojo-dashboard-content) {
+    position: relative;
+    isolation: isolate;
     min-height: 0;
     overflow-y: auto;
     overscroll-behavior-y: contain;
     -webkit-overflow-scrolling: touch;
+    background:
+        radial-gradient(circle at 18% 18%, color-mix(in srgb, var(--primary) 12%, transparent), transparent 28rem),
+        radial-gradient(circle at 82% 72%, color-mix(in srgb, var(--accent) 9%, transparent), transparent 24rem),
+        var(--background);
+}
+
+.papers-grid:has(.dojo-dashboard-content)::before,
+.papers-grid:has(.dojo-dashboard-content)::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    will-change: background-position;
+}
+
+.papers-grid:has(.dojo-dashboard-content)::before {
+    opacity: 0.36;
+    background-image: url("data:image/svg+xml,%3Csvg width='360' height='260' viewBox='0 0 360 260' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23818cf8' stroke-opacity='.34' stroke-width='1'%3E%3Cellipse cx='72' cy='76' rx='30' ry='10'/%3E%3Cellipse cx='72' cy='76' rx='30' ry='10' transform='rotate(60 72 76)'/%3E%3Cellipse cx='72' cy='76' rx='30' ry='10' transform='rotate(120 72 76)'/%3E%3C/g%3E%3Cg fill='%23a5b4fc' fill-opacity='.56'%3E%3Ccircle cx='72' cy='76' r='2.5'/%3E%3Ccircle cx='43' cy='70' r='1.5'/%3E%3Ccircle cx='86' cy='102' r='1.5'/%3E%3Ccircle cx='88' cy='50' r='1.5'/%3E%3C/g%3E%3Cg stroke='%236b7280' stroke-opacity='.2' stroke-width='1'%3E%3Cpath d='M188 48l42 25 38-18 45 38-22 48-55 8-35-30z'/%3E%3Cpath d='M230 73l6 76m32-94l-67 64m112-26l-87 56'/%3E%3C/g%3E%3Cg fill='%23c7d2fe' fill-opacity='.4'%3E%3Ccircle cx='188' cy='48' r='2'/%3E%3Ccircle cx='230' cy='73' r='2.5'/%3E%3Ccircle cx='268' cy='55' r='1.8'/%3E%3Ccircle cx='313' cy='93' r='2.2'/%3E%3Ccircle cx='291' cy='141' r='1.8'/%3E%3Ccircle cx='236' cy='149' r='2.3'/%3E%3Ccircle cx='201' cy='119' r='1.7'/%3E%3C/g%3E%3C/svg%3E");
+    background-size: 360px 260px;
+    animation: dashboard-network-drift 34s linear infinite alternate;
+}
+
+.papers-grid:has(.dojo-dashboard-content)::after {
+    opacity: 0.42;
+    background-image:
+        radial-gradient(circle, color-mix(in srgb, var(--primary) 75%, white) 0 1px, transparent 1.7px),
+        radial-gradient(circle, color-mix(in srgb, var(--accent) 55%, white) 0 1px, transparent 1.6px);
+    background-position: 0 0, 43px 61px;
+    background-size: 96px 96px, 137px 137px;
+    animation: dashboard-particle-drift 26s ease-in-out infinite alternate;
+}
+
+.papers-grid:has(.dojo-dashboard-content) > .dojo-top-row,
+.papers-grid:has(.dojo-dashboard-content) > .dojo-dashboard-content {
+    position: relative;
+    z-index: 1;
+}
+
+@keyframes dashboard-network-drift {
+    from { background-position: 0 0; }
+    to { background-position: 72px 36px; }
+}
+
+@keyframes dashboard-particle-drift {
+    from { background-position: 0 0, 43px 61px; }
+    to { background-position: -48px 38px, 91px 22px; }
+}
+
+[data-theme="light"] .papers-grid:has(.dojo-dashboard-content)::before { opacity: 0.19; }
+[data-theme="light"] .papers-grid:has(.dojo-dashboard-content)::after { opacity: 0.24; }
+
+@media (prefers-reduced-motion: reduce) {
+    .papers-grid:has(.dojo-dashboard-content)::before,
+    .papers-grid:has(.dojo-dashboard-content)::after { animation: none; }
 }
 
 .active-pet-companion {
