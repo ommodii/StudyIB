@@ -150,6 +150,30 @@ document.addEventListener('DOMContentLoaded', () => {
             syllabus: () => topicQuestionSyllabusData.math,
             papers: () => mathFullPapersData,
             practice: () => topicQuestionPracticeData.math
+        },
+        math_ai: {
+            label: 'Math AI HL',
+            icon: 'math_ai',
+            sidebarId: 'sidebarSubMathAi',
+            syllabus: () => additionalSubjectSyllabusData.math_ai,
+            papers: () => additionalSubjectFullPapersData.math_ai,
+            practice: () => additionalSubjectPracticeData.math_ai
+        },
+        economics: {
+            label: 'Economics HL',
+            icon: 'economics',
+            sidebarId: 'sidebarSubEconomics',
+            syllabus: () => additionalSubjectSyllabusData.economics,
+            papers: () => additionalSubjectFullPapersData.economics,
+            practice: () => additionalSubjectPracticeData.economics
+        },
+        business: {
+            label: 'Business Management HL',
+            icon: 'business',
+            sidebarId: 'sidebarSubBusiness',
+            syllabus: () => additionalSubjectSyllabusData.business,
+            papers: () => additionalSubjectFullPapersData.business,
+            practice: () => additionalSubjectPracticeData.business
         }
     };
 
@@ -824,7 +848,14 @@ document.addEventListener('DOMContentLoaded', () => {
         showContentHeader();
         renderPaperFilter();
         updateSidebarActiveState();
-        renderDashboard();
+        const hasSyllabus = Object.keys(getSyllabusData() || {}).length > 0;
+        if (hasSyllabus || subjectHasQuestionLevelContent()) {
+            renderDashboard();
+        } else {
+            currentMode = 'papers';
+            initNavigation();
+            renderPapersList();
+        }
     }
 
     function renderDojoHome() {
@@ -849,7 +880,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const xp = Number(gamificationState.xp) || 0;
         const dp = Number(gamificationState.dpPoints) || 0;
 
-        const buildSubjectProgress = (id, label, data) => {
+        const buildSubjectProgress = (id, label, data, papers) => {
             const questionIds = topicQuestionSubjects[id] || new Set();
             let topicCount = 0;
             let nextTopic = '';
@@ -872,15 +903,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             });
 
-            const completed = [...questionIds].filter(filepath => completedTopicQuestions.has(filepath)).length;
-            const total = questionIds.size;
+            const paperEntries = Object.values(papers || {}).flatMap(sessions => Object.values(sessions || {}).flat());
+            const isPaperLibrary = questionIds.size === 0 && paperEntries.length > 0;
+            const completed = isPaperLibrary
+                ? paperEntries.filter(entry => isQuestionCompleted(entry.qp_path)).length
+                : [...questionIds].filter(filepath => completedTopicQuestions.has(filepath)).length;
+            const total = isPaperLibrary ? paperEntries.length : questionIds.size;
+            const collectionCount = isPaperLibrary ? Object.keys(papers || {}).length : topicCount;
             return {
                 id,
                 label: label.replace(/\s+(HL|SL)$/i, ''),
-                topicCount,
+                topicCount: collectionCount,
                 total,
                 completed,
                 percent: total > 0 ? Math.round((completed / total) * 100) : 0,
+                isPaperLibrary,
                 nextTopic,
                 nextCategory,
                 searchEntries
@@ -888,7 +925,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         const subjectProgress = Object.entries(subjectConfigs).map(([id, config]) =>
-            buildSubjectProgress(id, config.label, config.practice())
+            buildSubjectProgress(id, config.label, config.practice(), config.papers())
         );
         const dashboardSearchEntries = subjectProgress.flatMap(subject => subject.searchEntries);
 
@@ -922,7 +959,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <section class="dashboard-subjects-section" aria-labelledby="dashboardSubjectsTitle">
                     <div class="dashboard-subjects-heading">
                         <div>
-                            <span class="dashboard-eyebrow">Topic question bank</span>
+                            <span class="dashboard-eyebrow">IB subject library</span>
                             <h1 id="dashboardSubjectsTitle">Choose a subject</h1>
                         </div>
                         <span class="dashboard-dataset-status">${topicQuestionBankMetadata.question_count.toLocaleString()} current questions</span>
@@ -930,7 +967,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     <div class="dashboard-subject-card-grid">
                         ${subjectProgress.map(subject => `
-                            <button type="button" class="dashboard-subject-card card" data-dashboard-subject="${subject.id}" aria-label="Open ${subject.label} topic questions, ${subject.completed} of ${subject.total} complete">
+                            <button type="button" class="dashboard-subject-card card" data-dashboard-subject="${subject.id}" aria-label="Open ${subject.label}, ${subject.completed} of ${subject.total} ${subject.isPaperLibrary ? 'papers' : 'questions'} complete">
                                 <div class="dashboard-subject-graphic ${subject.id}" aria-hidden="true">
                                     ${getWorkspaceIcon(subject.id)}
                                 </div>
@@ -942,8 +979,8 @@ document.addEventListener('DOMContentLoaded', () => {
                                     <span class="dashboard-subject-arrow">${getWorkspaceIcon('arrow')}</span>
                                 </div>
                                 <div class="dashboard-subject-metrics">
-                                    <div><strong>${subject.topicCount.toLocaleString()}</strong><span>Topics</span></div>
-                                    <div><strong>${subject.total.toLocaleString()}</strong><span>Questions</span></div>
+                                    <div><strong>${subject.topicCount.toLocaleString()}</strong><span>${subject.isPaperLibrary ? 'Years' : 'Topics'}</span></div>
+                                    <div><strong>${subject.total.toLocaleString()}</strong><span>${subject.isPaperLibrary ? 'Papers' : 'Questions'}</span></div>
                                     <div><strong>${subject.completed.toLocaleString()}</strong><span>Completed</span></div>
                                 </div>
                                 <div class="dashboard-subject-progress-summary">
@@ -1134,6 +1171,9 @@ document.addEventListener('DOMContentLoaded', () => {
             chemistry: '<path d="M9 3h6"></path><path d="M10 3v6.2l-5 8.3A2.3 2.3 0 0 0 7 21h10a2.3 2.3 0 0 0 2-3.5l-5-8.3V3"></path><path d="M8 15h8"></path>',
             biology: '<path d="M12 22c4.5-3.2 7-7.1 7-11.2C19 6 16.1 3 12 2 7.9 3 5 6 5 10.8 5 14.9 7.5 18.8 12 22z"></path><path d="M8.5 15c2.2-1.8 4.4-4.4 6.5-8"></path><path d="M9 10c1.5.1 2.7.6 3.6 1.5"></path>',
             math: '<path d="M18 4H7l5 8-5 8h11"></path><path d="M15 8h4M15 16h4"></path>',
+            math_ai: '<path d="M4 19V5"></path><path d="M4 19h16"></path><path d="m7 15 4-5 3 2 4-6"></path><circle cx="7" cy="15" r="1"></circle><circle cx="11" cy="10" r="1"></circle><circle cx="14" cy="12" r="1"></circle><circle cx="18" cy="6" r="1"></circle>',
+            economics: '<path d="M4 19V5"></path><path d="M4 19h16"></path><path d="m7 15 3-3 3 2 5-7"></path><path d="M15 7h3v3"></path>',
+            business: '<rect x="3" y="7" width="18" height="13" rx="2"></rect><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><path d="M3 12h18"></path><path d="M10 12v2h4v-2"></path>',
             syllabus: '<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H11v17H6.5A2.5 2.5 0 0 0 4 22z"></path><path d="M20 5.5A2.5 2.5 0 0 0 17.5 3H13v17h4.5A2.5 2.5 0 0 1 20 22z"></path>',
             topics: '<path d="m12 2 9 5-9 5-9-5z"></path><path d="m3 12 9 5 9-5"></path><path d="m3 17 9 5 9-5"></path>',
             papers: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path><path d="M8 13h8M8 17h8"></path>',

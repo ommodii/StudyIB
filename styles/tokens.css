@@ -107,6 +107,9 @@
     --chemistry: #34d399;
     --biology: #2dd4bf;
     --math: #fbbf24;
+    --math-ai: #c084fc;
+    --economics: #fb7185;
+    --business: #a78bfa;
     --document-background: #ffffff;
 
     --duration-fast: 120ms;
@@ -207,6 +210,9 @@
     --chemistry: #047857;
     --biology: #0f766e;
     --math: #a16207;
+    --math-ai: #7e22ce;
+    --economics: #be123c;
+    --business: #6d28d9;
 
     --bg-main: var(--background);
     --bg-sidebar: var(--sidebar);
@@ -236,10 +242,16 @@
 [data-color="chemistry"] { --subject-accent: var(--chemistry); }
 [data-color="biology"] { --subject-accent: var(--biology); }
 [data-color="math"] { --subject-accent: var(--math); }
+[data-color="math_ai"] { --subject-accent: var(--math-ai); }
+[data-color="economics"] { --subject-accent: var(--economics); }
+[data-color="business"] { --subject-accent: var(--business); }
 [data-color="physics"],
 [data-color="chemistry"],
 [data-color="biology"],
 [data-color="math"],
+[data-color="math_ai"],
+[data-color="economics"],
+[data-color="business"],
 [data-color="indigo"],
 [data-color="blue"],
 [data-color="green"],

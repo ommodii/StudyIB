@@ -1,11 +1,13 @@
 {
   "name": "ib-science-qbank",
   "version": "1.0.0",
-  "description": "IB Physics, Chemistry, Biology, and Mathematics study app",
+  "description": "IB study app for sciences, mathematics, economics, and business management",
   "author": "Om Modi",
   "license": "ISC",
   "scripts": {
-    "test": "node tests/test_gamification_ledger.js && node tests/test_account_progression.js",
+    "test": "node tests/test_gamification_ledger.js && node tests/test_account_progression.js && node tests/test_additional_subjects.js",
+    "build:additional-subjects": "node scripts/build_additional_subjects.js",
+    "upload:additional-subjects": "node scripts/upload_r2_manifest.js output/additional_subjects/web/upload_manifest.json 8",
     "build:topic-papers": "python -m scripts.topic_papers.cli --local-only",
     "build:question-production": "python -m scripts.topic_papers.production --subjects all --local-only",
     "build:question-web-data": "python -m scripts.topic_papers.build_web_dataset --version 2026-08-22-math-aa-v2 --corpus-root output/math_aa_rebuild/final --base-js topic_question_data.js",

@@ -15,6 +15,7 @@ const filesToCopy = [
     'radar_chart.js',
     'boundaries_data.js',
     'topic_question_data.js',
+    'additional_subjects_data.js',
     'data.js',
     'chemistry_data.js',
     'biology_data.js',
