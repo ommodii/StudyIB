@@ -2,7 +2,7 @@ const CACHE_VERSION = 'studyib-shell-v13';
 const APP_SHELL = [
     '/',
     '/index.html',
-    '/index.css?v=2.0.8',
+    '/index.css?v=2.0.9',
     '/atom.css?v=1.1.0',
     '/styles/tokens.css?v=2.0.0',
     '/styles/base.css?v=1.1.0',
