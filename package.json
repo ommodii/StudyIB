@@ -5,7 +5,7 @@
   "author": "Om Modi",
   "license": "ISC",
   "scripts": {
-    "test": "node tests/test_gamification_ledger.js && node tests/test_account_progression.js && node tests/test_additional_subjects.js && node tests/test_expanded_topicals.js",
+    "test": "node tests/test_gamification_ledger.js && node tests/test_account_progression.js && node tests/test_additional_subjects.js && node tests/test_expanded_topicals.js && node tests/test_worksheet_generator.js",
     "build:additional-subjects": "node scripts/build_additional_subjects.js",
     "upload:additional-subjects": "node scripts/upload_r2_manifest.js output/additional_subjects/web/upload_manifest.json 8",
     "build:topic-papers": "python -m scripts.topic_papers.cli --local-only",
@@ -19,6 +19,7 @@
   "dependencies": {
     "@capacitor/core": "^8.4.1",
     "@capacitor/filesystem": "^8.1.2",
-    "@supabase/supabase-js": "2.111.0"
+    "@supabase/supabase-js": "2.111.0",
+    "pdf-lib": "1.17.1"
   }
 }

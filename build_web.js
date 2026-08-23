@@ -12,6 +12,7 @@ const filesToCopy = [
     'app.js',
     'atom.js',
     'gamification.js',
+    'worksheet_generator.js',
     'radar_chart.js',
     'boundaries_data.js',
     'topic_question_data.js',
@@ -59,8 +60,12 @@ if (fs.existsSync(destDir)) {
 fs.mkdirSync(destDir, { recursive: true });
 
 const supabaseBrowserBundle = path.join(srcDir, 'node_modules', '@supabase', 'supabase-js', 'dist', 'umd', 'supabase.js');
+const pdfLibBrowserBundle = path.join(srcDir, 'node_modules', 'pdf-lib', 'dist', 'pdf-lib.min.js');
 if (!fs.existsSync(supabaseBrowserBundle)) {
     throw new Error('Missing pinned @supabase/supabase-js browser bundle. Run npm install first.');
+}
+if (!fs.existsSync(pdfLibBrowserBundle)) {
+    throw new Error('Missing pinned pdf-lib browser bundle. Run npm install first.');
 }
 
 console.log("Building web assets for Capacitor...");
@@ -89,5 +94,7 @@ for (let folder of foldersToCopy) {
 
 copyFileSync(supabaseBrowserBundle, path.join(destDir, 'vendor', 'supabase.js'));
 console.log('Copied pinned Supabase browser client');
+copyFileSync(pdfLibBrowserBundle, path.join(destDir, 'vendor', 'pdf-lib.min.js'));
+console.log('Copied pinned pdf-lib browser client');
 
 console.log("Web build completed successfully! Output directory: www/");

@@ -1542,6 +1542,218 @@ body {
     max-width: 520px;
 }
 
+/* =============================================
+   PRINTABLE WORKSHEET GENERATOR
+   ============================================= */
+.worksheet-modal-content {
+    width: min(100%, 52rem);
+    max-width: 52rem;
+}
+
+.worksheet-dialog-description,
+.worksheet-help {
+    margin: var(--space-1) 0 0;
+    color: var(--muted-foreground);
+    font-size: var(--text-xs);
+    line-height: 1.45;
+}
+
+.worksheet-form,
+.worksheet-primary-fields,
+.worksheet-control-grid {
+    display: grid;
+    gap: var(--space-4);
+}
+
+.worksheet-primary-fields {
+    grid-template-columns: minmax(12rem, .8fr) minmax(16rem, 1.6fr);
+}
+
+.worksheet-control-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: var(--space-4);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface-1);
+}
+
+.worksheet-label-row,
+.worksheet-topics-header,
+.worksheet-status-row,
+.worksheet-result,
+.worksheet-result-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+}
+
+.worksheet-label-row output {
+    color: var(--primary);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+}
+
+.worksheet-topics-field {
+    min-width: 0;
+}
+
+.worksheet-topic-actions,
+.worksheet-result-actions {
+    display: flex;
+    flex: 0 0 auto;
+    gap: var(--space-2);
+}
+
+.worksheet-topics {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-3);
+    max-height: min(19rem, 38dvh);
+    margin-top: var(--space-3);
+    padding: var(--space-1) var(--space-2) var(--space-1) 0;
+    overflow-y: auto;
+}
+
+.worksheet-topic-group {
+    align-self: start;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--surface-1);
+}
+
+.worksheet-topic-group-title {
+    padding: var(--space-3);
+    border-bottom: 1px solid var(--border);
+    color: var(--foreground);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-semibold);
+}
+
+.worksheet-topic-option {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-3);
+    color: var(--secondary-foreground);
+    cursor: pointer;
+}
+
+.worksheet-topic-option + .worksheet-topic-option {
+    border-top: 1px solid var(--border);
+}
+
+.worksheet-topic-option:hover {
+    background: var(--surface-hover);
+}
+
+.worksheet-topic-option input,
+.worksheet-option input {
+    flex: 0 0 auto;
+    margin-top: .15rem;
+    accent-color: var(--primary);
+}
+
+.worksheet-topic-option span,
+.worksheet-option span {
+    display: grid;
+    min-width: 0;
+    gap: var(--space-1);
+}
+
+.worksheet-topic-option strong,
+.worksheet-option strong {
+    color: var(--foreground);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-medium);
+    line-height: 1.35;
+}
+
+.worksheet-topic-option small,
+.worksheet-option small {
+    color: var(--muted-foreground);
+    font-size: .68rem;
+}
+
+.worksheet-options {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-3);
+}
+
+.worksheet-option {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--surface-1);
+    cursor: pointer;
+}
+
+.worksheet-status,
+.worksheet-result {
+    padding: var(--space-3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--surface-1);
+    color: var(--secondary-foreground);
+    font-size: var(--text-xs);
+}
+
+.worksheet-status.error {
+    border-color: var(--destructive);
+    color: var(--destructive);
+}
+
+.worksheet-status .progress {
+    height: .35rem;
+    margin-top: var(--space-2);
+}
+
+.worksheet-result > div:first-child {
+    display: grid;
+    gap: var(--space-1);
+}
+
+.worksheet-result strong {
+    color: var(--foreground);
+    font-size: var(--text-sm);
+}
+
+.worksheet-result span {
+    color: var(--muted-foreground);
+}
+
+.worksheet-generate-btn {
+    width: 100%;
+}
+
+@media (max-width: 680px) {
+    .worksheet-primary-fields,
+    .worksheet-control-grid,
+    .worksheet-topics,
+    .worksheet-options {
+        grid-template-columns: 1fr;
+    }
+
+    .worksheet-topics-header,
+    .worksheet-result {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .worksheet-result-actions {
+        width: 100%;
+    }
+
+    .worksheet-result-actions .button {
+        flex: 1;
+    }
+}
+
 .mock-config-group {
     margin-bottom: 1.25rem;
 }
@@ -3974,6 +4186,7 @@ body:has(.modal-overlay:not(.hidden)) .workspace-top-nav {
 }
 .shop-modal-content,
 .mock-modal-content { width: min(100%, 34rem); max-width: 34rem; }
+.dialog.worksheet-modal-content { width: min(100%, 52rem); max-width: 52rem; }
 .predictor-modal-content { width: min(100%, 30rem); max-width: 30rem; }
 .modal-header {
     padding: var(--space-4) var(--space-5);

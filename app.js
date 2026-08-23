@@ -1,4 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Shared read-only dataset access for standalone browser tools such as the worksheet generator.
+    window.StudyIBTopicQuestionData = topicQuestionPracticeData;
     // --- Node Filesystem Integration ---
     let fs = null;
     let path = null;
@@ -788,6 +790,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function initDojoLayout() {
         const sidebarHome = document.getElementById('sidebarHome');
         const sidebarMock = document.getElementById('sidebarMock');
+        const sidebarWorksheet = document.getElementById('sidebarWorksheet');
         const sidebarReviews = document.getElementById('sidebarReviews');
         const sidebarAtom = document.getElementById('sidebarAtom');
 
@@ -814,6 +817,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (sidebarMock) {
             sidebarMock.addEventListener('click', () => {
                 openMockGeneratorModal();
+            });
+        }
+
+        if (sidebarWorksheet) {
+            sidebarWorksheet.addEventListener('click', () => {
+                window.StudyIBWorksheet?.open?.();
             });
         }
 
