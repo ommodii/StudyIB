@@ -3,6 +3,8 @@ const {
     parsePageCount,
     estimateQuestionDifficulty,
     matchesDifficulty,
+    normalizeWorksheetPageText,
+    shouldKeepWorksheetPage,
     flattenSubjectData,
     selectRandomQuestions
 } = require('../worksheet_generator.js');
@@ -16,6 +18,11 @@ assert.strictEqual(estimateQuestionDifficulty({ pages: '2-3', paper_type: 'P2' }
 assert.strictEqual(estimateQuestionDifficulty({ pages: '2-5', paper_type: 'P1' }), 5, 'long questions should remain extended regardless of paper');
 assert(matchesDifficulty({ pages: '1-1', paper_type: 'P1' }, 1), 'quick filter should include short Paper 1 questions');
 assert(!matchesDifficulty({ pages: '1-4', paper_type: 'P2' }, 1), 'quick filter should exclude long questions');
+
+assert.strictEqual(normalizeWorksheetPageText('– 19 –   8825–6707'), '', 'page numbers and exam codes should not count as question content');
+assert.strictEqual(shouldKeepWorksheetPage({ width: 595, height: 72, text: '– 19 – 8825–6707' }), false, 'thin footer-only crop strips should be rejected');
+assert.strictEqual(shouldKeepWorksheetPage({ width: 595, height: 155, text: '35. An alternating current generator rotates 300 times. A. 2 Hz B. 3 Hz C. 4 Hz D. 5 Hz' }), true, 'short real MCQ slices must be retained');
+assert.strictEqual(shouldKeepWorksheetPage({ width: 595, height: 842, text: '' }), true, 'full-size diagram or image pages must be retained conservatively');
 
 const fixture = {
     'Theme A': {

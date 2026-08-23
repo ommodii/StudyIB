@@ -46,6 +46,55 @@
         return true;
     }
 
+    function normalizeWorksheetPageText(text) {
+        return String(text || '')
+            .replace(/\b\d{4}\s*[-–—]\s*\d{4}\b/g, ' ')
+            .replace(/\bturn\s+over\b/gi, ' ')
+            .replace(/[-–—]\s*\d{1,3}\s*[-–—]/g, ' ')
+            .replace(/\bpage\s+\d+(?:\s+of\s+\d+)?\b/gi, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+    }
+
+    function shouldKeepWorksheetPage({ width, height, text }) {
+        const safeWidth = Math.max(1, Number(width) || 1);
+        const aspectRatio = (Number(height) || 0) / safeWidth;
+        const meaningfulText = normalizeWorksheetPageText(text);
+        const meaningfulCharacters = meaningfulText.replace(/[^A-Za-z0-9]/g, '').length;
+
+        // Question slices retain the source-page width. Stray detector fragments are
+        // characteristically very shallow and contain only a footer/page identifier.
+        if (aspectRatio < 0.2 && meaningfulCharacters < 80) return false;
+        if (aspectRatio < 0.32 && meaningfulCharacters < 24) return false;
+        return true;
+    }
+
+    async function getUsablePageIndices(sourceBytes, sourcePdf) {
+        const pages = sourcePdf.getPages();
+        const analyses = pages.map(page => ({ ...page.getSize(), text: '' }));
+        const pdfjs = globalScope.pdfjsLib;
+
+        if (pdfjs?.getDocument) {
+            let textDocument = null;
+            try {
+                textDocument = await pdfjs.getDocument({ data: sourceBytes.slice() }).promise;
+                for (let index = 0; index < textDocument.numPages && index < analyses.length; index += 1) {
+                    const page = await textDocument.getPage(index + 1);
+                    const content = await page.getTextContent();
+                    analyses[index].text = content.items.map(item => item.str || '').join(' ');
+                }
+            } catch (error) {
+                console.warn('Worksheet page-quality text scan unavailable; using geometric checks.', error);
+            } finally {
+                await textDocument?.destroy?.();
+            }
+        }
+
+        return analyses
+            .map((analysis, index) => shouldKeepWorksheetPage(analysis) ? index : -1)
+            .filter(index => index >= 0);
+    }
+
     function flattenSubjectData(subjectData, selectedTopicKeys, difficultyPreference) {
         const selected = selectedTopicKeys instanceof Set ? selectedTopicKeys : new Set(selectedTopicKeys || []);
         const unique = new Map();
@@ -171,7 +220,7 @@
             cover.drawLine({ start: { x: 422, y: y - 2 }, end: { x: pageWidth - margin, y: y - 2 }, thickness: 0.75, color: muted });
             y -= 72;
             const details = [
-                ['Questions', String(options.questions.length)],
+                ['Questions', String(options.targetCount || options.questions.length)],
                 ['Topics selected', String(options.topicCount)],
                 ['Question length', options.difficultyLabel]
             ];
@@ -189,17 +238,21 @@
 
         const included = [];
         const failed = [];
-        for (let index = 0; index < options.questions.length; index += 1) {
+        const targetCount = Math.max(1, Number(options.targetCount) || options.questions.length);
+        for (let index = 0; index < options.questions.length && included.length < targetCount; index += 1) {
             const question = options.questions[index];
-            options.onProgress?.(index, options.questions.length, question);
+            options.onProgress?.(included.length, targetCount, question);
             try {
                 const resolvedUrl = globalScope.resolveStudyIBContentUrl
                     ? globalScope.resolveStudyIBContentUrl(question.filepath)
                     : question.filepath;
                 const response = await fetch(resolvedUrl, { mode: 'cors', credentials: 'omit' });
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                const source = await PDFDocument.load(await response.arrayBuffer(), { ignoreEncryption: true, updateMetadata: false });
-                const pages = await output.copyPages(source, source.getPageIndices());
+                const sourceBytes = new Uint8Array(await response.arrayBuffer());
+                const source = await PDFDocument.load(sourceBytes.slice(), { ignoreEncryption: true, updateMetadata: false });
+                const usablePageIndices = await getUsablePageIndices(sourceBytes, source);
+                if (!usablePageIndices.length) throw new Error('Question contained only blank or footer-only crop fragments.');
+                const pages = await output.copyPages(source, usablePageIndices);
                 pages.forEach(page => output.addPage(page));
                 included.push({ ...question, outputPages: pages.length });
             } catch (error) {
@@ -232,7 +285,7 @@
             });
         }
 
-        options.onProgress?.(options.questions.length, options.questions.length, null);
+        options.onProgress?.(included.length, targetCount, null);
         const bytes = await output.save({ useObjectStreams: true });
         return { bytes, included, failed, pageCount: output.getPageCount() };
     }
@@ -243,6 +296,8 @@
         parsePageCount,
         estimateQuestionDifficulty,
         matchesDifficulty,
+        normalizeWorksheetPageText,
+        shouldKeepWorksheetPage,
         flattenSubjectData,
         selectRandomQuestions,
         createWorksheetPdf
@@ -261,13 +316,19 @@
         const titleInput = document.getElementById('worksheetTitle');
         const countInput = document.getElementById('worksheetQuestionCount');
         const countDisplay = document.getElementById('worksheetQuestionCountDisplay');
+        const countDownButton = document.getElementById('worksheetCountDown');
+        const countUpButton = document.getElementById('worksheetCountUp');
+        const countPresetButtons = [...document.querySelectorAll('.worksheet-count-presets [data-count]')];
         const difficultyInput = document.getElementById('worksheetDifficulty');
         const difficultyDisplay = document.getElementById('worksheetDifficultyDisplay');
+        const difficultyOptions = document.getElementById('worksheetDifficultyOptions');
         const topicsRoot = document.getElementById('worksheetTopics');
         const poolSummary = document.getElementById('worksheetPoolSummary');
         const selectAllButton = document.getElementById('worksheetSelectAll');
         const clearAllButton = document.getElementById('worksheetClearAll');
         const generateButton = document.getElementById('generateWorksheetBtn');
+        const generateLabel = document.getElementById('worksheetGenerateLabel');
+        const footerSummary = document.getElementById('worksheetFooterSummary');
         const status = document.getElementById('worksheetStatus');
         const statusText = document.getElementById('worksheetStatusText');
         const statusCount = document.getElementById('worksheetStatusCount');
@@ -305,13 +366,23 @@
         function updateSummary() {
             const selectedTopics = checkedTopicKeys();
             const pool = currentPool();
-            const requested = Math.min(Number(countInput.value), Math.max(1, pool.length));
-            countInput.max = String(Math.min(20, Math.max(1, pool.length)));
-            if (Number(countInput.value) > Number(countInput.max)) countInput.value = String(requested);
+            const maxCount = Math.min(20, Math.max(1, pool.length));
+            const requested = Math.max(1, Math.min(Number(countInput.value) || 1, maxCount));
+            countInput.max = String(maxCount);
+            countInput.value = String(requested);
             countDisplay.textContent = countInput.value;
             poolSummary.textContent = selectedTopics.size
                 ? `${selectedTopics.size} topic${selectedTopics.size === 1 ? '' : 's'} selected · ${pool.length.toLocaleString()} matching question${pool.length === 1 ? '' : 's'}`
                 : 'Select at least one topic.';
+            footerSummary.textContent = `${requested} question${requested === 1 ? '' : 's'} · ${selectedTopics.size} topic${selectedTopics.size === 1 ? '' : 's'}`;
+            countDownButton.disabled = requested <= 1;
+            countUpButton.disabled = requested >= maxCount;
+            countPresetButtons.forEach(button => {
+                const value = Number(button.dataset.count);
+                button.disabled = value > maxCount;
+                button.classList.toggle('active', value === requested);
+                button.setAttribute('aria-pressed', String(value === requested));
+            });
             generateButton.disabled = !selectedTopics.size || !pool.length;
         }
 
@@ -388,7 +459,28 @@
         });
         titleInput.addEventListener('input', () => { titleWasEdited = true; });
         countInput.addEventListener('input', updateSummary);
-        difficultyInput.addEventListener('input', () => {
+        countInput.addEventListener('change', updateSummary);
+        countDownButton.addEventListener('click', () => {
+            countInput.value = String(Math.max(1, Number(countInput.value) - 1));
+            updateSummary();
+        });
+        countUpButton.addEventListener('click', () => {
+            countInput.value = String(Math.min(Number(countInput.max), Number(countInput.value) + 1));
+            updateSummary();
+        });
+        countPresetButtons.forEach(button => button.addEventListener('click', () => {
+            countInput.value = button.dataset.count;
+            updateSummary();
+        }));
+        difficultyOptions.addEventListener('click', event => {
+            const button = event.target.closest('[data-difficulty]');
+            if (!button) return;
+            difficultyInput.value = button.dataset.difficulty;
+            difficultyOptions.querySelectorAll('[data-difficulty]').forEach(option => {
+                const active = option === button;
+                option.classList.toggle('active', active);
+                option.setAttribute('aria-pressed', String(active));
+            });
             difficultyDisplay.textContent = DIFFICULTY_LABELS[difficultyInput.value];
             clearPreviousResult();
             updateSummary();
@@ -411,13 +503,15 @@
         generateButton.addEventListener('click', async () => {
             const selectedTopics = checkedTopicKeys();
             const pool = currentPool();
-            const questions = selectRandomQuestions(pool, Number(countInput.value));
+            const targetCount = Number(countInput.value);
+            const backupCount = Math.max(4, Math.ceil(targetCount / 2));
+            const questions = selectRandomQuestions(pool, Math.min(pool.length, targetCount + backupCount));
             if (!selectedTopics.size || !questions.length) return;
 
             clearPreviousResult();
             isGenerating = true;
             generateButton.disabled = true;
-            generateButton.textContent = 'Generating…';
+            generateLabel.textContent = 'Generating…';
             status.classList.remove('hidden');
             status.classList.remove('error');
             statusText.textContent = 'Preparing original question pages…';
@@ -431,6 +525,7 @@
                     difficultyLabel: DIFFICULTY_LABELS[difficultyInput.value],
                     topicCount: selectedTopics.size,
                     questions,
+                    targetCount,
                     includeCover: coverCheckbox.checked,
                     includeSources: sourcesCheckbox.checked,
                     onProgress(completed, total, question) {
@@ -456,7 +551,8 @@
             } finally {
                 isGenerating = false;
                 generateButton.disabled = false;
-                generateButton.textContent = 'Generate another worksheet';
+                generateLabel.textContent = outputUrl ? 'Generate another' : 'Try again';
+                updateSummary();
             }
         });
 
