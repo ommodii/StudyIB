@@ -76,6 +76,7 @@
 [data-color="math_ai"] { --accent: #A855F7; --accent-light: rgba(168, 85, 247, 0.14); --accent-hover: #9333EA; --accent-glow: rgba(168, 85, 247, 0.25); --accent-solid: #A855F7; }
 [data-color="economics"] { --accent: #F43F5E; --accent-light: rgba(244, 63, 94, 0.14); --accent-hover: #E11D48; --accent-glow: rgba(244, 63, 94, 0.25); --accent-solid: #F43F5E; }
 [data-color="business"] { --accent: #8B5CF6; --accent-light: rgba(139, 92, 246, 0.14); --accent-hover: #7C3AED; --accent-glow: rgba(139, 92, 246, 0.25); --accent-solid: #8B5CF6; }
+[data-color="computer_science"] { --accent: #06B6D4; --accent-light: rgba(6, 182, 212, 0.14); --accent-hover: #0891B2; --accent-glow: rgba(6, 182, 212, 0.25); --accent-solid: #06B6D4; }
 
 [data-color="indigo"] { --accent: #6366F1; --accent-light: rgba(99, 102, 241, 0.14); --accent-hover: #4F46E5; --accent-glow: rgba(99, 102, 241, 0.25); --accent-solid: #6366F1; }
 [data-color="blue"] { --accent: #3B82F6; --accent-light: rgba(59, 130, 246, 0.14); --accent-hover: #2563EB; --accent-glow: rgba(59, 130, 246, 0.25); --accent-solid: #3B82F6; }
@@ -4458,6 +4459,7 @@ body:has(.modal-overlay:not(.hidden)) .workspace-top-nav {
 .math-ai-dot { background: var(--math-ai); }
 .economics-dot { background: var(--economics); }
 .business-dot { background: var(--business); }
+.computer-science-dot { background: var(--computer-science); }
 .chem-dot { background: var(--chemistry); }
 .biology-dot { background: var(--biology); }
 .math-dot { background: var(--math); }
@@ -4721,6 +4723,12 @@ body:has(.modal-overlay:not(.hidden)) .workspace-top-nav {
     color: var(--business);
     border-color: color-mix(in srgb, var(--business) 30%, transparent);
     background: color-mix(in srgb, var(--business) 12%, transparent);
+}
+
+.dashboard-subject-graphic.computer_science {
+    color: var(--computer-science);
+    border-color: color-mix(in srgb, var(--computer-science) 30%, transparent);
+    background: color-mix(in srgb, var(--computer-science) 12%, transparent);
 }
 
 .dashboard-subject-graphic .workspace-nav-icon {

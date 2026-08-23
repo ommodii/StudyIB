@@ -8,7 +8,8 @@
         math: 'Mathematics AA HL',
         math_ai: 'Mathematics AI HL',
         economics: 'Economics HL',
-        business: 'Business Management HL'
+        business: 'Business Management HL',
+        computer_science: 'Computer Science HL'
     };
 
     const DIFFICULTY_LABELS = {

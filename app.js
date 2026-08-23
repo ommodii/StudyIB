@@ -176,6 +176,14 @@ document.addEventListener('DOMContentLoaded', () => {
             syllabus: () => topicQuestionSyllabusData.business,
             papers: () => additionalSubjectFullPapersData.business,
             practice: () => topicQuestionPracticeData.business
+        },
+        computer_science: {
+            label: 'Computer Science HL',
+            icon: 'computer_science',
+            sidebarId: 'sidebarSubComputerScience',
+            syllabus: () => topicQuestionSyllabusData.computer_science,
+            papers: () => additionalSubjectFullPapersData.computer_science,
+            practice: () => topicQuestionPracticeData.computer_science
         }
     };
 
@@ -1223,6 +1231,7 @@ document.addEventListener('DOMContentLoaded', () => {
             math_ai: '<path d="M4 19V5"></path><path d="M4 19h16"></path><path d="m7 15 4-5 3 2 4-6"></path><circle cx="7" cy="15" r="1"></circle><circle cx="11" cy="10" r="1"></circle><circle cx="14" cy="12" r="1"></circle><circle cx="18" cy="6" r="1"></circle>',
             economics: '<path d="M4 19V5"></path><path d="M4 19h16"></path><path d="m7 15 3-3 3 2 5-7"></path><path d="M15 7h3v3"></path>',
             business: '<rect x="3" y="7" width="18" height="13" rx="2"></rect><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><path d="M3 12h18"></path><path d="M10 12v2h4v-2"></path>',
+            computer_science: '<rect x="5" y="5" width="14" height="14" rx="2"></rect><path d="M9 9h6v6H9z"></path><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"></path>',
             syllabus: '<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H11v17H6.5A2.5 2.5 0 0 0 4 22z"></path><path d="M20 5.5A2.5 2.5 0 0 0 17.5 3H13v17h4.5A2.5 2.5 0 0 1 20 22z"></path>',
             topics: '<path d="m12 2 9 5-9 5-9-5z"></path><path d="m3 12 9 5 9-5"></path><path d="m3 17 9 5 9-5"></path>',
             papers: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path><path d="M8 13h8M8 17h8"></path>',
@@ -1966,6 +1975,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 P1: { title: 'Paper 1 — Case study', meta: 'Case study' },
                 P2: { title: 'Paper 2 — Business contexts', meta: 'Business contexts' },
                 P3: { title: 'Paper 3 — Social enterprise', meta: 'Social enterprise' },
+                UNKNOWN: unknown
+            };
+        }
+        if (subjectId === 'computer_science') {
+            return {
+                P1: { title: 'Paper 1 — Core and HL extension', meta: 'Core and HL extension' },
+                P2: { title: 'Paper 2 — Option', meta: 'Option paper' },
+                P3: { title: 'Paper 3 — Case study', meta: 'Case study' },
                 UNKNOWN: unknown
             };
         }

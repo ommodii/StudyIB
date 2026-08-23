@@ -60,6 +60,57 @@ def _taxonomy_key(subject: str, course: str) -> tuple[str, str]:
     return subject, course if subject == "mathematics" else "NONE"
 
 
+def _classification_scope(question: QuestionRecord) -> set[str] | None:
+    """Use the legacy Computer Science option layout as a deterministic hint.
+
+    The 2014-2026 Paper 2 always grouped questions by option: databases,
+    modelling/simulation, web science, then OOP. Restricting candidate topics
+    prevents generic words such as "class", "model", and "table" from sending
+    an otherwise clear option question to the wrong current-curriculum theme.
+    """
+    if question.subject != "computer_science" or question.paper != "P2":
+        return None
+    digits = "".join(character for character in question.question_number if character.isdigit())
+    if not digits:
+        return None
+    number = int(digits)
+    if 1 <= number <= 4:
+        return {"CS A.3"}
+    if 5 <= number <= 8:
+        return {"CS B.1", "CS A.4"}
+    if 9 <= number <= 12:
+        return {"CS A.2"}
+    if 13 <= number <= 17:
+        return {"CS B.2", "CS B.3", "CS B.4"}
+    return None
+
+
+def _apply_computer_science_option_fallback(question: QuestionRecord) -> None:
+    """Map a vocabulary-light legacy Paper 2 question by its official option."""
+    if question.subject != "computer_science" or question.paper != "P2" or question.primary_topic:
+        return
+    digits = "".join(character for character in question.question_number if character.isdigit())
+    if not digits:
+        return
+    number = int(digits)
+    fallback = (
+        "CS A.3" if 1 <= number <= 4 else
+        "CS B.1" if 5 <= number <= 8 else
+        "CS A.2" if 9 <= number <= 12 else
+        "CS B.3" if 13 <= number <= 17 else
+        None
+    )
+    if not fallback:
+        return
+    question.primary_topic = fallback
+    question.secondary_topics = []
+    question.confidence = 0.85
+    question.classification_method = "legacy_option_structure"
+    question.rationale = f"Mapped from the official 2014-2026 Paper 2 option block to {fallback}."
+    question.review_required = False
+    question.status = "included"
+
+
 def _load_taxonomies(options: PipelineOptions) -> dict[tuple[str, str], Taxonomy]:
     config_dir = options.repo_root / "config" / "curricula"
     taxonomies: dict[tuple[str, str], Taxonomy] = {}
@@ -253,7 +304,14 @@ def run_pipeline(options: PipelineOptions) -> dict[str, Any]:
             except (json.JSONDecodeError, OSError):
                 cache_used = False
         if not cache_used:
-            classify_question(question, taxonomy, options.confidence_threshold, manual_overrides)
+            classify_question(
+                question,
+                taxonomy,
+                options.confidence_threshold,
+                manual_overrides,
+                allowed_codes=_classification_scope(question),
+            )
+            _apply_computer_science_option_fallback(question)
             if not overridden:
                 _cache_classification(cache_path, question)
         logger.emit("classification", question.status, question.rationale, question.source_path, question.question_id)

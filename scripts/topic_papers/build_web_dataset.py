@@ -16,9 +16,10 @@ SUBJECT_IDS = {
     "mathematics": "math",
     "business": "business",
     "economics": "economics",
+    "computer_science": "computer_science",
 }
 
-WEB_SUBJECTS = ("physics", "chemistry", "biology", "math", "math_ai", "business", "economics")
+WEB_SUBJECTS = ("physics", "chemistry", "biology", "math", "math_ai", "business", "economics", "computer_science")
 
 
 def _web_subject(corpus_subject: str, course: str | None) -> str:
@@ -174,6 +175,7 @@ def build(
         "math_ai": "mathematics_ai.json",
         "business": "business.json",
         "economics": "economics.json",
+        "computer_science": "computer_science.json",
     }
     for web_subject, filename in taxonomy_files.items():
         if not syllabus[web_subject]:
@@ -214,7 +216,7 @@ def build(
             for subtopic, papers in subtopics.items():
                 questions = practice.get(subject, {}).get(category, {}).get(subtopic, [])
                 question_total += len(questions)
-                code_match = re.match(r"^((?:AA|AI|BM|ECON) \d+\.\d+|[A-E]\d*\.\d+|(?:Structure|Reactivity) \d+\.\d+)", subtopic)
+                code_match = re.match(r"^((?:AA|AI|BM|ECON|CS [AB]) \d+\.\d+|[A-E]\d*\.\d+|(?:Structure|Reactivity) \d+\.\d+)", subtopic)
                 code = code_match.group(1) if code_match else subtopic
                 title = subtopic[len(code):].strip() or code
                 topic_catalog.append({

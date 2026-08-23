@@ -260,10 +260,52 @@ def economics() -> dict:
     return {"subject": "economics", "course": None, "curriculum_version": "DP Economics, first assessment 2022 with legacy mapping from the 2013 course", "first_assessment": 2022, "sources": [{"title": "IB Economics subject brief", "url": "https://www.ibo.org/globalassets/new-structure/programmes/dp/pdfs/hl-economics-en.pdf"}], "topics": topics}
 
 
+def computer_science() -> dict:
+    groups = {
+        "A. Concepts of computer science": [
+            ("A.1", "Computer fundamentals", "computer architecture|computer organization|computer organisation|cpu|central processing unit|processor|register|memory address register|memory data register|program counter|instruction register|cache memory|ram|rom|primary memory|secondary storage|binary|hexadecimal|logic gate|truth table|operating system|system software|utility software|compiler|interpreter|interrupt|scheduling|paging|virtual memory|distributed system|embedded system|human computer interaction|usability|system fundamentals|planning a new computing system|planning a new system|system development life cycle|system life cycle|feasibility study|requirements specification|data collection method|observation|interview|questionnaire|changeover|direct changeover|parallel running|user training|colour representation|color representation|colour can be represented|color can be represented|polling|sensor|control system|integrated system|autonomous agent|autonomous agents|social implication|ethical implication"),
+            ("A.2", "Networks", "computer network|network topology|local area network|wide area network|lan|wan|router|switch|packet|protocol|tcp|ip address|mac address|domain name system|dns|client server|peer to peer|p2p|wireless network|encryption|firewall|network security|internet|world wide web|network fundamentals|cloud computing|cyber security|cybersecurity|computer security|data security|security concern|security measure|threat landscape|whitelisting|zero-day|man-in-the-middle|cyber-criminal|malware|computer virus|phishing|authentication|authorization|authorisation|access control|bring your own device|byod|social networking|intellectual property|web|search engine|web crawler|page ranking|hits algorithm|compression technique|distributed systems|virtual private network|vpn|global positioning system|gps|voice over ip|voip|osi model|near field communication|nfc|radio frequency identification|rfid|interoperability|qr code"),
+            ("A.3", "Databases", "database|database management system|dbms|relational database|table|record|field|primary key|foreign key|candidate key|normalization|normalisation|first normal form|second normal form|third normal form|sql|structured query language|entity relationship diagram|data redundancy|data integrity|transaction|query|schema|data warehouse|data warehousing|etl process|extract transform load|data mining|association rule|deviation detection"),
+            ("A.4", "Machine learning", "machine learning|artificial intelligence|neural network|training data|supervised learning|unsupervised learning|reinforcement learning|classification model|regression model|bias in data|overfitting|underfitting|feature extraction|inference model"),
+        ],
+        "B. Computational thinking and problem-solving": [
+            ("B.1", "Computational thinking", "computational thinking|decomposition|abstraction|pattern recognition|algorithmic thinking|flowchart|pseudocode|trace table|dry run|algorithm|linear search|binary search|bubble sort|selection sort|insertion sort|efficiency|complexity|big o|recursion|recursive|decision table|state transition|modelling|modeling|simulation|visualization|visualisation|rendering|wire frame|wireframe|computer-aided design|computer aided design|cad|3d view|2d view|graphics"),
+            ("B.2", "Programming", "programming|program code|source code|computer language|programming language|variable|constant|assignment|selection|iteration|loop|while loop|for loop|array|two dimensional array|string|subprogram|procedure|function|parameter|return value|scope|exception|file handling|testing|test data|debugging|syntax error|logic error|runtime error|java|python"),
+            ("B.3", "Object-oriented programming (OOP)", "object oriented|object-oriented|oop|class|object|instance|attribute|method|constructor|encapsulation|inheritance|polymorphism|aggregation|association|dependency|uml|unified modeling language|unified modelling language|public method|private method|static method"),
+            ("B.4", "Abstract data types", "abstract data type|adt|stack|queue|linked list|binary tree|binary search tree|tree traversal|graph|hash table|heap|node|pointer|push|pop|enqueue|dequeue|fifo|lifo|inorder|preorder|postorder|data structure|dynamic data structure"),
+        ],
+    }
+    topics = [
+        topic(f"CS {code}", title, parent, ["SL", "HL"] if code != "B.4" else ["HL"], terms)
+        for parent, rows in groups.items()
+        for code, title, terms in rows
+    ]
+    exclusions = {
+        "CS A.1": ["primary key", "foreign key", "machine learning"],
+        "CS A.2": ["neural network"],
+        "CS B.2": ["object oriented", "object-oriented", "abstract data type"],
+        "CS B.3": ["database object", "linked list", "stack", "queue", "binary tree", "web graph", "semantic web", "folksonomy"],
+    }
+    for item in topics:
+        item["exclusions"] = exclusions.get(item["code"], [])
+    return {
+        "subject": "computer_science",
+        "course": None,
+        "curriculum_version": "DP Computer science, first assessment 2027 with legacy mapping from the 2014 course",
+        "first_assessment": 2027,
+        "sources": [{
+            "title": "IB Computer science subject brief",
+            "url": "https://www.ibo.org/globalassets/new-structure/university-admission/pdfs/dp_comp_sci_subjectbrief_en.pdf",
+        }],
+        "topics": topics,
+    }
+
+
 def main() -> None:
     write("mathematics_ai.json", math_ai())
     write("business.json", business())
     write("economics.json", economics())
+    write("computer_science.json", computer_science())
 
 
 if __name__ == "__main__":

@@ -110,6 +110,7 @@
     --math-ai: #c084fc;
     --economics: #fb7185;
     --business: #a78bfa;
+    --computer-science: #22d3ee;
     --document-background: #ffffff;
 
     --duration-fast: 120ms;
@@ -213,6 +214,7 @@
     --math-ai: #7e22ce;
     --economics: #be123c;
     --business: #6d28d9;
+    --computer-science: #0e7490;
 
     --bg-main: var(--background);
     --bg-sidebar: var(--sidebar);

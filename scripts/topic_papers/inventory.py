@@ -17,6 +17,7 @@ SOURCE_ROOTS = {
     "mathematics": Path("Content/IB_Math"),
     "business": Path("Content/Business_management_HL"),
     "economics": Path("Content/Economics_HL"),
+    "computer_science": Path("Content/Computer_science_HL"),
 }
 
 SESSION_RE = re.compile(r"(?P<year>\d{4})\s+(?P<session>May|November)\s+Examination\s+Session", re.I)

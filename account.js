@@ -13,7 +13,8 @@
         math: 'Mathematics AA',
         math_ai: 'Mathematics AI',
         economics: 'Economics',
-        business: 'Business Management'
+        business: 'Business Management',
+        computer_science: 'Computer Science'
     };
 
     const escapeHtml = value => String(value == null ? '' : value)

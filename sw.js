@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'studyib-shell-v13';
+const CACHE_VERSION = 'studyib-shell-v14';
 const APP_SHELL = [
     '/',
     '/index.html',
@@ -8,7 +8,7 @@ const APP_SHELL = [
     '/styles/base.css?v=1.1.0',
     '/styles/components.css?v=1.1.0',
     '/styles/atom-components.css?v=1.1.0',
-    '/worksheet_generator.js?v=1.1.0',
+    '/worksheet_generator.js?v=1.2.0',
     '/vendor/pdf-lib.min.js?v=1.17.1',
     '/manifest.webmanifest',
     '/assets/icons/studyib-icon.svg?v=2',

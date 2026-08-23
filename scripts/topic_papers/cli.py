@@ -14,12 +14,14 @@ SUBJECT_ALIASES = {
     "mathematics": "mathematics",
     "business": "business",
     "economics": "economics",
+    "computer-science": "computer_science",
+    "computer_science": "computer_science",
 }
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Build local, reviewable IB topic-paper PDFs.")
-    parser.add_argument("--subject", choices=["chemistry", "physics", "biology", "math", "business", "economics", "all"], default="all")
+    parser.add_argument("--subject", choices=["chemistry", "physics", "biology", "math", "business", "economics", "computer-science", "computer_science", "all"], default="all")
     parser.add_argument("--course", choices=["aa", "ai"], help="Required to disambiguate Math fixture/legacy sources.")
     parser.add_argument("--source-dir", type=Path, help="Optional controlled source directory for a sample run.")
     parser.add_argument("--output-dir", type=Path, default=Path("output/local_topic_papers"))

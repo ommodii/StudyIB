@@ -25,6 +25,12 @@ const SUBJECTS = {
         label: 'Math AI HL',
         minYear: 2021,
         maxYear: 2022
+    },
+    computer_science: {
+        source: 'Computer_science_HL',
+        label: 'Computer Science HL',
+        minYear: 2014,
+        maxYear: 2022
     }
 };
 
@@ -170,8 +176,8 @@ const metadata = {
 const js = [
     `const additionalSubjectPaperMetadata = ${JSON.stringify(metadata)};`,
     `const additionalSubjectFullPapersData = ${JSON.stringify(fullPapers)};`,
-    'const additionalSubjectSyllabusData = { business: {}, economics: {}, math_ai: {} };',
-    'const additionalSubjectPracticeData = { business: {}, economics: {}, math_ai: {} };',
+    `const additionalSubjectSyllabusData = ${JSON.stringify(Object.fromEntries(Object.keys(SUBJECTS).map(subject => [subject, {}])))};`,
+    `const additionalSubjectPracticeData = ${JSON.stringify(Object.fromEntries(Object.keys(SUBJECTS).map(subject => [subject, {}])))};`,
     ''
 ].join('\n');
 
@@ -185,6 +191,17 @@ fs.writeFileSync(path.join(OUTPUT_DIR, 'upload_manifest.json'), JSON.stringify({
     total_bytes: uploadFiles.reduce((sum, file) => sum + file.size, 0),
     files: uploadFiles
 }, null, 2));
+for (const subjectId of Object.keys(SUBJECTS)) {
+    const subjectFiles = uploadFiles.filter(file => file.object_key.includes(`/${subjectId}/`));
+    fs.writeFileSync(path.join(OUTPUT_DIR, `upload_manifest.${subjectId}.json`), JSON.stringify({
+        version: VERSION,
+        prefix: `${PREFIX}/${subjectId}`,
+        bucket: 'studyib-content',
+        object_count: subjectFiles.length,
+        total_bytes: subjectFiles.reduce((sum, file) => sum + file.size, 0),
+        files: subjectFiles
+    }, null, 2));
+}
 fs.writeFileSync(path.join(OUTPUT_DIR, 'audit.json'), JSON.stringify(metadata, null, 2));
 
 console.log(JSON.stringify({

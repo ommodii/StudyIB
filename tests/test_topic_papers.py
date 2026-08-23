@@ -27,7 +27,7 @@ from scripts.topic_papers.inventory import inventory_sources, parse_paper_metada
 from scripts.topic_papers.local_guard import LocalOnlyViolation, assert_local_only, assert_safe_process
 from scripts.topic_papers.models import PageRegion, QuestionRecord
 from scripts.topic_papers.pdf_extract import Boundary, build_regions, detect_question_boundaries, extract_questions, stable_question_id
-from scripts.topic_papers.pipeline import PipelineOptions, run_pipeline
+from scripts.topic_papers.pipeline import PipelineOptions, _apply_computer_science_option_fallback, _classification_scope, run_pipeline
 from scripts.topic_papers.production import classify_with_priors, math_source_candidates, page_fingerprint, topic_priors
 from scripts.topic_papers.reporting import write_reports
 from scripts.topic_papers.taxonomy import load_taxonomy, validate_taxonomy
@@ -264,7 +264,7 @@ class BoundaryTests(unittest.TestCase):
 
 class TaxonomyAndClassificationTests(unittest.TestCase):
     def test_all_taxonomies_validate(self) -> None:
-        for filename in ("chemistry.json", "physics.json", "biology.json", "mathematics_aa.json", "mathematics_ai.json", "business.json", "economics.json"):
+        for filename in ("chemistry.json", "physics.json", "biology.json", "mathematics_aa.json", "mathematics_ai.json", "business.json", "economics.json", "computer_science.json"):
             data = json.loads((REPO_ROOT / "config" / "curricula" / filename).read_text(encoding="utf-8"))
             self.assertEqual(validate_taxonomy(data), [], filename)
 
@@ -334,6 +334,34 @@ class TaxonomyAndClassificationTests(unittest.TestCase):
         self.assertEqual(len(taxonomy.topics), 78)
         self.assertEqual(taxonomy.topics[0]["code"], "AI 1.1")
         self.assertEqual(taxonomy.topics[-1]["code"], "AI 5.18")
+
+    def test_computer_science_taxonomy_uses_current_2027_topics(self) -> None:
+        taxonomy = load_taxonomy(REPO_ROOT / "config" / "curricula", "computer_science")
+        self.assertEqual([topic["code"] for topic in taxonomy.topics], [
+            "CS A.1", "CS A.2", "CS A.3", "CS A.4",
+            "CS B.1", "CS B.2", "CS B.3", "CS B.4",
+        ])
+
+    def test_legacy_computer_science_paper_two_options_scope_current_topics(self) -> None:
+        question = make_question("cs_option_database", "database normalization and primary keys")
+        question.subject = "computer_science"
+        question.paper = "P2"
+        question.question_number = "2"
+        self.assertEqual(_classification_scope(question), {"CS A.3"})
+        question.question_number = "10"
+        self.assertEqual(_classification_scope(question), {"CS A.2"})
+        question.question_number = "15"
+        self.assertEqual(_classification_scope(question), {"CS B.2", "CS B.3", "CS B.4"})
+
+    def test_legacy_computer_science_option_fallback_is_deterministic(self) -> None:
+        question = make_question("cs_option_web", "A context-only legacy option question")
+        question.subject = "computer_science"
+        question.paper = "P2"
+        question.question_number = "10"
+        _apply_computer_science_option_fallback(question)
+        self.assertEqual(question.primary_topic, "CS A.2")
+        self.assertEqual(question.status, "included")
+        self.assertFalse(question.review_required)
 
     def test_manual_override_can_resolve_false_duplicate_candidate(self) -> None:
         taxonomy = load_taxonomy(REPO_ROOT / "config" / "curricula", "mathematics", "aa")
