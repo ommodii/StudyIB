@@ -76,10 +76,11 @@ def build(
     version: str,
     js_output: Path,
     base_js: Path | None = None,
+    paper_manifest: Path | None = None,
 ) -> dict[str, Any]:
     prefix = f"Content/TopicQuestionBank/{version}"
     paper_lookup: dict[str, str] = {}
-    paper_manifest = repo_root / "output" / "additional_subjects" / "web" / "upload_manifest.json"
+    paper_manifest = paper_manifest or repo_root / "output" / "additional_subjects" / "web" / "upload_manifest.json"
     if paper_manifest.exists():
         paper_payload = json.loads(paper_manifest.read_text(encoding="utf-8"))
         paper_lookup = {
@@ -205,9 +206,28 @@ def build(
     if base_js:
         _, base_syllabus, base_practice = _load_data_js(base_js)
         for subject in WEB_SUBJECTS:
-            if not syllabus[subject]:
-                syllabus[subject] = base_syllabus.get(subject, {})
-                practice[subject] = base_practice.get(subject, {})
+            generated_syllabus = syllabus[subject]
+            generated_practice = practice[subject]
+            merged_syllabus = json.loads(json.dumps(base_syllabus.get(subject, {})))
+            merged_practice = json.loads(json.dumps(base_practice.get(subject, {})))
+            for category, subtopics in generated_syllabus.items():
+                merged_syllabus.setdefault(category, {})
+                merged_practice.setdefault(category, {})
+                for subtopic, papers in subtopics.items():
+                    if papers:
+                        merged_syllabus[category][subtopic] = papers
+                    else:
+                        merged_syllabus[category].setdefault(subtopic, [])
+                    existing = merged_practice[category].get(subtopic, [])
+                    additions = generated_practice.get(category, {}).get(subtopic, [])
+                    by_path = {
+                        question.get("filepath"): question
+                        for question in [*existing, *additions]
+                        if question.get("filepath")
+                    }
+                    merged_practice[category][subtopic] = list(by_path.values())
+            syllabus[subject] = merged_syllabus
+            practice[subject] = merged_practice
 
     topic_catalog = []
     question_total = 0
@@ -279,6 +299,7 @@ def main() -> int:
     parser.add_argument("--version", default="2026-07-28-v1")
     parser.add_argument("--js-output", type=Path, default=Path("topic_question_data.js"))
     parser.add_argument("--base-js", type=Path)
+    parser.add_argument("--paper-manifest", type=Path)
     args = parser.parse_args()
     repo_root = Path(__file__).resolve().parents[2]
     corpus_root = args.corpus_root if args.corpus_root.is_absolute() else repo_root / args.corpus_root
@@ -286,7 +307,17 @@ def main() -> int:
     base_js = None
     if args.base_js:
         base_js = args.base_js if args.base_js.is_absolute() else repo_root / args.base_js
-    result = build(repo_root, corpus_root.resolve(), args.version, js_output.resolve(), base_js.resolve() if base_js else None)
+    paper_manifest = None
+    if args.paper_manifest:
+        paper_manifest = args.paper_manifest if args.paper_manifest.is_absolute() else repo_root / args.paper_manifest
+    result = build(
+        repo_root,
+        corpus_root.resolve(),
+        args.version,
+        js_output.resolve(),
+        base_js.resolve() if base_js else None,
+        paper_manifest.resolve() if paper_manifest else None,
+    )
     print(json.dumps(result, indent=2))
     return 0
 

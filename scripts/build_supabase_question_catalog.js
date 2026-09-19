@@ -11,6 +11,9 @@ const practiceData = vm.runInContext('topicQuestionPracticeData', context);
 const metadata = vm.runInContext('topicQuestionBankMetadata', context);
 const subjectArgIndex = process.argv.indexOf('--subject');
 const subjectFilter = subjectArgIndex >= 0 ? process.argv[subjectArgIndex + 1] : null;
+const prefixArgIndex = process.argv.indexOf('--path-prefix');
+const pathPrefix = prefixArgIndex >= 0 ? process.argv[prefixArgIndex + 1] : null;
+const keepExisting = process.argv.includes('--keep-existing');
 
 const records = new Map();
 for (const [subject, categories] of Object.entries(practiceData || {})) {
@@ -20,6 +23,7 @@ for (const [subject, categories] of Object.entries(practiceData || {})) {
             for (const question of questions || []) {
                 const questionId = question.filepath || question.qp_path;
                 if (!questionId) continue;
+                if (pathPrefix && !questionId.startsWith(pathPrefix)) continue;
                 records.set(questionId, {
                     question_id: questionId,
                     dataset_version: metadata.version,
@@ -38,7 +42,7 @@ const all = [...records.values()].sort((a, b) => a.question_id.localeCompare(b.q
 // Keep each statement below MCP/query transport limits.
 const batchSize = 60;
 const quote = value => `'${String(value).replace(/'/g, "''")}'`;
-if (subjectFilter) {
+if (subjectFilter && !keepExisting) {
     fs.writeFileSync(
         path.join(outputDir, 'deactivate_previous.sql'),
         `update public.question_catalog set active=false where subject=${quote(subjectFilter)} and dataset_version<>${quote(metadata.version)};\n`
@@ -51,5 +55,5 @@ for (let offset = 0; offset < all.length; offset += batchSize) {
     fs.writeFileSync(path.join(outputDir, `batch_${String(offset / batchSize + 1).padStart(3, '0')}.sql`), sql);
 }
 
-fs.writeFileSync(path.join(outputDir, 'summary.json'), JSON.stringify({ dataset_version: metadata.version, question_count: all.length, batch_count: Math.ceil(all.length / batchSize) }, null, 2));
-console.log(JSON.stringify({ dataset_version: metadata.version, subject: subjectFilter || 'all', question_count: all.length, batch_count: Math.ceil(all.length / batchSize), output_dir: outputDir }));
+fs.writeFileSync(path.join(outputDir, 'summary.json'), JSON.stringify({ dataset_version: metadata.version, subject: subjectFilter || 'all', path_prefix: pathPrefix, keep_existing: keepExisting, question_count: all.length, batch_count: Math.ceil(all.length / batchSize) }, null, 2));
+console.log(JSON.stringify({ dataset_version: metadata.version, subject: subjectFilter || 'all', path_prefix: pathPrefix, keep_existing: keepExisting, question_count: all.length, batch_count: Math.ceil(all.length / batchSize), output_dir: outputDir }));

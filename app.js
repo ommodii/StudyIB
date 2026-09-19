@@ -120,13 +120,26 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     let activeDailyChallengeFile = null;
 
+    const mergeFullPaperData = (base, additions) => {
+        const merged = { ...(base || {}) };
+        Object.entries(additions || {}).forEach(([year, sessions]) => {
+            merged[year] = { ...(merged[year] || {}) };
+            Object.entries(sessions || {}).forEach(([session, entries]) => {
+                const combined = [...(merged[year][session] || []), ...(entries || [])];
+                const unique = new Map(combined.map(entry => [entry.qp_path, entry]));
+                merged[year][session] = [...unique.values()];
+            });
+        });
+        return merged;
+    };
+
     const subjectConfigs = {
         physics: {
             label: 'Physics HL',
             icon: 'physics',
             sidebarId: 'sidebarSubPhysics',
             syllabus: () => topicQuestionSyllabusData.physics,
-            papers: () => fullPapersData,
+            papers: () => mergeFullPaperData(fullPapersData, newPaperFullPapersData.physics),
             practice: () => topicQuestionPracticeData.physics
         },
         chemistry: {
@@ -134,7 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
             icon: 'chemistry',
             sidebarId: 'sidebarSubChem',
             syllabus: () => topicQuestionSyllabusData.chemistry,
-            papers: () => chemistryFullPapersData,
+            papers: () => mergeFullPaperData(chemistryFullPapersData, newPaperFullPapersData.chemistry),
             practice: () => topicQuestionPracticeData.chemistry
         },
         biology: {
@@ -142,7 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
             icon: 'biology',
             sidebarId: 'sidebarSubBiology',
             syllabus: () => topicQuestionSyllabusData.biology,
-            papers: () => biologyFullPapersData,
+            papers: () => mergeFullPaperData(biologyFullPapersData, newPaperFullPapersData.biology),
             practice: () => topicQuestionPracticeData.biology
         },
         math: {
@@ -150,7 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
             icon: 'math',
             sidebarId: 'sidebarSubMath',
             syllabus: () => topicQuestionSyllabusData.math,
-            papers: () => mathFullPapersData,
+            papers: () => mergeFullPaperData(mathFullPapersData, newPaperFullPapersData.math),
             practice: () => topicQuestionPracticeData.math
         },
         math_ai: {
@@ -158,7 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
             icon: 'math_ai',
             sidebarId: 'sidebarSubMathAi',
             syllabus: () => topicQuestionSyllabusData.math_ai,
-            papers: () => additionalSubjectFullPapersData.math_ai,
+            papers: () => mergeFullPaperData(additionalSubjectFullPapersData.math_ai, newPaperFullPapersData.math_ai),
             practice: () => topicQuestionPracticeData.math_ai
         },
         economics: {
@@ -166,7 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
             icon: 'economics',
             sidebarId: 'sidebarSubEconomics',
             syllabus: () => topicQuestionSyllabusData.economics,
-            papers: () => additionalSubjectFullPapersData.economics,
+            papers: () => mergeFullPaperData(additionalSubjectFullPapersData.economics, newPaperFullPapersData.economics),
             practice: () => topicQuestionPracticeData.economics
         },
         business: {
@@ -174,7 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
             icon: 'business',
             sidebarId: 'sidebarSubBusiness',
             syllabus: () => topicQuestionSyllabusData.business,
-            papers: () => additionalSubjectFullPapersData.business,
+            papers: () => mergeFullPaperData(additionalSubjectFullPapersData.business, newPaperFullPapersData.business),
             practice: () => topicQuestionPracticeData.business
         },
         computer_science: {
@@ -182,7 +195,7 @@ document.addEventListener('DOMContentLoaded', () => {
             icon: 'computer_science',
             sidebarId: 'sidebarSubComputerScience',
             syllabus: () => topicQuestionSyllabusData.computer_science,
-            papers: () => additionalSubjectFullPapersData.computer_science,
+            papers: () => mergeFullPaperData(additionalSubjectFullPapersData.computer_science, newPaperFullPapersData.computer_science),
             practice: () => topicQuestionPracticeData.computer_science
         }
     };

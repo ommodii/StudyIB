@@ -20,10 +20,13 @@ SOURCE_ROOTS = {
     "computer_science": Path("Content/Computer_science_HL"),
 }
 
-SESSION_RE = re.compile(r"(?P<year>\d{4})\s+(?P<session>May|November)\s+Examination\s+Session", re.I)
-PAPER_RE = re.compile(r"(?:^|_)paper[_\s-]*(?P<paper>\d+|[A-Za-z]+)(?:_|\.|$)", re.I)
-TZ_RE = re.compile(r"(?:^|[_\s-])TZ(?P<tz>\d+)(?:[_\s.-]|$)", re.I)
-LEVEL_RE = re.compile(r"(?:^|[_\s-])(?P<level>HL|SL)(?:[_\s.-]|$)", re.I)
+SESSION_RES = (
+    re.compile(r"(?P<year>\d{4})\s+(?P<session>May|November)\s+Examination\s+Session", re.I),
+    re.compile(r"(?P<session>May|November)\s+(?P<year>\d{4})\s+Examination\s+Session", re.I),
+)
+PAPER_RE = re.compile(r"(?:^|_)paper[_\s-]*(?P<paper>\d+[A-Za-z]?|[A-Za-z]+)(?:_|\.|$)", re.I)
+TZ_RE = re.compile(r"(?:^|[_\s-])TZ(?P<tz>[0-9A-C]+)(?:[_\s.-]|$)", re.I)
+LEVEL_RE = re.compile(r"(?:^|[_\s-])(?P<level>HL|SL|HLSL|SLHL)(?:[_\s.-]|$)", re.I)
 LANGUAGES = {"french": "FR", "spanish": "ES", "german": "DE"}
 
 
@@ -37,9 +40,10 @@ def sha256_file(path: Path, chunk_size: int = 1024 * 1024) -> str:
 
 def _session_metadata(path: Path) -> tuple[int | None, str]:
     for part in reversed(path.parts):
-        match = SESSION_RE.search(part)
-        if match:
-            return int(match.group("year")), match.group("session").title()
+        for pattern in SESSION_RES:
+            match = pattern.search(part)
+            if match:
+                return int(match.group("year")), match.group("session").title()
     year_match = re.search(r"(?:19|20)\d{2}", path.name)
     year = int(year_match.group()) if year_match else None
     session_match = re.search(r"\b(May|November)\b", path.name, re.I)
@@ -79,7 +83,8 @@ def parse_paper_metadata(path: Path, subject: str) -> PaperRecord:
         year=year,
         session=session,
         timezone=f"TZ{timezone_match.group('tz')}" if timezone_match else "UNKNOWN",
-        level=level_match.group("level").upper() if level_match else "UNKNOWN",
+        level=("HL" if level_match and level_match.group("level").upper() in {"HLSL", "SLHL"}
+               else level_match.group("level").upper() if level_match else "UNKNOWN"),
         paper=f"P{paper_match.group('paper').upper()}" if paper_match else "UNKNOWN",
         role=role,
         language=language,

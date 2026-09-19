@@ -63,6 +63,12 @@ class InventoryTests(unittest.TestCase):
         self.assertEqual((record.year, record.session, record.timezone), (2022, "May", "TZ2"))
         self.assertEqual((record.level, record.paper, record.role, record.course), ("HL", "P2", "markscheme", "aa"))
 
+    def test_current_science_split_paper_metadata_parsing(self) -> None:
+        path = Path("May 2025 Examination Session/Physics_paper_1A_TZ2_HLSL_markscheme.pdf")
+        record = parse_paper_metadata(path, "physics")
+        self.assertEqual((record.year, record.session, record.timezone), (2025, "May", "TZ2"))
+        self.assertEqual((record.level, record.paper, record.role), ("HL", "P1A", "markscheme"))
+
     def test_unknown_legacy_math_course_is_preserved(self) -> None:
         record = parse_paper_metadata(Path("2005 November Examination Session/Mathematics_paper_1_HL.pdf"), "mathematics")
         self.assertEqual(record.course, "UNKNOWN")
